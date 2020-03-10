@@ -1,0 +1,43 @@
+SDL
+OpenGL
+
+imgui
+assimp
+
+glad or GLEW
+
+  engine
+     |
+  _imgui
+  |    |
+ SDL OpenGL 
+
+
+./engine <project folder>
+
+//Cache (imported assets with same directory structure) *** Later
+Assets (any asset you want) 
+	What'll we do with these? Load into memory, that's what assimp does, no cooking yet
+	Import files by extension with Assimp into memory (save their paths, etc)
+	Some files you'll be able to change (txt, glsl, etc...)
+	
+
+File Manager
+	Expandable File List of Project Folder
+
+Shader Editor
+	Save Button + Edit Text
+
+Main View
+	Camera can (Select(LMouseClick), Pan(Alt+MMouse), Rotate(Alt+LMouse), Focus(F))
+	
+	Translate Arrows
+	Rotate Arrows
+	Scale Arrows
+
+Inspector
+	Shows Components of an Object
+	Components
+		Transform
+		Shaders
+	
