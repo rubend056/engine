@@ -20,19 +20,24 @@ include_directories(
 	libs/include/menus
 )
 
-add_subdirectory(apps)
+# add_subdirectory(apps)
 add_subdirectory(extern)
 add_subdirectory(libs)
 
 
-add_executable(engine apps/engine.cpp)
+add_executable(engine 
+	apps/engine0.cpp
+	apps/engine1.cpp
+	apps/engine2.cpp
+	apps/engine3.cpp
+)
 
 target_link_libraries(engine 
 	${ASSIMP_LIBRARY}
 	SDL2::SDL2 
 	
-	imgui 
-	glad 
-	menus 
+	menus
 	components 
+	imgui 
+	glad
 )

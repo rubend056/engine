@@ -4,6 +4,7 @@ add_library(menus STATIC
     src/menus/inspector.cpp
     src/menus/files.cpp
     src/menus/text_editor.cpp
+    src/menus/stats.cpp
 )
 target_link_libraries(menus imgui)
 

@@ -22,6 +22,7 @@ namespace menus{
 
     static vector<fs::directory_entry> fl;
     void list_dir(string d){
+        
         for (const auto &entry : fs::directory_iterator(d)){
             // auto f = File(
             //     entry.is_directory(),
@@ -44,6 +45,7 @@ namespace menus{
         //Find files
         
         if(fl.size() == 0){
+            
             list_dir(root);
         }
             

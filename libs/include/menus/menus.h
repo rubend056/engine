@@ -24,6 +24,7 @@ namespace menus
     
     void open_text_editor(fs::path path);
     void text_editor();
+    void stats();
 }; // namespace menus
 
 

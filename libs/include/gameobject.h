@@ -9,6 +9,7 @@
 #include "component.h"
 
 class GameObject{
+    
     public:
         bool enabled = true;
         glm::vec3 pos = glm::vec3(0);
@@ -17,8 +18,7 @@ class GameObject{
 
         std::vector<Component*> comps;
         void add_component(Component* c);
-        GameObject(){
-        }
+        GameObject(){}
 };
 
 #endif
