@@ -1,3 +1,9 @@
+#include "engine.h"
+// Engine::instance(){if (!Engine::_instance)Engine::_instance = new Engine;return Engine::_instance;}
+
+#include "menus.h"
+
+#include "components.h"
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -12,18 +18,74 @@
 #include <glad/glad.h>  // Initialize with gladLoadGL()
 #endif
 
-// using namespace std;
+using namespace std;
 
 bool run = true;
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+
+
+
+ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.00f);
+GameObject* selected = NULL;
+string project_path;
+void init(){
+    
+
+    selected = Engine::instantiate();
+}
+
+void update(){
+    
+    static float f = 0.0f;
+    static int counter = 0;
+
+    ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+    ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+    // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+    // ImGui::Checkbox("Another Window", &show_another_window);
+
+    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+    ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+    if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        counter++;
+    ImGui::SameLine();
+    ImGui::Text("counter = %d", counter);
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
+
+    menus::inspector(selected);
+    menus::files(project_path);
+    menus::text_editor();
+}
+void render(SDL_Window* window, ImGuiIO& io){
+    // Rendering
+    ImGui::Render();
+    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+    glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    SDL_GL_SwapWindow(window);
+}
+
+
 void exit(){
 	run = false;
 }
 
+Engine *Engine::_instance = 0;
 int main( int argc, char* args[] )
 {
+    if (argc == 1){cout << "need path to project folder" << endl;exit();}
+    project_path = string(args[1]);
+
     SDL_Window* window = NULL;
     SDL_Surface* screenSurface = NULL;
     
@@ -45,7 +107,7 @@ int main( int argc, char* args[] )
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	// Create Window
 	SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-	window = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, window_flags );
+	window = SDL_CreateWindow( "Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, window_flags );
 	if( window == NULL ){printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );}
 	
 	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
@@ -78,24 +140,18 @@ int main( int argc, char* args[] )
     ImGui_ImplOpenGL3_Init(glsl_version);
 	
 	//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-	
-	
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	init();
 	while (run)
 	{
-		// screenSurface = SDL_GetWindowSurface( window );	
-		// SDL_UpdateWindowSurface( window );
-		// SDL_Delay( 1111 );
-		// break;
 		
 		SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
-                run = false;
+                exit();
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                run = false;
+                exit();
         }
 
         // Start the Dear ImGui frame
@@ -103,36 +159,9 @@ int main( int argc, char* args[] )
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
 		
+		update();
 		
-		{
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            // ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            // ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-		
-		// Rendering
-        ImGui::Render();
-        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(window);
+		render(window, io);
 	}
 	
 	ImGui_ImplOpenGL3_Shutdown();
@@ -146,6 +175,3 @@ int main( int argc, char* args[] )
     return 0;
 }
 
-// void setup_imgui(){
-	
-// }

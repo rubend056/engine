@@ -15,6 +15,11 @@ glad or GLEW
 
 ./engine <project folder>
 
+
+Camera Object to Render (Perspective Matrix)
+	Transform
+	
+
 //Cache (imported assets with same directory structure) *** Later
 Assets (any asset you want) 
 	What'll we do with these? Load into memory, that's what assimp does, no cooking yet

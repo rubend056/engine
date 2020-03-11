@@ -1,23 +1,38 @@
 cmake_minimum_required(VERSION 3.7)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project(engine)
 
+# find_package(GLEW REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(ASSIMP REQUIRED)
+
 include_directories(
-	apps
+	${ASSIMP_INCLUDE_DIR}
 	libs/include/
 	extern/imgui
+	extern/imgui/examples
+
+	apps
+	libs/include
+	libs/include/menus
 )
 
 add_subdirectory(apps)
-add_subdirectory(libs)
 add_subdirectory(extern)
+add_subdirectory(libs)
 
-# find_package(GLEW REQUIRED)
-
-find_package(SDL2 REQUIRED)
-# message(“SDL2 dir: ${SDL2_DIR}”)
 
 add_executable(engine apps/engine.cpp)
-set_property(TARGET engine PROPERTY CXX_STANDARD 11)
-target_link_options(engine PRIVATE "-lassimp")
-target_link_libraries(engine imgui glad SDL2::SDL2)
+
+target_link_libraries(engine 
+	${ASSIMP_LIBRARY}
+	SDL2::SDL2 
+	
+	imgui 
+	glad 
+	menus 
+	components 
+)
