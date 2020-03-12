@@ -3,6 +3,10 @@
 
 #include <vector>
 #include <mutex>
+#include <functional>
+#include <string>
+
+
 
 namespace inotify{
 	#define FILTER_EVENTS_DELAY 100
@@ -11,14 +15,17 @@ namespace inotify{
 	enum FILE_EVENT{OPEN, CLOSE, MODIFY, CREATE, DELETE, DELETE_SELF};
 	struct FileEvent{
 		FILE_EVENT event;
-		const char* folder_path;
-		const char* filename;
+		char* folder_path;
+		char* filename;
 		bool isdir;
 	};
 
-	extern std::vector<FileEvent> events;
-	extern std::mutex events_mutex;
-
+	extern std::vector<FileEvent*> events;
+	extern std::vector<std::string> filesnames_allowed;
+	// extern 
+	
+	
+	// std::function<void(FileEvent)> event_handler;
 
 	int init(int argc, char* argv[100]);
 	void update();

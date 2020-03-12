@@ -1,10 +1,9 @@
-
-in a;
+in a; 
 out a;
-
-main (){
+ 
+main (){ 
 	testing122231sdf
 	joking around
 }
-
+ 
 

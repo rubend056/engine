@@ -66,42 +66,41 @@ namespace assets{
 		for(int i=0;i<entries.size()+1;++i){
 			// path 0 is fullpath to our assets, others are real paths to folders inside our assets
 			if(i){
-				if(entries[i-1].is_directory()){
-					realpath(entries[i-1].path().c_str(), argv[i]);
-					cout << argv[i] << endl;
+				auto &e = entries[i-1];
+				if(e.is_directory()){
+					realpath(e.path().c_str(), argv[argc]);
+					cout << argv[argc] << endl;
 					argc++;
 				}
-				
 			}else{
-				realpath(assets_path, argv[i]);
-				cout << argv[i] << endl;
+				realpath(assets_path, argv[argc]);
+				cout << argv[argc] << endl;
 				argc++;
 			}
+			
 		}
 		
+		
+		
 		if(!inotify_thread)inotify_thread = new thread(inotify::init, argc, argv);
+		
+		
+		// Populating inotify's allowed file list
+		for(auto&entry:entries){if(!entry.is_directory())inotify::filesnames_allowed.push_back(entry.path().filename().string());}
+		
 		return true;
 	}
 	void update(){
+		inotify::update();
+		
 		ImGui::Begin("Events");
 		ImGui::Text("Event size is %d", inotify::events.size());
 		for(auto&e:inotify::events){
-			ImGui::Text ("File %s %d, in folder %s", e.filename, e.event, e.folder_path);
+			ImGui::Text ("File %s %d, in folder %s", e->filename, e->event, e->folder_path);
 		}
-		
 		ImGui::End();
 		
-		{
-			
-			lock_guard<mutex> lock(inotify::events_mutex);
-			// Filter only to files in our entries
-			vector<string> files;
-			for(auto&entry:entries){if(!entry.is_directory())files.push_back(entry.path().filename().string());}
-			// Filter all events to files in our registry
-			vector<inotify::FileEvent> fevents;
-			
-			
-		}
+		
 	}
 	void exit(){
 		inotify_thread->join();

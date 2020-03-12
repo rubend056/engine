@@ -20,9 +20,9 @@ using namespace std;
 
 namespace inotify{
 	bool exit_thread = false;
-	vector<FileEvent> events;
+	vector<FileEvent*> events;
 	vector<FileEvent> _events;
-	mutex events_mutex;
+	std::mutex _events_mutex;
 
 	static void handle_events(int fd, int *wd, int argc, char** argv)
 	{
@@ -68,16 +68,19 @@ namespace inotify{
 				/* Print event type */
 				FileEvent myevent;
 				
-				if (event->mask & IN_OPEN){
-					// printf("Opened\n");
-					myevent.event = FILE_EVENT::OPEN;
-				}
-				if (event->mask & (IN_CLOSE_NOWRITE | IN_CLOSE_WRITE)){
-					// printf("Closed\n");
-					myevent.event = FILE_EVENT::CLOSE;
-				}
-				if (event->mask & IN_MODIFY)
+				// if (event->mask & IN_OPEN){
+				// 	// printf("Opened\n");
+				// 	myevent.event = FILE_EVENT::OPEN;
+				// }
+				// if (event->mask & (IN_CLOSE_NOWRITE | IN_CLOSE_WRITE)){
+				// 	// printf("Closed\n");
+				// 	myevent.event = FILE_EVENT::CLOSE;
+				// }
+				if (event->mask & IN_MODIFY){
+					printf("Modified %s\n", event->name);
 					myevent.event = FILE_EVENT::MODIFY;
+				}
+					
 				if (event->mask & IN_CREATE)
 					myevent.event = FILE_EVENT::CREATE;
 				if (event->mask & IN_DELETE)
@@ -96,13 +99,15 @@ namespace inotify{
 				}
 
 				/* Print the name of the file */
-				if (event->len){
-					myevent.filename = event->name;
+				if (event->len>1){
+					myevent.filename = (char*)calloc(event->len,sizeof(char));
+					strcpy(myevent.filename,event->name);
 				}
 
 				/* Print type of filesystem object */
 				myevent.isdir = (event->mask & IN_ISDIR);
 				
+				lock_guard<mutex> lock(_events_mutex);
 				_events.push_back(myevent);
 			}
 		}
@@ -131,7 +136,9 @@ namespace inotify{
 		for (int i = 0; i < argc; i++) {
 			cout << "Trying to watch " << argv[i] << endl;
 			
-			wd[i] = inotify_add_watch(fd, argv[i],IN_OPEN | IN_CLOSE | IN_MODIFY | IN_CREATE | IN_DELETE | IN_DELETE_SELF);
+			wd[i] = inotify_add_watch(fd, argv[i],
+												// IN_OPEN | IN_CLOSE | 
+															IN_MODIFY | IN_CREATE | IN_DELETE | IN_DELETE_SELF);
 			if (wd[i] == -1) {
 				fprintf(stderr, "Cannot watch %s %s", argv[i], strerror(errno));
 				exit(EXIT_FAILURE);
@@ -174,21 +181,35 @@ namespace inotify{
 
 	#include <chrono>
 	// #include <algorithm>
+	vector<string> filesnames_allowed;
+	function<void(FileEvent)> event_handler;
 	void update(){
-		static chrono::milliseconds start =chrono::milliseconds();
+		static auto start = chrono::steady_clock::now();
 		
 		
-		// chrono::milliseconds m(500);
-		if ((chrono::milliseconds() - start) > (chrono::milliseconds)(500)){
-			lock_guard<mutex> lock(events_mutex);
-			cout << "Filtering " << endl;
+		// chrono::milliseconds m;
+		if (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() > 500){
+			lock_guard<mutex> lock(_events_mutex);
+			// cout << "Filtering " << endl;
 			
-			
-			
-			start = chrono::milliseconds();
+			for(auto it=_events.end()-1;it>=_events.begin() && it<_events.end();--it){
+				if( !(*it).filename)continue;
+				bool _events_found = false, filelist_found = false;
+				for(auto&e:events){
+					if(e == &(*it) || (e->event == (*it).event && strcmp(e->filename,(*it).filename) == 0))
+					{_events_found=true;break;}}
+				if(_events_found) continue;
+				
+				for(auto&f:filesnames_allowed){int d = f.compare((*it).filename);if(!d){filelist_found=true;break;}}
+				
+					
+				
+				if(!_events_found && filelist_found)events.push_back(&(*it));
+				
+				cout << "Did somethin" << endl;
+			}
+			start = chrono::steady_clock::now();
 		}
-		
-		
 	}
 
 }
