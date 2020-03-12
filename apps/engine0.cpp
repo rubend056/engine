@@ -22,8 +22,10 @@ const int SCREEN_HEIGHT = 480;
 
 int main( int argc, char* args[] )
 {
-    if (argc == 1){cout << "need path to project folder" << endl;run=false;}
-    engine::project_path = string(args[1]);
+	
+    if (argc == 1){cout << "need path to project folder" << endl;run=false;return -1;}
+	cout << argc << endl;
+	engine::project_path = string(args[1]);
 
     SDL_Window* window = NULL;
     SDL_Surface* screenSurface = NULL;

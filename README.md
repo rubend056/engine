@@ -4,6 +4,9 @@ Day 1:<br>
 
 To build:
 
+Needs SDL,
+
+
 - LINUX
   - Install (SDL2 development) in your distro first, with your package manager
   - Compile & Run the Engine

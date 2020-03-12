@@ -7,10 +7,11 @@ project(engine)
 
 # find_package(GLEW REQUIRED)
 find_package(SDL2 REQUIRED)
-find_package(ASSIMP REQUIRED)
+# find_package(SOIL REQUIRED)
+# find_package(ASSIMP REQUIRED)
 
 include_directories(
-	${ASSIMP_INCLUDE_DIR}
+	# ${ASSIMP_INCLUDE_DIR}
 	libs/include/
 	extern/imgui
 	extern/imgui/examples
@@ -32,10 +33,14 @@ add_executable(engine
 	apps/engine3.cpp
 )
 
-target_link_libraries(engine 
-	${ASSIMP_LIBRARY}
+target_link_options(engine BEFORE PRIVATE "-lSOIL" PRIVATE "-linotifytools")
+target_link_options(engine PRIVATE "-lGL")
+
+target_link_libraries(engine
+	# ${ASSIMP_LIBRARY}
 	SDL2::SDL2 
 	
+	assets
 	menus
 	components 
 	imgui 

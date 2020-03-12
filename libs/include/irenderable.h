@@ -1,6 +1,6 @@
 
 
-class IRenderable{
-    public:
-        virtual void render() = 0;
-}
+// class IRenderable{
+//     public:
+//         virtual void render() = 0;
+// }

@@ -4,6 +4,8 @@ OpenGL
 imgui
 assimp
 
+inotify
+
 glad or GLEW
 
   engine
@@ -16,6 +18,12 @@ glad or GLEW
 ./engine <project folder>
 
 
+RIGHT NOW***********************
+Watch for changes in project asset folder and reimport/compile accordingly
+
+
+LATER+++++++++++++++++
+
 Camera Object to Render (Perspective Matrix)
 	Transform
 	
@@ -25,7 +33,6 @@ Assets (any asset you want)
 	What'll we do with these? Load into memory, that's what assimp does, no cooking yet
 	Import files by extension with Assimp into memory (save their paths, etc)
 	Some files you'll be able to change (txt, glsl, etc...)
-	
 
 File Manager
 	Expandable File List of Project Folder
@@ -46,3 +53,6 @@ Inspector
 		Transform
 		Shaders
 	
+
+
+

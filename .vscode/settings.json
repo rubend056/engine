@@ -80,7 +80,9 @@
 		"cinttypes": "cpp",
 		"cstdbool": "cpp",
 		"typeindex": "cpp",
-		"typeinfo": "cpp"
+		"typeinfo": "cpp",
+		"*.ipp": "cpp",
+		"*.rh": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
