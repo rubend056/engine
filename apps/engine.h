@@ -23,14 +23,11 @@
 
 // Has initialization of everything as well as basic functions init, update, render, etc...
 namespace engine{
-    extern bool run;
-    extern std::vector<GameObject*> objects;
-    extern std::vector<GameObject*> selected;
-    extern std::string project_path;
     
     void init();
     void update();
     void render(SDL_Window* window, ImGuiIO& io);
+	void exit();
     
     GameObject* instantiate();
     void destroy(GameObject* gobj);

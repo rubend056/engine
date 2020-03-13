@@ -1,3 +1,4 @@
+#include "engine_globals.h"
 #include "engine.h"
 
 
@@ -104,6 +105,8 @@ int main( int argc, char* args[] )
         
         engine::render(window, io);
     }
+	
+	engine::exit();
     
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();

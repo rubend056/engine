@@ -1,3 +1,4 @@
+#include "engine_globals.h"
 #include "engine.h"
 
 #include "menus.h"
@@ -50,7 +51,7 @@ namespace engine
 {
     void init(){
         selected.push_back(instantiate());
-		assets::init(project_path.c_str());
+		assets::init();
     }
 
     void update(){
@@ -74,5 +75,9 @@ namespace engine
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }
+	
+	void exit(){
+		assets::exit();
+	}
 } // namespace engine
 

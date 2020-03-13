@@ -107,8 +107,10 @@ namespace inotify{
 				/* Print type of filesystem object */
 				myevent.isdir = (event->mask & IN_ISDIR);
 				
-				lock_guard<mutex> lock(_events_mutex);
-				_events.push_back(myevent);
+				{	
+					lock_guard<mutex> lock(_events_mutex);
+					_events.push_back(myevent);
+				}
 			}
 		}
 	}
@@ -184,15 +186,20 @@ namespace inotify{
 	vector<string> filesnames_allowed;
 	function<void(FileEvent)> event_handler;
 	void update(){
+		
 		static auto start = chrono::steady_clock::now();
-		
-		
-		// chrono::milliseconds m;
 		if (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() > 500){
+			
+			
+			
 			lock_guard<mutex> lock(_events_mutex);
 			// cout << "Filtering " << endl;
 			
-			for(auto it=_events.end()-1;it>=_events.begin() && it<_events.end();--it){
+			if(_events.size()>0)
+			for(auto it=_events.end()-1;
+			it>=_events.begin() && 
+			it<_events.end();--it){
+				
 				if( !(*it).filename)continue;
 				bool _events_found = false, filelist_found = false;
 				for(auto&e:events){
@@ -203,11 +210,16 @@ namespace inotify{
 				for(auto&f:filesnames_allowed){int d = f.compare((*it).filename);if(!d){filelist_found=true;break;}}
 				
 					
-				
-				if(!_events_found && filelist_found)events.push_back(&(*it));
+				if(!_events_found){
+					if(filelist_found)events.push_back(&(*it));
+					else _events.erase(it);
+				}
 				
 				cout << "Did somethin" << endl;
 			}
+			
+			
+			
 			start = chrono::steady_clock::now();
 		}
 	}

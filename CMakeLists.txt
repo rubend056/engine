@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.7)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Uncoment this to debug
+add_compile_definitions(DEBUG_GUI)
+
 project(engine)
 
 # find_package(GLEW REQUIRED)
@@ -46,3 +49,4 @@ target_link_libraries(engine
 	imgui 
 	glad
 )
+

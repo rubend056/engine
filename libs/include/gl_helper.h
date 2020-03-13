@@ -1,15 +1,12 @@
 #ifndef GL_helper_h
 #define GL_helper_h
 
-#include "gl_group.h"
 #include <vector>
-
-
 
 struct Shader{
 	char* name;
-	GLuint s_id;
-	GLint status;
+	unsigned int s_id;
+	int status;
 	char* log = new char[512];
 	
 	std::vector<Program*> _programs;
@@ -18,13 +15,13 @@ struct Shader{
 	 * Will udpate code and recompile, relinking any programs that use the shader in the process
 	 */
 	void update(const char* src);
-	Shader(GLenum type, const char* _name=NULL, const char* src=NULL);
+	Shader(unsigned int type, const char* _name=NULL, const char* src=NULL);
 	~Shader();
 };
 
 struct Program{
 	char * name;
-	GLuint p_id;
+	unsigned int p_id;
 	
 	std::vector<Shader*> _shaders;
 	

@@ -1,3 +1,4 @@
+#include "engine_globals.h"
 #include "menus.h"
 #include "engine.h"
 

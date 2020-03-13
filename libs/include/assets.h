@@ -9,8 +9,9 @@ namespace fs = std::filesystem;
 namespace assets{
 	extern std::vector<fs::directory_entry> entries;
 	
-	bool init(const char* assets_path);
+	bool init();
 	void update();
+	void exit();
 }
 
 #endif

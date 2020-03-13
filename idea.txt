@@ -19,7 +19,8 @@ glad or GLEW
 
 
 RIGHT NOW***********************
-Watch for changes in project asset folder and reimport/compile accordingly
+Watch for changes in project asset folder and reimport/compile accordingly ------------------- DONE
+IMPLEMENT VERTEX DATA FOR OPENGL -
 
 
 LATER+++++++++++++++++

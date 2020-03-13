@@ -1,4 +1,5 @@
 #include "gl_helper.h"
+#include "gl_group.h"
 #include <cstring>
 #include <iostream>
 
@@ -16,7 +17,7 @@ void Shader::update(const char* src){
 	printf("Shader %s compilation %s", name, (status == GL_TRUE)?"success!":"ERROR");
 	if(status == GL_TRUE){for(auto&p:_programs)p->link();}
 }
-Shader::Shader(GLenum type, const char* _name=NULL, const char* src=NULL){
+Shader::Shader(unsigned int type, const char* _name=NULL, const char* src=NULL){
 	s_id = glCreateShader(type);
 	if(_name){name=new char[sizeof(_name)];strcpy(name, _name);}
 	if(src)update (src);
