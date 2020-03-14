@@ -1,31 +1,45 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Uncoment this to debug
-add_compile_definitions(DEBUG_GUI)
+
+if (NOT CMAKE_VERSION VERSION_LESS 3.12.4) # Means greater than or equal
+	# Uncoment this to debug
+	add_compile_definitions(DEBUG_GUI)	
+endif()
+
+list(INSERT CMAKE_MODULE_PATH 0 "extern/sdl2/lib/cmake extern/assimp/lib/cmake")
+link_directories(
+	extern/assimp/lib
+	extern/sdl2/lib
+	extern/soil/lib
+)
+
+SET(CMAKE_BUILD_TYPE Debug)
+
+SET(GCC_COVERAGE_COMPILE_FLAGS "-g3")
+SET(GCC_COVERAGE_LINK_FLAGS    "")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+
+
 
 project(engine)
 
-# find_package(GLEW REQUIRED)
-find_package(SDL2 REQUIRED)
-# find_package(SOIL REQUIRED)
-# find_package(ASSIMP REQUIRED)
-
 include_directories(
-	# ${ASSIMP_INCLUDE_DIR}
-	libs/include/
+	extern/assimp/include
+	extern/sdl2/include/SDL2
+	extern/soil/include
+	
 	extern/imgui
 	extern/imgui/examples
-
+	
 	apps
 	libs/include
-	libs/include/menus
 )
 
-# add_subdirectory(apps)
-add_subdirectory(extern)
+add_subdirectory(extern/imgui)
 add_subdirectory(libs)
 
 
@@ -36,17 +50,23 @@ add_executable(engine
 	apps/engine3.cpp
 )
 
-target_link_options(engine BEFORE PRIVATE "-lSOIL" PRIVATE "-linotifytools")
-target_link_options(engine PRIVATE "-lGL")
-
 target_link_libraries(engine
-	# ${ASSIMP_LIBRARY}
-	SDL2::SDL2 
-	
+	#Engine libraries
 	assets
 	menus
 	components 
 	imgui 
 	glad
+	
+	#Core libraries for engine
+	libSOIL.a
+	libSDL2d.a
+	libassimp.a
+	
+	#Very low level
+	inotifytools
+	GL
+	dl
+	pthread
 )
 

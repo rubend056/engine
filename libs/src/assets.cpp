@@ -60,10 +60,11 @@ namespace assets{
 	bool init(){
 		if(!engine::project_path.c_str())return false;
 		
-		printf("assets path is %s\n", engine::project_path);
+		printf("assets path is %s\n", engine::project_path.c_str());
 		
 		// List all files
 		list_dir(string(engine::project_path));
+		inotify_init();
 		
 		return true;
 	}

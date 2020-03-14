@@ -1,5 +1,6 @@
 
-mkdir -p build/p
+mkdir -p build
+cmake -S . -B build && cmake --build build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j1 && ./engine ../game0
+./engine ../game0
 cd ..
