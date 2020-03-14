@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <glm/vec3.hpp>
-#include "component.h"
+#include "components/component.h"
 
 class GameObject{
     
