@@ -10,7 +10,7 @@ namespace menus{
     // void list_dir(string d){
     //     for (const auto &entry : fs::directory_iterator(d)){
     //         fl.push_back(entry);
-    //         if (entry.is_directory()){list_dir(entry.path().string());}
+    //         if (ENTRY_IS_DIR(entry)){list_dir(entry.path().string());}
     //     }
     // }
 	
@@ -28,7 +28,7 @@ namespace menus{
         filter.Draw();
 		
         for(auto&f:assets::entries){
-            if (!f.is_directory() && filter.PassFilter(f.path().filename().c_str())){
+            if (!ENTRY_IS_DIR(f) && filter.PassFilter(f.path().filename().c_str())){
                 ImGui::Text("%s", f.path().filename().string().c_str());
                 if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
                 {

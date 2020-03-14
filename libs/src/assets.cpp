@@ -12,14 +12,10 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <filesystem>
 
 
-
-namespace fs = std::filesystem;
+#include "my_filesystem.h"
 using namespace std;
-
-
 
 #include <limits>
 
@@ -28,7 +24,7 @@ namespace assets{
 	void list_dir(string d){
 		for (const auto &entry : fs::directory_iterator(d)){
 			assets::entries.push_back(entry);
-			if (entry.is_directory()){list_dir(entry.path().string());}
+			if (ENTRY_IS_DIR(entry)){list_dir(entry.path().string());}
 		}
 	}
 	
@@ -40,7 +36,7 @@ namespace assets{
 			// path 0 is fullpath to our assets, others are real paths to folders inside our assets
 			if(i){
 				auto &e = entries[i-1];
-				if(e.is_directory()){
+				if(ENTRY_IS_DIR(e)){
 					realpath(e.path().c_str(), argv[argc]);
 					// cout << argv[argc] << endl;
 					argc++;
@@ -56,7 +52,7 @@ namespace assets{
 		
 		
 		// Populating inotify's allowed file list
-		for(auto&entry:entries){if(!entry.is_directory())inotify::filesnames_allowed.push_back(entry.path().filename().string());}
+		for(auto&entry:entries){if(!ENTRY_IS_DIR(entry))inotify::filesnames_allowed.push_back(entry.path().filename().string());}
 	}
 	
 	

@@ -1,10 +1,8 @@
 #ifndef Assets_h
 #define Assets_h
 
-#include <filesystem>
+#include "my_filesystem.h"
 #include <vector>
-
-namespace fs = std::filesystem;
 
 namespace assets{
 	extern std::vector<fs::directory_entry> entries;

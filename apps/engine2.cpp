@@ -2,7 +2,7 @@
 
 #include "menus/menus.h"
 #include "assets.h"
-#include "components.h"
+#include "components/components.h"
 
 #include <SDL.h>
 

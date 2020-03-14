@@ -61,12 +61,17 @@ target_link_libraries(engine
 	#Core libraries for engine
 	libSOIL.a
 	libSDL2d.a
+	
 	libassimp.a
+	libIrrXML.a
+	libzlibstatic.a
+	
 	
 	#Very low level
 	inotifytools
 	GL
 	dl
 	pthread
+	stdc++fs
 )
 
