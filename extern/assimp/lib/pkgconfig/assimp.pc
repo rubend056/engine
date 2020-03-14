@@ -1,0 +1,11 @@
+prefix=/home/rubend/p/libraries/assimp
+exec_prefix=/home/rubend/p/libraries/assimp/
+libdir=/home/rubend/p/libraries/assimp/lib
+includedir=/home/rubend/p/libraries/assimp/../include/include
+
+Name: Assimp
+Description: Import various well-known 3D model formats in an uniform manner.
+Version: 5.0.0
+Libs: -L${libdir} -lassimp
+Libs.private: -lstdc++ 
+Cflags: -I${includedir}
