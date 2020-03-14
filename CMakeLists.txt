@@ -62,7 +62,7 @@ target_link_libraries(engine
 	libSOIL.a
 	libSDL2d.a
 	
-	libassimp.a
+	assimp
 	libIrrXML.a
 	libzlibstatic.a
 	
