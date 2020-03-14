@@ -2,13 +2,16 @@
 #include "assets.h"
 #include "imgui.h"
 #include "inotify_imp.h"
-#include <thread>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include <thread>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <memory>
-
 #include <filesystem>
 
 
@@ -57,17 +60,37 @@ namespace assets{
 	}
 	
 	
+	
+	
+	
 	bool init(){
 		if(!engine::project_path.c_str())return false;
 		
-		printf("assets path is %s\n", engine::project_path.c_str());
+		printf("Assets path is %s\n", engine::project_path.c_str());
 		
 		// List all files
 		list_dir(string(engine::project_path));
 		inotify_init();
 		
+		inotify_init();
+		
+		// ? ASSIMP *****************
+		Assimp::Importer importer;
+		
+		const auto scene = importer.ReadFile("../game0/monkey.obj", aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+		if(!scene){printf ("Assimp couldn't read file \n");}
+		else {}
+		
+		// ? &&&&&&&&&&&&&&&&&&&&&&&&&&
+		
 		return true;
 	}
+	
+	
+	
+	
+	
+	
 	void update(){
 		inotify::update();
 		
