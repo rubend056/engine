@@ -1,6 +1,0 @@
-[submodule "cereal"]
-	path = extern/cereal
-	url = git@github.com:USCiLab/cereal
-[submodule "imgui"]
-	path = extern/imgui
-	url = git@github.com:ocornut/imgui
