@@ -82,7 +82,10 @@
 		"typeindex": "cpp",
 		"typeinfo": "cpp",
 		"*.ipp": "cpp",
-		"*.rh": "cpp"
+		"*.rh": "cpp",
+		"csetjmp": "cpp",
+		"strstream": "cpp",
+		"cfenv": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

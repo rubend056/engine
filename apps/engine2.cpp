@@ -1,4 +1,3 @@
-#include "engine_globals.h"
 #include "engine.h"
 
 #include "menus/menus.h"
@@ -70,7 +69,7 @@ namespace engine
 
         
         
-        testing();
+        // testing();
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);

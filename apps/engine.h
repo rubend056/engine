@@ -1,24 +1,21 @@
 #ifndef Engine_h
 #define Engine_h
 
+#include "engine_globals.h"
+
 #include <vector>
 #include <type_traits>
 #include "gameobject.h"
 
 #include <iostream>
 #include <string>
+
 #include <SDL.h>
 
-
-
 #include "imgui.h"
-
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-
 #include "groups/gl_group.h"
-
-
 
 
 // Has initialization of everything as well as basic functions init, update, render, etc...
