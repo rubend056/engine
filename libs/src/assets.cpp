@@ -47,7 +47,6 @@ namespace assets{
 			for(auto&event:inotify::events){
 				if(event->event ==  inotify::MODIFY){
 					auto g = update_shader(string(event->filename));
-					
 				}
 			}
 			inotify::events.clear();

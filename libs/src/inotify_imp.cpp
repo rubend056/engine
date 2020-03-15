@@ -215,7 +215,7 @@ namespace inotify{
 					else _events.erase(it);
 				}
 				
-				cout << "Did somethin" << endl;
+				// cout << "Did somethin" << endl;
 			}
 			
 			

@@ -5,7 +5,7 @@
 #include "assets.h"
 
 #include "rendering/gl_helper.h"
-#include "rendering/mesh.h"
+// #include "rendering/mesh.h"
 
 #include "inotify_imp.h"
 
@@ -19,7 +19,7 @@
 #include <vector>
 #include <memory>
 #include <fstream>
-#include <limits>
+// #include <limits>
 
 #include "my_filesystem.h"
 using namespace std;

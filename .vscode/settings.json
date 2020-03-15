@@ -85,11 +85,12 @@
 		"*.rh": "cpp",
 		"csetjmp": "cpp",
 		"strstream": "cpp",
-		"cfenv": "cpp"
+		"cfenv": "cpp",
+		"*.inc": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled",
 	"files.exclude": {
-		"**/cereal": true,
-		"**/extern": true
+		"**/cereal": false,
+		"**/extern": false
 	}
 }
