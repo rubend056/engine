@@ -1,9 +1,12 @@
 #include "_assets.h"
 
+#include "SOIL.h"
+
 namespace assets{
     //? RENDERING **************************
     vector<Mesh*> meshes;
 	vector<Shader*> shaders;
+	vector<Texture*> textures;
 	vector<Program*> programs;
 	
 	bool init_shader(fs::directory_entry &e){
@@ -24,7 +27,7 @@ namespace assets{
 				type = VERTEX;
 			
 			if(type != NOTHING){
-				printf("Importing %s as %d shader\n",filename.c_str(), type);
+				printf("Importing %s as type %d shader\n",filename.c_str(), type);
 				auto sfile = ifstream(path.c_str());
 				auto data = string((istreambuf_iterator<char>(sfile)),istreambuf_iterator<char>());
 				auto shader = new Shader(type, e.path().filename().string().c_str(), data.c_str());
@@ -42,10 +45,10 @@ namespace assets{
 		
 		auto lfilename = boost::algorithm::to_lower_copy(filename);
 		for(auto&shader:shaders){
-			if(lfilename.compare(shader->name) == 0){
+			if(lfilename.compare(shader->filename) == 0){
 				auto sfile = ifstream(path.c_str());
 				auto data = string((istreambuf_iterator<char>(sfile)),istreambuf_iterator<char>());
-				printf("Compiling shader for %s\n", shader->name);
+				printf("Compiling shader for %s\n", shader->filename);
 				shader->update(data.c_str());	
 			}
 		}
@@ -67,21 +70,51 @@ namespace assets{
 					if(!scene)continue;
 					printf ("Has %d mesh/es, %d material/s\n", scene->mNumMeshes, scene->mNumTextures);
 					
+					
 					if(scene->HasMeshes())
 					for(int i=0;i<scene->mNumMeshes;++i){
 						auto aimesh = scene->mMeshes[i];
-						if(i==0)printf("vertex size is %d\n", sizeof(aimesh->mVertices[0]));
-						// if(aimesh->HasPositions()){
-						// 	Mesh mesh(aimesh->mNumVertices);
-						// 	for(int i=0;i<aimesh->mNumVertices;++i){
-						// 		mesh.vertices[i]=aimesh->mVertices[i].
-						// 	}
-						// }
 						
-						
+						if(aimesh->HasPositions()){
+							auto mesh = new Mesh(filename.c_str(),aimesh->mNumVertices);
+							for(int i=0;i<aimesh->mNumVertices;++i){
+								memcpy(
+									&(mesh->vertices[i].Position),
+									&(aimesh->mVertices[i]),
+									sizeof(mesh->vertices[i].Position));
+								if(aimesh->HasNormals())
+									memcpy(
+										&(mesh->vertices[i].Normal),
+										&(aimesh->mNormals[i]),
+										sizeof(mesh->vertices[i].Normal));
+								if(aimesh->HasTextureCoords(0))
+									memcpy(
+										&(mesh->vertices[i].TexCoords),
+										&(aimesh->mTextureCoords[0][i]),
+										sizeof(mesh->vertices[i].TexCoords));
+							}
+							meshes.push_back(mesh);
+						}
 					}
-				}else {
-					init_shader(e);
+				}else if (init_shader(e)){
+				}else if (
+					ext.compare(".bmp") == 0 |
+					ext.compare(".tga") == 0 |
+					ext.compare(".dds") == 0 |
+					ext.compare(".png") == 0 |
+					ext.compare(".jpg") == 0 |
+					ext.compare(".jpeg") == 0
+				){
+					auto id = SOIL_load_OGL_texture(
+						path.c_str(),
+						SOIL_LOAD_AUTO,
+						SOIL_CREATE_NEW_ID,
+						0
+					);
+					if(id){
+						auto t = new Texture(filename.c_str(),id);
+						printf("Imported image %s\n", filename.c_str());
+					}
 				}
 			}
 		}

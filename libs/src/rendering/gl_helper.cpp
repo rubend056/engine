@@ -14,11 +14,11 @@ void Shader::update(const char* src){
 	glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
 	glGetShaderInfoLog(s_id, sizeof(log), NULL, log);
 	
-	printf("Shader %s compilation %s\n", name, (status == GL_TRUE)?"success!":"ERROR");
+	printf("Shader %s compilation %s\n", filename, (status == GL_TRUE)?"success!":"ERROR");
 	if(status == GL_TRUE){for(auto&p:_programs)p->link();}
 }
 
-Shader::Shader(SHADER_ENUM type, const char* _name, const char* src){
+Shader::Shader(SHADER_ENUM type, const char* _f, const char* src):IFile(_f){
 	GLenum t;
 	switch(type){
 		case VERTEX:t=GL_VERTEX_SHADER; break;
@@ -27,12 +27,12 @@ Shader::Shader(SHADER_ENUM type, const char* _name, const char* src){
 		default: printf("Coudn't find shader in SHADER_ENUM %s\n", type);
 	}
 	s_id = glCreateShader(t);
-	if(_name){name=new char[sizeof(_name)];strcpy(name, _name);}
+	if(_f){filename=new char[sizeof(_f)];strcpy(filename, _f);}
 	log = new char[200];
 	if(src)update (src);
 }
 Shader::~Shader(){
-	delete[] log,name;
+	delete[] log,filename;
 	glDeleteShader(s_id);
 }
 
@@ -50,11 +50,9 @@ void Program::link(){
 void Program::use(){
 	glUseProgram(p_id);
 }
-Program::Program(const char* _name){
-	if(_name){name=new char[sizeof(_name)];strcpy(name, _name);}
-}
+Program::Program(const char* _f):IFile(_f){}
 Program::~Program(){
-	delete[] name;
+	delete[] filename;
 	glDeleteProgram(p_id);
 }
 
