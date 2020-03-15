@@ -1,25 +1,12 @@
-#include "engine_globals.h"
+
 #include "assets.h"
+#include "_assets.h"
 #include "imgui.h"
-#include "inotify_imp.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#include <thread>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <memory>
 
 
-#include "my_filesystem.h"
-using namespace std;
-
-#include <limits>
 
 namespace assets{
+	//? ENTRIES **************************
 	vector<fs::directory_entry> entries;
 	void list_dir(string d){
 		for (const auto &entry : fs::directory_iterator(d)){
@@ -28,62 +15,19 @@ namespace assets{
 		}
 	}
 	
-	thread* inotify_thread;
-	void inotify_init(){
-		int argc = 0;
-		static char* argv[100];for(int i=0;i<100;i++)argv[i]=(char*)calloc(100,1);
-		for(int i=0;i<entries.size()+1;++i){
-			// path 0 is fullpath to our assets, others are real paths to folders inside our assets
-			if(i){
-				auto &e = entries[i-1];
-				if(ENTRY_IS_DIR(e)){
-					realpath(e.path().c_str(), argv[argc]);
-					// cout << argv[argc] << endl;
-					argc++;
-				}
-			}else{
-				realpath(engine::project_path.c_str(), argv[argc]);
-				// cout << argv[argc] << endl;
-				argc++;
-			}
-		}
-		
-		if(!inotify_thread)inotify_thread = new thread(inotify::init, argc, argv);
-		
-		
-		// Populating inotify's allowed file list
-		for(auto&entry:entries){if(!ENTRY_IS_DIR(entry))inotify::filesnames_allowed.push_back(entry.path().filename().string());}
-	}
 	
-	
-	
-	
-	
-	bool init(){
-		if(!engine::project_path.c_str())return false;
+	void init(){
+		if(!engine::project_path.c_str())return;
 		
 		printf("Assets path is %s\n", engine::project_path.c_str());
 		
 		// List all files
 		list_dir(string(engine::project_path));
-		inotify_init();
 		
 		inotify_init();
 		
-		// ? ASSIMP *****************
-		Assimp::Importer importer;
-		
-		const auto scene = importer.ReadFile("../game0/monkey.obj", aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
-		if(!scene){printf ("Assimp couldn't read file \n");}
-		else {}
-		
-		// ? &&&&&&&&&&&&&&&&&&&&&&&&&&
-		
-		return true;
+		import_assets();
 	}
-	
-	
-	
 	
 	
 	
@@ -102,7 +46,7 @@ namespace assets{
 		if(inotify::events.size()){
 			for(auto&event:inotify::events){
 				if(event->event ==  inotify::MODIFY){
-					printf("Compiling shader for %s\n", event->filename);
+					auto g = update_shader(string(event->filename));
 					
 				}
 			}
@@ -112,9 +56,12 @@ namespace assets{
 		
 	}
 	
+	
 	void exit(){
+		// INOTIFY EXIT
 		inotify::exit_thread = true;
 		inotify_thread->join();
 		delete inotify_thread;
+		
 	}
 }

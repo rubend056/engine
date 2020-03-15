@@ -1,12 +1,12 @@
-#include "gl_helper.h"
-#include "gl_group.h"
+#include "rendering/gl_helper.h"
+#include "groups/gl.h"
 #include <cstring>
 #include <iostream>
 
 using namespace std;
 
-vector<Shader> shaders;
-vector<Program> programs;
+// vector<Shader> shaders;
+// vector<Program> programs;
 
 void Shader::update(const char* src){
 	glShaderSource(s_id, 1, &src, NULL);
@@ -14,12 +14,21 @@ void Shader::update(const char* src){
 	glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
 	glGetShaderInfoLog(s_id, sizeof(log), NULL, log);
 	
-	printf("Shader %s compilation %s", name, (status == GL_TRUE)?"success!":"ERROR");
+	printf("Shader %s compilation %s\n", name, (status == GL_TRUE)?"success!":"ERROR");
 	if(status == GL_TRUE){for(auto&p:_programs)p->link();}
 }
-Shader::Shader(unsigned int type, const char* _name=NULL, const char* src=NULL){
-	s_id = glCreateShader(type);
+
+Shader::Shader(SHADER_ENUM type, const char* _name, const char* src){
+	GLenum t;
+	switch(type){
+		case VERTEX:t=GL_VERTEX_SHADER; break;
+		case GEOMETRY:t=GL_GEOMETRY_SHADER; break;
+		case FRAGMENT:t=GL_FRAGMENT_SHADER; break;
+		default: printf("Coudn't find shader in SHADER_ENUM %s\n", type);
+	}
+	s_id = glCreateShader(t);
 	if(_name){name=new char[sizeof(_name)];strcpy(name, _name);}
+	log = new char[200];
 	if(src)update (src);
 }
 Shader::~Shader(){
@@ -44,6 +53,9 @@ void Program::use(){
 Program::Program(const char* _name){
 	if(_name){name=new char[sizeof(_name)];strcpy(name, _name);}
 }
-Program::~Program(){delete[] name;}
+Program::~Program(){
+	delete[] name;
+	glDeleteProgram(p_id);
+}
 
 

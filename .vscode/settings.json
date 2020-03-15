@@ -87,5 +87,9 @@
 		"strstream": "cpp",
 		"cfenv": "cpp"
 	},
-	"C_Cpp.errorSquiggles": "Enabled"
+	"C_Cpp.errorSquiggles": "Enabled",
+	"files.exclude": {
+		"**/cereal": true,
+		"**/extern": true
+	}
 }

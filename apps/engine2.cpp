@@ -24,24 +24,6 @@ void testing(){
     };
     
     GLuint vbo = load_vertex(g_vertex_buffer_data);
-    
-	
-    
-    //! GLint posAttrib = glGetAttribLocation()
-    
-    // glEnableVertexAttribArray(0);
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    // glVertexAttribPointer(
-    //     0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-    //     3,                  // size
-    //     GL_FLOAT,           // type
-    //     GL_FALSE,           // normalized?
-    //     0,                  // stride
-    //     (void*)0            // array buffer offset
-    // );
-    // // Draw the triangle !
-    // glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-    // glDisableVertexAttribArray(0);
 }
 
 
@@ -66,10 +48,8 @@ namespace engine
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
-
         
-        
-        // testing();
+        // RENDER
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);

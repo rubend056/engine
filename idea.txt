@@ -1,29 +1,55 @@
-SDL
-OpenGL
+  LIBRARIES 
+	 |
+	 V
+	SDL
+	OpenGL
 
-imgui
-assimp
+	imgui
+	assimp
 
-inotify
+	inotify
 
-glad or GLEW
+	glad or GLEW
 
-  engine
-     |
-  _imgui
-  |    |
- SDL OpenGL 
-
+	     -------engine---------------
+	     |				   |        |
+	  _imgui             assimp  inotify
+	  |    |
+	 SDL OpenGL 
 
 ./engine <project folder>
 
 
-RIGHT NOW***********************
-Watch for changes in project asset folder and reimport/compile accordingly ------------------- DONE
-IMPLEMENT VERTEX DATA FOR OPENGL -
+
+	Shader       Programs
+	in -> out  mesh/textures     
+				    | 
+				 	V
+				  shader
+					V
+				  shader
+					V
+				   ...
+				    V
+				pixel_color
+
+	Mesh          	Textures/Bump
+	-Verteices		-2D Image
+	-Normals
+	-UV's
+				
+				
+RIGHT NOW**************************************    STATUS
+Shader and Program initial classes  				DONE
+
+Watch for changes in project asset 
+folder and reimport/compile accordingly				DONE
+
+Implement vertex data for gl_helper 				Working..
 
 
-LATER+++++++++++++++++
+
+LATER++++++++++++++++++++++++++++++++++++++++++
 
 Camera Object to Render (Perspective Matrix)
 	Transform
