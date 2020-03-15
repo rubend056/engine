@@ -15,7 +15,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-#include "groups/gl_group.h"
+#include "groups/gl.h"
 
 
 // Has initialization of everything as well as basic functions init, update, render, etc...

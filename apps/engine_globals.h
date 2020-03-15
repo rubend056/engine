@@ -1,9 +1,11 @@
 #ifndef Engine_Globals_h
 #define Engine_Globals_h
 
-#include <vector>
+
 #include "gameobject.h"
+
 #include <string>
+#include <vector>
 
 // Has initialization of everything as well as basic functions init, update, render, etc...
 namespace engine{

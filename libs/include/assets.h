@@ -7,7 +7,7 @@
 namespace assets{
 	extern std::vector<fs::directory_entry> entries;
 	
-	bool init();
+	void init();
 	void update();
 	void exit();
 }
