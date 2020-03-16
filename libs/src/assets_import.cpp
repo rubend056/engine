@@ -55,68 +55,84 @@ namespace assets{
 		return true;
 	}
     
+	const float testvertices[]{
+		0.0f,  0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+       -0.5f, -0.5f, 0.0f
+	};
+	
     void import_assets(){
         Assimp::Importer importer;
 		
+		// TEST MESH
+		auto tmesh = new Mesh("testmesh",3);
+		for(int i=0;i<3;++i)
+			memcpy(&(tmesh->vertices[i]), &(testvertices[i*3]), 3*sizeof(float));
+		tmesh->set_data();
+		meshes.push_back(tmesh);
+		// #################
+		
 		for(auto&e:entries){
-			if(!ENTRY_IS_DIR(e)){
-				auto path = e.path().string();
-				auto ext = boost::algorithm::to_lower_copy(e.path().extension().string());
-				auto filename = boost::algorithm::to_lower_copy(e.path().filename().string());
-				if(importer.IsExtensionSupported(ext)){
-					auto scene = importer.ReadFile(path.c_str(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+			if(ENTRY_IS_DIR(e))continue;
+			
+			auto path = e.path().string();
+			auto ext = boost::algorithm::to_lower_copy(e.path().extension().string());
+			auto filename = boost::algorithm::to_lower_copy(e.path().filename().string());
+			if(importer.IsExtensionSupported(ext)){
+				auto scene = importer.ReadFile(path.c_str(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+				
+				printf ("Assimp %sread file %s\n", (!scene)?"coudn't ":"", path.c_str());
+				if(!scene)continue;
+				printf ("Has %d mesh/es, %d material/s\n", scene->mNumMeshes, scene->mNumTextures);
+				
+				
+				if(scene->HasMeshes())
+				for(int i=0;i<scene->mNumMeshes;++i){
+					auto aimesh = scene->mMeshes[i];
 					
-					printf ("Assimp %sread file %s\n", (!scene)?"coudn't ":"", path.c_str());
-					if(!scene)continue;
-					printf ("Has %d mesh/es, %d material/s\n", scene->mNumMeshes, scene->mNumTextures);
-					
-					
-					if(scene->HasMeshes())
-					for(int i=0;i<scene->mNumMeshes;++i){
-						auto aimesh = scene->mMeshes[i];
-						
-						if(aimesh->HasPositions()){
-							auto mesh = new Mesh(filename.c_str(),aimesh->mNumVertices);
-							for(int i=0;i<aimesh->mNumVertices;++i){
+					if(aimesh->HasPositions()){
+						auto mesh = new Mesh(filename.c_str(),aimesh->mNumVertices);
+						for(int i=0;i<aimesh->mNumVertices;++i){
+							memcpy(
+								&(mesh->vertices[i].Position),
+								&(aimesh->mVertices[i]),
+								sizeof(mesh->vertices[i].Position));
+							if(aimesh->HasNormals())
 								memcpy(
-									&(mesh->vertices[i].Position),
-									&(aimesh->mVertices[i]),
-									sizeof(mesh->vertices[i].Position));
-								if(aimesh->HasNormals())
-									memcpy(
-										&(mesh->vertices[i].Normal),
-										&(aimesh->mNormals[i]),
-										sizeof(mesh->vertices[i].Normal));
-								if(aimesh->HasTextureCoords(0))
-									memcpy(
-										&(mesh->vertices[i].TexCoords),
-										&(aimesh->mTextureCoords[0][i]),
-										sizeof(mesh->vertices[i].TexCoords));
-							}
-							meshes.push_back(mesh);
+									&(mesh->vertices[i].Normal),
+									&(aimesh->mNormals[i]),
+									sizeof(mesh->vertices[i].Normal));
+							if(aimesh->HasTextureCoords(0))
+								memcpy(
+									&(mesh->vertices[i].TexCoords),
+									&(aimesh->mTextureCoords[0][i]),
+									sizeof(mesh->vertices[i].TexCoords));
 						}
-					}
-				}else if (init_shader(e)){
-				}else if (
-					ext.compare(".bmp") == 0 |
-					ext.compare(".tga") == 0 |
-					ext.compare(".dds") == 0 |
-					ext.compare(".png") == 0 |
-					ext.compare(".jpg") == 0 |
-					ext.compare(".jpeg") == 0
-				){
-					auto id = SOIL_load_OGL_texture(
-						path.c_str(),
-						SOIL_LOAD_AUTO,
-						SOIL_CREATE_NEW_ID,
-						0
-					);
-					if(id){
-						auto t = new Texture(filename.c_str(),id);
-						printf("Imported image %s\n", filename.c_str());
+						// mesh->set_data();
+						meshes.push_back(mesh);
 					}
 				}
+			}else if (init_shader(e)){
+			}else if (
+				ext.compare(".bmp") == 0 |
+				ext.compare(".tga") == 0 |
+				ext.compare(".dds") == 0 |
+				ext.compare(".png") == 0 |
+				ext.compare(".jpg") == 0 |
+				ext.compare(".jpeg") == 0
+			){
+				auto id = SOIL_load_OGL_texture(
+					path.c_str(),
+					SOIL_LOAD_AUTO,
+					SOIL_CREATE_NEW_ID,
+					0
+				);
+				if(id){
+					auto t = new Texture(filename.c_str(),id);
+					printf("Imported image %s\n", filename.c_str());
+				}
 			}
+			
 		}
     }
     

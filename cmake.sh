@@ -1,7 +1,6 @@
 #!/bin/bash
 
 mkdir -p build
-cmake -S . -B build && cmake --build build
 cd build
-./engine ../game0
+cmake .. && make -j1 && ./engine ../game0
 cd ..

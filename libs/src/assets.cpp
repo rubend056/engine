@@ -4,7 +4,7 @@
 #include "imgui.h"
 
 
-
+#include <algorithm>
 namespace assets{
 	//? ENTRIES **************************
 	vector<fs::directory_entry> entries;
@@ -27,6 +27,19 @@ namespace assets{
 		inotify_init();
 		
 		import_assets();
+		
+		auto p = new Program("test");
+		programs.push_back(p);
+		p->attach_shader(
+			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == SHADER_ENUM::VERTEX;})
+		);
+		p->attach_shader(
+			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == SHADER_ENUM::FRAGMENT;})
+		);
+		auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
+        auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
+		p->link();
+		p->link_vertex(mesh);
 	}
 	
 	
