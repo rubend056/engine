@@ -24,8 +24,14 @@ struct Vertex {
 class Mesh : public IFile{
 	public:
 		unsigned int v_id;
+		unsigned int vbo;
 		Vertex* vertices;
-		Mesh(const char* _f,int n):IFile(_f){vertices = new Vertex[n];}
+		unsigned int n_vertices;
+		
+		void bind();
+		void set_data();
+		
+		Mesh(const char* _f,int n);
 		~Mesh(){delete[] vertices;}
 };
 
@@ -42,6 +48,7 @@ struct Program; //Forward declaration
 struct Shader : public IFile{
 	// char* name;
 	unsigned int s_id;
+	SHADER_ENUM type;
 	int status;
 	char* log = new char[512];
 	
@@ -61,15 +68,22 @@ struct Shader : public IFile{
 
 struct Program : public IFile{
 	unsigned int p_id;
+	unsigned int vao;
 	
 	std::vector<Shader*> _shaders;
+	
 	
 	/**
 	 * Adds a shader to the program
 	 * glAttachShader
 	 */
-	void add_shader(Shader* shader);
+	void attach_shader(Shader* shader);
+	void detach_shader(unsigned int index);
+	void clear_shaders();
 	void link();
+	
+	unsigned int pos_attrib=0;
+	void link_vertex(Mesh* mesh);
 	/**
 	 * glUseProgram
 	 */

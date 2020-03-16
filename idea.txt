@@ -37,7 +37,12 @@
 	-Verteices		-2D Image
 	-Normals
 	-UV's
-				
+
+Load and compile Shaders
+Load and upload meshes to OpenGL
+Now we have SHADERS and MESHES, we can create Programs
+Create Program, add shaders, 
+
 				
 RIGHT NOW**************************************    STATUS
 Shader and Program initial classes  				DONE
