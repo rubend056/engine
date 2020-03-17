@@ -1,12 +1,19 @@
 #ifndef GL_helper_h
 #define GL_helper_h
 
+#include "groups/gl.h"
+
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
+
+#include <glm/gtc/constants.hpp>
+#include <glm/trigonometric.hpp>
 
 #include <string>
 #include <vector>
 #include <cstring>
+
+#define _BV32(x) ((uint32_t)1 << x)
 
 class IFile{
 	public:
@@ -15,24 +22,67 @@ class IFile{
 	~IFile(){delete[] filename;}
 };
 
-struct Vertex {
-    glm::vec3 Position;
-    glm::vec3 Normal;
-    glm::vec2 TexCoords;
+// struct Vertex {
+//     glm::vec3 Position;
+//     glm::vec3 Normal;
+//     glm::vec2 TexCoords;
+// };
+
+struct Mesh_VAO_data{
+	
 };
 
+
 class Mesh : public IFile{
+	private:
+		void vao_set_vertex_attrib_pointer();
 	public:
-		unsigned int v_id;
+		// unsigned int v_id;
+		
+		// Can't modify this after constructor is called
 		unsigned int vbo;
-		Vertex* vertices;
+		unsigned int vao;
+		// Can't modify the size after constructor is called
+		glm::vec3* positions=nullptr;
+		glm::vec3* normals=nullptr;
+		glm::vec2* tex_cords=nullptr;
+		
+		// Vertex* vertices;
 		unsigned int n_vertices;
 		
-		void bind();
-		void set_data();
 		
-		Mesh(const char* _f,int n);
-		~Mesh(){delete[] vertices;}
+		
+		void vbo_bind();
+		void vao_bind();
+		
+		void vao_attrib_enable(uint32_t attribs){
+			for(int i=0;i<3;++i)if(attribs & _BV32(i))glEnableVertexArrayAttrib(vao, i);
+		};
+		void vao_attrib_disable(){
+			for(int i=0;i<3;++i)glDisableVertexArrayAttrib(vao, i);
+		};
+		virtual void vbo_set_data();
+		virtual void gl_draw();
+		
+		/**
+		 * You have to then vbo_set_data, then link it to 
+		 */
+		Mesh(const char* _f,int n, bool _normals=false, bool _tex_cords=false);
+		~Mesh(){delete[] positions,normals,tex_cords;}
+};
+
+class FilledCircleMesh : public Mesh{
+	public:
+	void gl_draw(){glDrawArrays(GL_TRIANGLE_FAN, 0, n_vertices);}
+	FilledCircleMesh(const char* _f, float radius, unsigned int subdivisions):Mesh(_f, subdivisions+2){
+		positions[0] = glm::vec3(0);
+		
+		auto dtheta = glm::pi<float>()*2/subdivisions;
+		for(int i=subdivisions;i>=0;--i){
+			auto theta = dtheta * i;
+			positions[i+1] = glm::vec3(glm::cos(theta), glm::sin(theta), 0);
+		}
+	}
 };
 
 class Texture : public IFile{
@@ -42,11 +92,14 @@ class Texture : public IFile{
 };
 
 
+
+
 enum SHADER_ENUM{NOTHING=0,VERTEX,GEOMETRY,FRAGMENT};
 
 struct Program; //Forward declaration
+
 struct Shader : public IFile{
-	// char* name;
+	
 	unsigned int s_id;
 	SHADER_ENUM type;
 	int status;
@@ -66,9 +119,12 @@ struct Shader : public IFile{
 	~Shader();
 };
 
+
+
 struct Program : public IFile{
 	unsigned int p_id;
-	unsigned int vao;
+	int link_status=0;
+	uint32_t attribs_enabled=0;
 	
 	std::vector<Shader*> _shaders;
 	
@@ -82,8 +138,8 @@ struct Program : public IFile{
 	void clear_shaders();
 	void link();
 	
-	unsigned int pos_attrib=0;
-	void link_vertex(Mesh* mesh);
+	// unsigned int pos_attrib=0;
+	// void link_vertex(Mesh* mesh);
 	/**
 	 * glUseProgram
 	 */

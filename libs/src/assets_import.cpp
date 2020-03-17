@@ -64,12 +64,16 @@ namespace assets{
     void import_assets(){
         Assimp::Importer importer;
 		
-		// TEST MESH
-		auto tmesh = new Mesh("testmesh",3);
-		for(int i=0;i<3;++i)
-			memcpy(&(tmesh->vertices[i]), &(testvertices[i*3]), 3*sizeof(float));
-		tmesh->set_data();
-		meshes.push_back(tmesh);
+		// TEST MESHES
+		// auto tmesh = new Mesh("testmesh",3);
+		// for(int i=0;i<3;++i)
+		// 	memcpy(&tmesh->positions[i], &testvertices[i*3], 3*sizeof(float));
+		// tmesh->vbo_set_data();
+		// meshes.push_back(tmesh);
+		
+		// FilledCircleMesh* cmesh = new FilledCircleMesh("circlemesh",.3f, 20);
+		// cmesh->vbo_set_data();
+		// meshes.push_back(cmesh);
 		// #################
 		
 		for(auto&e:entries){
@@ -94,21 +98,21 @@ namespace assets{
 						auto mesh = new Mesh(filename.c_str(),aimesh->mNumVertices);
 						for(int i=0;i<aimesh->mNumVertices;++i){
 							memcpy(
-								&(mesh->vertices[i].Position),
+								&(mesh->positions[i]),
 								&(aimesh->mVertices[i]),
-								sizeof(mesh->vertices[i].Position));
-							if(aimesh->HasNormals())
-								memcpy(
-									&(mesh->vertices[i].Normal),
-									&(aimesh->mNormals[i]),
-									sizeof(mesh->vertices[i].Normal));
-							if(aimesh->HasTextureCoords(0))
-								memcpy(
-									&(mesh->vertices[i].TexCoords),
-									&(aimesh->mTextureCoords[0][i]),
-									sizeof(mesh->vertices[i].TexCoords));
+								sizeof(mesh->positions[i]));
+							// if(aimesh->HasNormals())
+							// 	memcpy(
+							// 		&(mesh->normals[i]),
+							// 		&(aimesh->mNormals[i]),
+							// 		sizeof(mesh->normals[i]));
+							// if(aimesh->HasTextureCoords(0))
+							// 	memcpy(
+							// 		&(mesh->tex_cords[i]),
+							// 		&(aimesh->mTextureCoords[0][i]),
+							// 		sizeof(mesh->tex_cords[i]));
 						}
-						// mesh->set_data();
+						mesh->vbo_set_data();
 						meshes.push_back(mesh);
 					}
 				}

@@ -6,20 +6,53 @@
 using namespace std;
 
 #include <algorithm>
+#include "groups/debug.h"
 // vector<Shader> shaders;
 // vector<Program> programs;
 
-Mesh::Mesh(const char* _f,int n):IFile(_f){
+// ? MESH ***************
+Mesh::Mesh(const char* _f,int n, bool _normals, bool _tex_cords):IFile(_f){
 	n_vertices = n;
-	vertices = new Vertex[n];
+	// vertices = new Vertex[n];
+	// Initialize vertices
+	positions = new glm::vec3[n];
+	if(_normals)normals = new glm::vec3[n];
+	if(_tex_cords)tex_cords = new glm::vec2[n];
+	
 	glGenBuffers(1, &vbo);
+	glGenVertexArrays(1, &vao);
 }
-void Mesh::bind(){glBindBuffer(GL_ARRAY_BUFFER, vbo);}
-void Mesh::set_data(){
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * n_vertices, vertices, GL_STATIC_DRAW);
+void Mesh::gl_draw(){glDrawArrays(GL_TRIANGLES, 0, n_vertices);}
+void Mesh::vbo_bind(){glBindBuffer(GL_ARRAY_BUFFER, vbo);}
+void Mesh::vao_bind(){glBindVertexArray(vao);}
+void Mesh::vbo_set_data(){
+	auto vbo_size = ((positions?sizeof(*positions):0) + 
+					 (normals?sizeof(*normals):0) + 
+					 (tex_cords?sizeof(*tex_cords):0)) * n_vertices;
+	vbo_bind();
+	auto pos_s = sizeof(*positions)*n_vertices,
+	norm_s = sizeof(*normals)*n_vertices,
+	tex_s = sizeof(*tex_cords)*n_vertices;
+	glBufferData(GL_ARRAY_BUFFER, vbo_size, NULL , GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, pos_s , positions);
+	if(normals)glBufferSubData(GL_ARRAY_BUFFER, pos_s, norm_s , normals);
+	if(tex_cords)glBufferSubData(GL_ARRAY_BUFFER, pos_s + norm_s, tex_s , tex_cords);
+	// glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * n_vertices, vertices, GL_STATIC_DRAW);
+	vao_set_vertex_attrib_pointer();
+}
+void Mesh::vao_set_vertex_attrib_pointer(){
+	vao_bind();
+	vbo_bind();
+	auto pos_s = sizeof(*positions)*n_vertices,
+	norm_s = sizeof(*normals)*n_vertices,
+	tex_s = sizeof(*tex_cords)*n_vertices;
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	if(normals)glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)pos_s);
+	if(tex_cords)glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(pos_s+norm_s));
 }
 
+
+// ? SHADER ***************
 void Shader::update(const char* src){
 	glShaderSource(s_id, 1, &src, NULL);
 	glCompileShader(s_id);
@@ -50,19 +83,23 @@ Shader::~Shader(){
 }
 
 
+// ? PROGRAM ***************
 Program::Program(const char* _f):IFile(_f){
-	glGenVertexArrays(1, &vao);
+	// glGenVertexArrays(1, &vao);
 	p_id = glCreateProgram();
 }
 Program::~Program(){clear_shaders();glDeleteProgram(p_id);}
 
 void Program::attach_shader(Shader* shader){
-	if(!shader)return;
+	if(!shader){printf(ANSI_COLOR_RED "Shader %s is null" ANSI_COLOR_RESET "\n", shader->filename);return;}
 	glAttachShader(p_id, shader->s_id);
 	
 	// Adding shader to our list and updating the shader's program list
 	_shaders.push_back(shader);
-	for(auto&p:shader->_programs){if (this == p)return;}
+	for(auto&p:shader->_programs){
+		if (this == p)
+		return;
+	}
 	shader->_programs.push_back(this);
 	
 	link();
@@ -79,7 +116,7 @@ void Program::detach_shader(unsigned int index){
 	shader->_programs.erase(find(shader->_programs.begin(), shader->_programs.end(), this));
 more_than_one:
 	glDetachShader(p_id, shader->s_id);
-	// link();
+	link();
 }
 void Program::clear_shaders(){
 	for(auto &s:_shaders){
@@ -87,22 +124,37 @@ void Program::clear_shaders(){
 		glDetachShader(p_id, s->s_id);
 	}
 	_shaders.clear();
-	// link();
-}
-void Program::link_vertex(Mesh* mesh){
-	glBindVertexArray(vao);
-	mesh->set_data();
-	glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE, (GLsizei)(sizeof(Vertex)), (void*)0);
-	glEnableVertexAttribArray(pos_attrib);
-}
-void Program::link(){
-	glBindFragDataLocation(p_id, 0, "outColor");
-	glLinkProgram(p_id);
-	pos_attrib = glGetAttribLocation(p_id, "pos");
-}
-void Program::use(){
-	glUseProgram(p_id);
-	glBindVertexArray(vao);
+	link();
 }
 
+
+bool attrib_bind(unsigned int p_id, int attrib_num, GLuint index, const char * name, const char* shader_filename, bool crucial=false){
+	if(attrib_num != index){
+		printf((crucial ? ANSI_COLOR_RED:ANSI_COLOR_YELLOW));
+		printf((attrib_num < 0)?"No '%s' attrib":"'%s' attrib different than %d", name, index);
+		printf( " in shader %s" ANSI_COLOR_RESET "\n", shader_filename);
+		if(!crucial && attrib_num >= 0){glBindAttribLocation(p_id, index, name);return true;}
+		else return false;
+	}
+	return true;
+}
+
+
+void Program::link(){
+	if(!_shaders.size())return;
+	glBindFragDataLocation(p_id, 0, "outColor");
+	glLinkProgram(p_id);
+	glGetProgramiv(p_id,GL_LINK_STATUS, &link_status);
+	if(link_status == GL_TRUE){
+		auto pos_attrib = glGetAttribLocation(p_id, "pos"),
+		norm_atrrib = glGetAttribLocation(p_id, "norm"),
+		tex_atrrib = glGetAttribLocation(p_id, "tex");
+		auto shader_f = _shaders[0]->filename;
+		if(attrib_bind(p_id, pos_attrib, 0, "pos", shader_f, true))attribs_enabled |= _BV32(0);
+		else{link_status=GL_FALSE;return;}
+		if(attrib_bind(p_id, norm_atrrib, 1, "norm", shader_f))attribs_enabled |= _BV32(1);
+		if(attrib_bind(p_id, tex_atrrib, 2, "pos", shader_f))attribs_enabled |= _BV32(2);
+	}
+}
+void Program::use(){glUseProgram(p_id);}
 
