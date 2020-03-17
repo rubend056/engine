@@ -77,7 +77,7 @@ namespace inotify{
 				// 	myevent.event = FILE_EVENT::CLOSE;
 				// }
 				if (event->mask & IN_MODIFY){
-					printf("Modified %s\n", event->name);
+					// printf("Modified %s\n", event->name);
 					myevent.event = FILE_EVENT::MODIFY;
 				}
 					

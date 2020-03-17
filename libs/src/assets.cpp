@@ -31,15 +31,15 @@ namespace assets{
 		auto p = new Program("test");
 		programs.push_back(p);
 		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == SHADER_ENUM::VERTEX;})
+			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == VERTEX;})
 		);
 		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == SHADER_ENUM::FRAGMENT;})
+			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == FRAGMENT;})
 		);
-		auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
-        auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
-		p->link();
-		p->link_vertex(mesh);
+		// auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
+        // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
+		// p->link();
+		
 	}
 	
 	

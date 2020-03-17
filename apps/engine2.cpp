@@ -79,11 +79,21 @@ namespace engine
         
         // testing_draw();
         // RENDER
-        assets::programs[0]->use();
-        auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
-        auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
-        // mesh->bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        
+        // auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
+        // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
+        
+        auto& program = assets::programs[0];
+        program->use();
+        
+        if (program->link_status)
+        for(auto&m:assets::meshes){
+            m->vao_bind();
+            m->vao_attrib_enable(program->attribs_enabled);
+            m->gl_draw();
+            m->vao_attrib_disable();
+        }
+        
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
