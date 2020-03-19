@@ -57,9 +57,18 @@ void Shader::update(const char* src){
 	glShaderSource(s_id, 1, &src, NULL);
 	glCompileShader(s_id);
 	glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
-	glGetShaderInfoLog(s_id, sizeof(log), NULL, log);
 	
-	printf("Shader %s compilation %s\n", filename, (status == GL_TRUE)?"success!":"ERROR");
+	printf((status == GL_TRUE)?ANSI_COLOR_GREEN:ANSI_COLOR_RED);
+	printf("Shader %s compilation %s\n" ANSI_COLOR_RESET, filename, (status == GL_TRUE)?"success!":"ERROR");
+	
+	int log_length;
+	glGetShaderiv(s_id, GL_INFO_LOG_LENGTH, &log_length);
+	if(log_length){
+		delete[] log;log = new char[log_length];
+		glGetShaderInfoLog(s_id, log_length, NULL, log);
+		cout << log << endl;
+	}
+	
 	if(status == GL_TRUE){for(auto&p:_programs)p->link();}
 }
 
@@ -128,37 +137,50 @@ void Program::clear_shaders(){
 }
 
 
-bool attrib_bind(unsigned int p_id, int attrib_num, GLuint index, const char * name, const char* shader_filename, bool crucial=false){
-	if(attrib_num != index){
+bool attrib_bind(unsigned int p_id, int attrib_num, GLuint good_attrib_num, const char * name, const char* shader_filename, bool crucial=false){
+	if(attrib_num != good_attrib_num){
 		printf((crucial ? ANSI_COLOR_RED:ANSI_COLOR_YELLOW));
-		printf((attrib_num < 0)?"No '%s' attrib":"'%s' attrib different than %d", name, index);
+		printf((attrib_num < 0)?"No '%s' attrib":"'%s' attrib different than %d", name, good_attrib_num);
 		printf( " in shader %s" ANSI_COLOR_RESET "\n", shader_filename);
-		if(!crucial && attrib_num >= 0){glBindAttribLocation(p_id, index, name);return true;}
+		if(!crucial && attrib_num >= 0){glBindAttribLocation(p_id, good_attrib_num, name);return true;}
 		else return false;
 	}
 	return true;
 }
 
 
+void print_link_status(int link_status, const char* filename){
+	printf((link_status == GL_TRUE)?ANSI_COLOR_GREEN:ANSI_COLOR_RED);
+	printf("Program %s link %s"ANSI_COLOR_RESET"\n", filename, (link_status)?"OK":"BAD");
+}
+
 void Program::link(){
 	if(!_shaders.size())return;
 	glBindFragDataLocation(p_id, 0, "outColor");
 	glLinkProgram(p_id);
 	glGetProgramiv(p_id,GL_LINK_STATUS, &link_status);
+	
+	print_link_status(link_status, filename);
+	
 	if(link_status == GL_TRUE){
 		auto pos_attrib = glGetAttribLocation(p_id, "pos"),
 		norm_atrrib = glGetAttribLocation(p_id, "norm"),
-		tex_atrrib = glGetAttribLocation(p_id, "tex");
+		tex_atrrib = glGetAttribLocation(p_id, "tex_cord");
 		auto shader_f = _shaders[0]->filename;
 		if(attrib_bind(p_id, pos_attrib, 0, "pos", shader_f, true))attribs_enabled |= _BV32(0);
 		else{link_status=GL_FALSE;return;}
 		if(attrib_bind(p_id, norm_atrrib, 1, "norm", shader_f))attribs_enabled |= _BV32(1);
-		if(attrib_bind(p_id, tex_atrrib, 2, "pos", shader_f))attribs_enabled |= _BV32(2);
+		if(attrib_bind(p_id, tex_atrrib, 2, "tex_cord", shader_f))attribs_enabled |= _BV32(2);
 		
-		use();
-		auto u = glGetUniformLocation(p_id, "color");
-		if(u>=0)glUniform3f(u, 0, 0, 1);
+		if(link_status){
+			use();
+			auto u = glGetUniformLocation(p_id, "color_uniform");
+			if(u>=0)glUniform3f(u, 0, 0, 1);
+		}
 	}
 }
-void Program::use(){glUseProgram(p_id);}
+void Program::use(){
+	if(link_status)glUseProgram(p_id);
+	else {printf("Can't use "); print_link_status(link_status, filename);}
+}
 

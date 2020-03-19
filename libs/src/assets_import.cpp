@@ -61,14 +61,22 @@ const float testvertices[]{
     0.0f, 0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,
     -0.5f, -0.5f, 0.0f};
+const float testtextcords[]{
+	0.5f, 1.0f,
+	1.0f, 0.0f,
+	0.0f, 0.0f
+};
 
 void import_assets() {
     Assimp::Importer importer;
 
     // TEST MESHES
-    auto tmesh = new Mesh("testmesh", 3);
-    for (int i = 0; i < 3; ++i)
-        memcpy(&tmesh->positions[i], &testvertices[i * 3], 3 * sizeof(float));
+    auto tmesh = new Mesh("testmesh", 3, false, true);
+    for (int i = 0; i < 3; ++i){
+		memcpy(&tmesh->positions[i], &testvertices[i * 3], 3 * sizeof(float));
+		memcpy(&tmesh->tex_cords[i], &testtextcords[i * 2], 2 * sizeof(float));
+	}
+        
     tmesh->vbo_set_data();
     meshes.push_back(tmesh);
 
@@ -84,7 +92,7 @@ void import_assets() {
         auto ext = boost::algorithm::to_lower_copy(e.path().extension().string());
         auto filename = boost::algorithm::to_lower_copy(e.path().filename().string());
         if (importer.IsExtensionSupported(ext)) {
-            auto scene = importer.ReadFile(path.c_str(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+            auto scene = importer.ReadFile(path.c_str(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_SortByPType);
 
             printf("Assimp %sread file %s\n", (!scene) ? "coudn't " : "", path.c_str());
             if (!scene) continue;
@@ -93,24 +101,24 @@ void import_assets() {
             if (scene->HasMeshes())
                 for (int i = 0; i < scene->mNumMeshes; ++i) {
                     auto aimesh = scene->mMeshes[i];
-
+					
                     if (aimesh->HasPositions()) {
-                        auto mesh = new Mesh(filename.c_str(), aimesh->mNumVertices);
+                        auto mesh = new Mesh(filename.c_str(), aimesh->mNumVertices, aimesh->HasNormals(), aimesh->HasTextureCoords(0));
                         for (int i = 0; i < aimesh->mNumVertices; ++i) {
                             memcpy(
                                 &(mesh->positions[i]),
                                 &(aimesh->mVertices[i]),
                                 sizeof(mesh->positions[i]));
-                            // if(aimesh->HasNormals())
-                            // 	memcpy(
-                            // 		&(mesh->normals[i]),
-                            // 		&(aimesh->mNormals[i]),
-                            // 		sizeof(mesh->normals[i]));
-                            // if(aimesh->HasTextureCoords(0))
-                            // 	memcpy(
-                            // 		&(mesh->tex_cords[i]),
-                            // 		&(aimesh->mTextureCoords[0][i]),
-                            // 		sizeof(mesh->tex_cords[i]));
+                            if(aimesh->HasNormals())
+                            	memcpy(
+                            		&(mesh->normals[i]),
+                            		&(aimesh->mNormals[i]),
+                            		sizeof(mesh->normals[i]));
+                            if(aimesh->HasTextureCoords(0))
+                            	memcpy(
+                            		&(mesh->tex_cords[i]),
+                            		&(aimesh->mTextureCoords[0][i]),
+                            		sizeof(mesh->tex_cords[i]));
                         }
                         mesh->vbo_set_data();
                         meshes.push_back(mesh);

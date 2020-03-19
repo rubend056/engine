@@ -35,6 +35,7 @@ include_directories(
 	extern/sdl2/include/SDL2
 	extern/soil/include
 	
+	extern
 	extern/imgui
 	extern/imgui/examples
 	
@@ -42,6 +43,7 @@ include_directories(
 	libs/include
 )
 
+add_library(glad STATIC extern/glad/glad.c)
 add_subdirectory(extern/imgui)
 add_subdirectory(libs)
 

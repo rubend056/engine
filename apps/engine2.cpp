@@ -58,26 +58,24 @@ ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.00f);
 namespace engine
 {
     void init(){
-        selected.push_back(instantiate());
+        load_settings_glEnable();
+		selected.push_back(instantiate());
 		assets::init();
         
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-
-        load_settings_glEnable();
     }
 
     void update(){
+		
 		menus::imgui_engine_update();
-        menus::stats();
-        menus::inspector(selected[0]);
-        menus::files(project_path);
-        menus::text_editor();
+        
 		
         // window_glEnable_config();
         
 		assets::update();
     }
     void render(SDL_Window* window, ImGuiIO& io){
+		
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
@@ -89,16 +87,22 @@ namespace engine
         // auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
         // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
         
+		if(assets::textures.size()){
+			auto &texture = assets::textures[0];
+			glBindTexture(GL_TEXTURE_2D, texture->t_id);
+		}
+		
         auto& program = assets::programs[0];
-        program->use();
+        if (program->link_status){
+			program->use();
+			for(auto&m:assets::meshes){
+				m->vao_bind();
+				m->vao_attrib_enable(program->attribs_enabled);
+				m->gl_draw();
+				m->vao_attrib_disable();
+			}
+		}
         
-        if (program->link_status)
-        for(auto&m:assets::meshes){
-            m->vao_bind();
-            m->vao_attrib_enable(program->attribs_enabled);
-            m->gl_draw();
-            m->vao_attrib_disable();
-        }
         
         
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
