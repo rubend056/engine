@@ -36,6 +36,11 @@ namespace assets{
 		p->attach_shader(
 			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == FRAGMENT;})
 		);
+		p->use();
+		
+		auto u = glGetUniformLocation(p->p_id, "color");
+		glUniform3f(u, 0, 0, 1);
+		
 		// auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
         // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
 		// p->link();

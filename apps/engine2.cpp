@@ -5,6 +5,7 @@
 #include "components/components.h"
 
 #include "groups/gl.h"
+#include "menus/imgui_engine.h"
 
 #include <SDL.h>
 
@@ -59,14 +60,20 @@ namespace engine
     void init(){
         selected.push_back(instantiate());
 		assets::init();
-        // testing_init();
+        
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+
+        load_settings_glEnable();
     }
 
     void update(){
+		menus::imgui_engine_update();
         menus::stats();
         menus::inspector(selected[0]);
         menus::files(project_path);
         menus::text_editor();
+		
+        // window_glEnable_config();
         
 		assets::update();
     }
@@ -74,7 +81,6 @@ namespace engine
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         
         // testing_draw();

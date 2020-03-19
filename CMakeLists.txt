@@ -64,6 +64,7 @@ target_link_libraries(engine
 	#Core libraries for engine
 	libSOIL.a
 	libSDL2d.a
+	libSDL2maind.a
 	
 	assimp
 	libIrrXML.a

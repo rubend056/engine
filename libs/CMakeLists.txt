@@ -11,7 +11,8 @@ add_library(menus STATIC
     src/menus/inspector.cpp
     src/menus/files.cpp
     src/menus/text_editor.cpp
-	src/menus/stats.cpp
+    src/menus/stats.cpp
+    src/menus/imgui_engine.cpp
 )
 target_link_libraries(menus imgui assets)
 
