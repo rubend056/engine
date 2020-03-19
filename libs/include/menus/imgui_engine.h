@@ -2,6 +2,7 @@
 #define imgui_engine_h
 
 #include "cereal/archives/json.hpp"
+#include "menus/menus.h"
 #include "engine.h"
 
 namespace menus{

@@ -111,14 +111,18 @@ void window_glEnable_config(bool *p_open) {
 
         switch (s.index) {
             case GL_COLOR_LOGIC_OP: {
-                // Find our logic op index in our array
+                // Find our logic op index in our array only the first time
                 static int logic_ops_i = -1;
-                if (logic_ops_i == -1) logic_ops_i = (std::find_if(std::begin(logic_ops), std::end(logic_ops), [](LogicOp &o) -> bool {
-                                                          int j;
-                                                          glGetIntegerv(GL_LOGIC_OP_MODE, &j);
-                                                          return j == o.index;
-                                                      }) -
-                                                      std::begin(logic_ops));
+                if (logic_ops_i == -1)
+                    logic_ops_i =
+                        (std::find_if(std::begin(logic_ops),
+                                      std::end(logic_ops),
+                                      [](LogicOp &o) -> bool {
+                                          int j;
+                                          glGetIntegerv(GL_LOGIC_OP_MODE, &j);
+                                          return j == o.index;
+                                      }) -
+                         std::begin(logic_ops));
 
                 // Format the logic ops for the dropdown menu
                 static std::string logic_ops_str;
@@ -140,46 +144,63 @@ void window_glEnable_config(bool *p_open) {
     ImGui::End();
 }
 
-
 void menus::imgui_engine_update() {
-    static bool show_glEnable = false;
-    static bool show_open = false;
-    static bool show_save_as = false;
+    static bool
+        show_glEnable = false,
+        show_open = false,
+        show_metrics_window = true,
+        show_stats = false,
+        show_inspector = true,
+        show_files = true;
 
     if (show_glEnable) window_glEnable_config(&show_glEnable);
     if (show_open) window_open_project(&show_open);
-	
-	
-	
-    ImGui::BeginMainMenuBar();
-    if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("Open")) {
-        }
-		
-		
-        if(ImGui::SmallButton("Save Scene"))
-		// if(ImGui::IsItemActivated())
-            ImGui::OpenPopup("SaveAs");
-		
-		if (ImGui::BeginPopupModal("SaveAs", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-			ImGui::Text("Save as modal");
-			if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
-			ImGui::EndPopup();
-		}
-		
-        if (ImGui::MenuItem("Quit")) {
-            engine::run = false;
-        }
-        ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Settings")) {
-        if (ImGui::BeginMenu("OpenGL")) {
-            ImGui::MenuItem("glEnable", NULL, &show_glEnable);
+
+    if (show_metrics_window) ImGui::ShowMetricsWindow(&show_metrics_window);
+
+    if (show_stats) menus::stats(&show_stats);
+    if (show_inspector) menus::inspector(engine::selected[0], &show_inspector);
+    if (show_files) menus::files(engine::project_path, &show_files);
+
+    menus::text_editor();
+
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Open")) {
+            }
+
+            if (ImGui::SmallButton("Save Scene"))
+                // if(ImGui::IsItemActivated())
+                ImGui::OpenPopup("SaveAs");
+
+            if (ImGui::BeginPopupModal("SaveAs", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+                ImGui::Text("Save as modal");
+                if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::MenuItem("Quit")) {
+                engine::run = false;
+            }
             ImGui::EndMenu();
         }
-        ImGui::EndMenu();
+        if (ImGui::BeginMenu("Settings")) {
+            if (ImGui::BeginMenu("OpenGL")) {
+                ImGui::MenuItem("glEnable", NULL, &show_glEnable);
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("View")) {
+            ImGui::MenuItem("Metrics", NULL, &show_metrics_window);
+            ImGui::MenuItem("Stats", NULL, &show_stats);
+            ImGui::MenuItem("Inspector", NULL, &show_inspector);
+            ImGui::MenuItem("Files", NULL, &show_files);
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
     }
-    ImGui::EndMainMenuBar();
 }
 
 void window_open_project(bool *p_open) {

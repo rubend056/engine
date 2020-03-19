@@ -1,10 +1,14 @@
-#version 150 core
+#version 450 core
 
-uniform vec3 color;
-
+in vec2 Tex_cord;
 out vec4 outColor;
+
+uniform vec3 color_uniform;
+uniform sampler2D tex;
 
 void main()
 {
-	outColor = vec4(color, 0.1);
+	outColor = 
+	texture(tex, Tex_cord) * 
+	vec4(color_uniform, 1) + vec4(.1);
 }

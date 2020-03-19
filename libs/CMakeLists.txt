@@ -1,4 +1,4 @@
-add_library(glad STATIC src/glad.c)
+
 
 add_library(assets STATIC 
 	src/inotify_imp.cpp

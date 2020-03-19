@@ -6,8 +6,8 @@ using namespace std;
 
 namespace menus{
 	
-    void files(string root){
-        ImGui::Begin("Files");
+    void files(string root,bool* p_open){
+        ImGui::Begin("Files",p_open);
         
         // Filter code
         static ImGuiTextFilter filter;
