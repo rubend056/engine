@@ -5,6 +5,7 @@
 #include "assets.h"
 
 #include "rendering/gl_helper.h"
+#include "groups/debug.h"
 // #include "rendering/mesh.h"
 
 #include "inotify_imp.h"

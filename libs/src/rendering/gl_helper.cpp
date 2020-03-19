@@ -154,6 +154,10 @@ void Program::link(){
 		else{link_status=GL_FALSE;return;}
 		if(attrib_bind(p_id, norm_atrrib, 1, "norm", shader_f))attribs_enabled |= _BV32(1);
 		if(attrib_bind(p_id, tex_atrrib, 2, "pos", shader_f))attribs_enabled |= _BV32(2);
+		
+		use();
+		auto u = glGetUniformLocation(p_id, "color");
+		if(u>=0)glUniform3f(u, 0, 0, 1);
 	}
 }
 void Program::use(){glUseProgram(p_id);}
