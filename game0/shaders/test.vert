@@ -5,7 +5,7 @@ layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 tex_cord;
 
 
-out vec2 Tex_cord;
+layout (location = 0) out vec2 Tex_cord;
 
 void main()
 {

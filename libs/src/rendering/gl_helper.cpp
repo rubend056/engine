@@ -29,14 +29,19 @@ void Mesh::vbo_set_data(){
 	auto vbo_size = ((positions?sizeof(*positions):0) + 
 					 (normals?sizeof(*normals):0) + 
 					 (tex_cords?sizeof(*tex_cords):0)) * n_vertices;
-	vbo_bind();
+	
 	auto pos_s = sizeof(*positions)*n_vertices,
 	norm_s = sizeof(*normals)*n_vertices,
 	tex_s = sizeof(*tex_cords)*n_vertices;
+	vbo_bind();
+	// Setting the array buffer size
 	glBufferData(GL_ARRAY_BUFFER, vbo_size, NULL , GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, pos_s , positions);
-	if(normals)glBufferSubData(GL_ARRAY_BUFFER, pos_s, norm_s , normals);
-	if(tex_cords)glBufferSubData(GL_ARRAY_BUFFER, pos_s + norm_s, tex_s , tex_cords);
+	// Filling the array buffer with our RAM data
+	unsigned long i=0;
+	auto f = [&i](unsigned long s, void*d) -> void{  glBufferSubData(GL_ARRAY_BUFFER, i, s, d);i+=s;  };
+	f(pos_s, positions);
+	if(normals)f(norm_s, normals);
+	if(tex_cords)f(tex_s, tex_cords);
 	// glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * n_vertices, vertices, GL_STATIC_DRAW);
 	vao_set_vertex_attrib_pointer();
 }
