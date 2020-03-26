@@ -19,7 +19,7 @@ target_link_libraries(menus imgui assets)
 add_library(components STATIC 
     src/gameobject.cpp
 	src/components/camera.cpp
-	
+	src/components/transform.cpp
 )
 
 add_library(rendering STATIC

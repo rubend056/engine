@@ -7,23 +7,16 @@
 #include <string>
 #include <vector>
 
+
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "groups/gl.h"
 
 #include "SOIL.h"
+#include "components/component.h"
 
 #define _BV32(x) ((uint32_t)1 << x)
-
-class IFile {
-   public:
-    char *filename;
-    IFile(const char *_f) {
-        filename = new char[strlen(_f)];
-        strcpy(filename, _f);
-    }
-    ~IFile() { delete[] filename; }
-};
+#include "serialize.h"
 
 // struct Vertex {
 //     glm::vec3 Position;
@@ -31,12 +24,12 @@ class IFile {
 //     glm::vec2 TexCoords;
 // };
 
-class Mesh : public IFile {
+class Mesh : public File {
    private:
     void vao_set_vertex_attrib_pointer();
     // Can't modify this after constructor is called
-    unsigned int vbo;
-    unsigned int vao;
+    unsigned int vbo_id;
+    unsigned int vao_id;
 
    protected:
     unsigned int n_vertices;
@@ -56,11 +49,11 @@ class Mesh : public IFile {
                            (tex_cords ? _BV32(2) : 0);
         for (int i = 0; i < 3; ++i)
             if (attribs & enabled & _BV32(i))
-                glEnableVertexArrayAttrib(vao, i);
+                glEnableVertexArrayAttrib(vao_id, i);
     };
     void vao_attrib_disable() {
         for (int i = 0; i < 3; ++i)
-            glDisableVertexArrayAttrib(vao, i);
+            glDisableVertexArrayAttrib(vao_id, i);
     };
     virtual void vbo_set_data();
     virtual void gl_draw();
@@ -74,7 +67,7 @@ class Mesh : public IFile {
 
 class FilledCircleMesh : public Mesh {
    public:
-    void gl_draw() { glDrawArrays(GL_TRIANGLE_FAN, 0, n_vertices); }
+    void gl_draw() override { glDrawArrays(GL_TRIANGLE_FAN, 0, n_vertices); }
     FilledCircleMesh(const char *_f, float radius, unsigned int subdivisions) : Mesh(_f, subdivisions + 2) {
         positions[0] = glm::vec3(0);
 
@@ -86,10 +79,10 @@ class FilledCircleMesh : public Mesh {
     }
 };
 
-class Texture : public IFile {
+class Texture : public File {
    public:
     unsigned int t_id;
-    Texture(const char *_f, const char *path) : IFile(_f) {
+    Texture(const char *_f, const char *path) : File(_f) {
         int width, height;
         auto image = SOIL_load_image(
             path,
@@ -116,20 +109,21 @@ class Texture : public IFile {
     }
 };
 
-enum SHADER_ENUM {
-    NOTHING = 0,
-    VERTEX,
-    GEOMETRY,
-    FRAGMENT
-};
+// enum SHADER_ENUM {
+//     NOTHING = 0,
+//     VERTEX,
+//     GEOMETRY,
+//     FRAGMENT
+// };
 
-struct Program;  //Forward declaration
+class Program;  //Forward declaration
 
-struct Shader : public IFile {
+class Shader : public File {
+public:
     unsigned int s_id;
-    SHADER_ENUM type;
+    GLenum type;
     int status;
-    char *log = new char[512];
+    char log[200];
 
     std::vector<Program *> _programs;
 
@@ -141,22 +135,53 @@ struct Shader : public IFile {
 	 * @param type Must be one of:
 	 * GL_COMPUTE_SHADER, GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER, or GL_FRAGMENT_SHADER
 	 */
-    Shader(SHADER_ENUM type, const char *_f, const char *src = NULL);
+    Shader(GLenum type, const char *_f, const char *src = NULL);
     ~Shader();
 };
 
-struct Program : public IFile {
+
+struct Attribute{
+	GLboolean uniform=false;
+	GLint i;
+	GLint location;
+	GLint size;
+	GLenum type=0;
+	static const GLsizei max_name=20;
+	GLchar name[max_name];
+	GLsizei length;
+	void* val=nullptr;
+	
+	// void create_delete(bool create);
+	// Attribute(){}
+	// virtual ~Attribute(){}
+};
+template <typename T>
+struct AttributeVar:public Attribute{
+	std::unique_ptr<T> _val = std::unique_ptr<T>(new T(0));
+	AttributeVar(void*_last_val=nullptr){
+		if(_last_val)memcpy(_val.get(), _last_val, sizeof(T));
+		val = _val.get();
+	}
+};
+
+class Program : public File, public Component {
+public:
     unsigned int p_id;
     int link_status = 0;
-    uint32_t attribs_enabled = 0;
+    uint32_t attribs_enabled (){
+		uint32_t t=0;
+		for(auto&a:attributes)if(!a->uniform)t|=_BV32(a->location);
+		return t;
+	};
 
-    std::vector<Shader *> _shaders;
+    std::vector<std::shared_ptr<Shader>> _shaders;
+	std::vector<std::unique_ptr<Attribute>> attributes;
 
     /**
 	 * Adds a shader to the program
 	 * glAttachShader
 	 */
-    void attach_shader(Shader *shader);
+    void attach_shader(std::shared_ptr<Shader> shader);
     void detach_shader(unsigned int index);
     void clear_shaders();
     void link();
@@ -167,8 +192,17 @@ struct Program : public IFile {
 	 * glUseProgram
 	 */
     void use();
-    Program(const char *_f);
-    ~Program();
+	
+	COMPONENT_IMGUI_DRAW override;
+	COMPONENT_IMGUI_NAME override{
+		return (std::string("Program ") + filename).c_str();
+	}
+	COMPONENT_NAME {return "Program";}
+    Program(const char *_f=nullptr):File(_f){p_id = glCreateProgram();};
+    ~Program(){
+		clear_shaders();
+		glDeleteProgram(p_id);
+	};
 };
 
 #endif

@@ -1,24 +1,22 @@
 #ifndef GameObject_h
 #define GameObject_h
 
-// #include <SDL2/SDL.h>
-// #include <SDL2/SDL2_gfxPrimitives.h>
-
 #include <vector>
 #include <glm/vec3.hpp>
-#include "components/component.h"
+#include "components/components.h"
+#include "serialize.h"
 
-class GameObject{
+class GameObject:public File{
     
     public:
         bool enabled = true;
-        glm::vec3 pos = glm::vec3(0);
-        glm::vec3 rot = glm::vec3(0);
-        glm::vec3 sca = glm::vec3(0);
-
-        std::vector<Component*> comps;
-        void add_component(Component* c);
-        GameObject(){}
+		
+        std::vector<std::shared_ptr<Component>> comps;
+        void add_component(std::shared_ptr<Component> c);
+		
+        GameObject(const char* _f=nullptr):File(_f){
+			comps.push_back(std::shared_ptr<Component>(new Transform()));
+		}
 };
 
 #endif

@@ -37,24 +37,27 @@ Gl_Enable_Setting gl_enable_settings[] = {
 
 #define GLENABLE_ARCHIVE_NAME (engine::project_path + "/glEnable_settings.json").c_str()
 
-void glEnable_apply_settings() {
-    for (auto &s : gl_enable_settings)
-        if (s.value)
-            glEnable(s.index);
-        else
-            glDisable(s.index);
-}
+// void glEnable_apply_settings() {
+    
+// }
 
 void load_settings_glEnable() {
     std::ifstream fs(GLENABLE_ARCHIVE_NAME);
+	// If there's no file, set current settings
     if (!fs.is_open()) {
         for (auto &s : gl_enable_settings)
             s.value = glIsEnabled(s.index);
         return;
     }
+	// If there is a file, set the file's settings
     cereal::JSONInputArchive ar(fs);
     ar(gl_enable_settings);
-    glEnable_apply_settings();
+	
+    for (auto &s : gl_enable_settings)
+        if (s.value)
+            glEnable(s.index);
+        else
+            glDisable(s.index);
 }
 
 #include <algorithm>
@@ -150,7 +153,9 @@ void menus::imgui_engine_update() {
         show_open = false,
         show_metrics_window = true,
         show_stats = false,
-        show_inspector = true,
+        show_inspector = false,
+		// show_textures = true,
+		// show_programs = true,
         show_files = true;
 
     if (show_glEnable) window_glEnable_config(&show_glEnable);
@@ -160,7 +165,7 @@ void menus::imgui_engine_update() {
 
     if (show_stats) menus::stats(&show_stats);
     if (show_inspector) menus::inspector(engine::selected[0], &show_inspector);
-    if (show_files) menus::files(engine::project_path, &show_files);
+    if (show_files) menus::files(&show_files);
 
     menus::text_editor();
 
@@ -192,10 +197,17 @@ void menus::imgui_engine_update() {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
-            ImGui::MenuItem("Metrics", NULL, &show_metrics_window);
-            ImGui::MenuItem("Stats", NULL, &show_stats);
+			if(ImGui::BeginMenu("Assets")){
+				ImGui::MenuItem("Files", NULL, &show_files);
+				ImGui::EndMenu();
+			}
+			if(ImGui::BeginMenu("Debug")){
+				ImGui::MenuItem("Metrics", NULL, &show_metrics_window);
+            	ImGui::MenuItem("Stats", NULL, &show_stats);
+				ImGui::EndMenu();
+			}
             ImGui::MenuItem("Inspector", NULL, &show_inspector);
-            ImGui::MenuItem("Files", NULL, &show_files);
+            
             ImGui::EndMenu();
         }
 

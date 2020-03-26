@@ -53,13 +53,43 @@ using namespace std;
     
 // }
 
+// #include "cereal/types/polymorphic.hpp"
+// struct A{
+	
+// };
+// struct B{
+// 	int j=4;
+// 	virtual void t()=0;
+// 	template<class Archive>
+// 	void serialize(Archive & ar){
+// 		ar(CEREAL_NVP(j));
+// 	}
+// };
+// struct J:public B{
+// 	void t(){};
+// 	int l=2;
+// 	template<class Archive>
+// 	void serialize(Archive & ar){
+// 		ar(cereal::make_nvp("B",cereal::base_class<B>(this)), CEREAL_NVP(l));
+// 	}
+// };
+// #include <cereal/archives/json.hpp>
+// CEREAL_REGISTER_TYPE_WITH_NAME(J, "JType");
+// // CEREAL_REGISTER_POLYMORPHIC_RELATION(B, J)
+
 
 ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.00f);
 namespace engine
 {
     void init(){
+		// std::shared_ptr<B> b(new J);
+		// cereal::JSONOutputArchive oarchive(std::cout);
+		// oarchive(b);
+		
         load_settings_glEnable();
-		selected.push_back(instantiate());
+		auto go = instantiate();
+		strcpy(go->filename,"First GObject");
+		selected.push_back(go);
 		assets::init();
         
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
@@ -97,7 +127,7 @@ namespace engine
 			program->use();
 			for(auto&m:assets::meshes){
 				m->vao_bind();
-				m->vao_attrib_enable(program->attribs_enabled);
+				m->vao_attrib_enable(program->attribs_enabled());
 				m->gl_draw();
 				m->vao_attrib_disable();
 			}

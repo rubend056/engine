@@ -28,13 +28,19 @@ namespace assets{
 		
 		import_assets();
 		
-		auto p = new Program("test");
+		auto p = std::shared_ptr<Program>(new Program("test"));
 		programs.push_back(p);
 		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == VERTEX;})
+			*find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_VERTEX_SHADER;})
 		);
 		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](Shader* &s) -> bool{return s->type == FRAGMENT;})
+			*find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_FRAGMENT_SHADER;})
+		);
+		p->attach_shader(
+			*find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_FRAGMENT_SHADER;})
+		);
+		p->detach_shader(
+			find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_FRAGMENT_SHADER;}) - shaders.begin()
 		);
 		// if(p->link_status){
 		// 	p->use();

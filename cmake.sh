@@ -2,5 +2,5 @@
 
 mkdir -p build
 cd build
-cmake .. && make -j4 && ./engine ../game0
+cmake .. && make -j1 && ./engine ../game0
 cd ..

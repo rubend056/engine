@@ -3,33 +3,33 @@
 
 namespace assets {
 //? RENDERING **************************
-vector<Mesh *> meshes;
-vector<Shader *> shaders;
-vector<Texture *> textures;
-vector<Program *> programs;
+std::vector<std::shared_ptr<Mesh>> meshes;
+std::vector<std::shared_ptr<Shader>> shaders;
+std::vector<std::shared_ptr<Texture>> textures;
+std::vector<std::shared_ptr<Program>> programs;
 
 bool init_shader(fs::directory_entry &e) {
     auto path = e.path().string();
     auto ext = boost::algorithm::to_lower_copy(e.path().extension().string());
     auto filename = boost::algorithm::to_lower_copy(e.path().filename().string());
     if (ext.compare(".glsl") == 0 || ext.compare(".vert") == 0 || ext.compare(".frag") == 0) {
-        SHADER_ENUM type = NOTHING;
+        GLenum type = 0;
         if (ext.compare(".frag") == 0)
-            type = FRAGMENT;
+            type = GL_FRAGMENT_SHADER;
         else if (ext.compare(".vert") == 0)
-            type = VERTEX;
+            type = GL_VERTEX_SHADER;
         else if (filename.find("fragment") != string::npos || filename.find("frag") != string::npos)
-            type = FRAGMENT;
+            type = GL_FRAGMENT_SHADER;
         else if (filename.find("geometry") != string::npos)
-            type = GEOMETRY;
+            type = GL_GEOMETRY_SHADER;
         else if (filename.find("vertex") != string::npos)
-            type = VERTEX;
+            type = GL_VERTEX_SHADER;
 
-        if (type != NOTHING) {
+        if (type != 0) {
             printf("Importing %s as type %d shader\n", filename.c_str(), type);
             auto sfile = ifstream(path.c_str());
             auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
-            auto shader = new Shader(type, e.path().filename().string().c_str(), data.c_str());
+            auto shader = std::shared_ptr<Shader>(new Shader(type, e.path().filename().string().c_str(), data.c_str()));
             shaders.push_back(shader);
         } else
             printf("Coudn't find type for shader %s, please update filename\n", filename.c_str());
@@ -71,7 +71,7 @@ void import_assets() {
     Assimp::Importer importer;
 
     // TEST MESHES
-    auto tmesh = new Mesh("testmesh", 3, false, true);
+    auto tmesh = std::shared_ptr<Mesh>(new Mesh("testmesh", 3, false, true));
     for (int i = 0; i < 3; ++i){
 		memcpy(&tmesh->positions[i], &testvertices[i * 3], 3 * sizeof(float));
 		memcpy(&tmesh->tex_cords[i], &testtextcords[i * 2], 2 * sizeof(float));
@@ -103,7 +103,7 @@ void import_assets() {
                     auto aimesh = scene->mMeshes[i];
 					
                     if (aimesh->HasPositions()) {
-                        auto mesh = new Mesh(filename.c_str(), aimesh->mNumVertices, aimesh->HasNormals(), aimesh->HasTextureCoords(0));
+                        auto mesh = std::shared_ptr<Mesh>(new Mesh(filename.c_str(), aimesh->mNumVertices, aimesh->HasNormals(), aimesh->HasTextureCoords(0)));
                         for (int i = 0; i < aimesh->mNumVertices; ++i) {
                             memcpy(
                                 &(mesh->positions[i]),
@@ -132,7 +132,7 @@ void import_assets() {
             ext.compare(".png") == 0 |
             ext.compare(".jpg") == 0 |
             ext.compare(".jpeg") == 0) {
-            auto t = new Texture(filename.c_str(), path.c_str());
+            auto t = std::shared_ptr<Texture>(new Texture(filename.c_str(), path.c_str()));
             printf("Imported image %s\n", filename.c_str());
 			textures.push_back(t);
             // }else printf(ANSI_COLOR_RED "Error SOIL importing texture %s\n" ANSI_COLOR_RESET, filename.c_str());

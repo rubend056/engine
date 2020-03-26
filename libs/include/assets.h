@@ -7,12 +7,14 @@
 #include "rendering/gl_helper.h"
 
 namespace assets{
+	
+	
 	extern std::vector<fs::directory_entry> entries;
 	
-	extern std::vector<Mesh*> meshes;
-	extern std::vector<Shader*> shaders;
-	extern std::vector<Texture*> textures;
-	extern std::vector<Program*> programs;
+	extern std::vector<std::shared_ptr<Mesh>> meshes;
+	extern std::vector<std::shared_ptr<Shader>> shaders;
+	extern std::vector<std::shared_ptr<Texture>> textures;
+	extern std::vector<std::shared_ptr<Program>> programs;
 	
 	void init();
 	void update();

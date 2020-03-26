@@ -26,8 +26,8 @@ namespace engine{
     void render(SDL_Window* window, ImGuiIO& io);
 	void exit();
     
-    GameObject* instantiate();
-    void destroy(GameObject* gobj);
+    std::shared_ptr<GameObject> instantiate();
+    // void destroy(GameObject* gobj);
 }
 
 
