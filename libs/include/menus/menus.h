@@ -17,9 +17,10 @@ namespace menus
     // files_open=0
     // // text_editor_open=0
     // ;
-    void inspector(GameObject*o, bool* p_open=NULL);
+    void inspector(std::shared_ptr<GameObject> o, bool* p_open=NULL);
 
-    void files(std::string root, bool* p_open=NULL);
+    void files(bool* p_open=NULL);
+	void programs(bool* p_open=NULL);
     
     void open_text_editor(fs::path path);
     void text_editor();

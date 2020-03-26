@@ -86,7 +86,8 @@
 		"csetjmp": "cpp",
 		"strstream": "cpp",
 		"cfenv": "cpp",
-		"*.inc": "cpp"
+		"*.inc": "cpp",
+		"version": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled",
 	"files.exclude": {

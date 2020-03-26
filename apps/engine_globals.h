@@ -6,12 +6,13 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 // Has initialization of everything as well as basic functions init, update, render, etc...
 namespace engine{
     extern bool run;
-    extern std::vector<GameObject*> objects;
-    extern std::vector<GameObject*> selected;
+    extern std::vector<std::shared_ptr<GameObject>> objects;
+    extern std::vector<std::shared_ptr<GameObject>> selected;
     extern std::string project_path;
 }
 

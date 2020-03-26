@@ -6,8 +6,8 @@ using namespace std;
 
 namespace engine{
     bool run = true;
-    std::vector<GameObject*> objects;
-    std::vector<GameObject*> selected;
+    std::vector<std::shared_ptr<GameObject>> objects;
+    std::vector<std::shared_ptr<GameObject>> selected;
     std::string project_path;
 }
 
@@ -74,6 +74,8 @@ int main( int argc, char* args[] )
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+	static auto iniPath=(project_path + "/imgui.ini");
+	io.IniFilename = iniPath.c_str();
     //ImGui::StyleColorsClassic();
     
     cout << glGetString(GL_VERSION) << endl;
