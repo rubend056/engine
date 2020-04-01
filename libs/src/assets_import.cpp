@@ -3,58 +3,12 @@
 
 namespace assets {
 //? RENDERING **************************
-std::vector<std::shared_ptr<Mesh>> meshes;
-std::vector<std::shared_ptr<Shader>> shaders;
-std::vector<std::shared_ptr<Texture>> textures;
-std::vector<std::shared_ptr<Program>> programs;
+std::unordered_map<std::string, std::shared_ptr<File>> rpath_asset_ht;
+std::unordered_multimap<std::string, std::shared_ptr<File>> type_asset_ht;
 
-bool init_shader(fs::directory_entry &e) {
-    auto path = e.path().string();
-    auto ext = boost::algorithm::to_lower_copy(e.path().extension().string());
-    auto filename = boost::algorithm::to_lower_copy(e.path().filename().string());
-    if (ext.compare(".glsl") == 0 || ext.compare(".vert") == 0 || ext.compare(".frag") == 0) {
-        GLenum type = 0;
-        if (ext.compare(".frag") == 0)
-            type = GL_FRAGMENT_SHADER;
-        else if (ext.compare(".vert") == 0)
-            type = GL_VERTEX_SHADER;
-        else if (filename.find("fragment") != string::npos || filename.find("frag") != string::npos)
-            type = GL_FRAGMENT_SHADER;
-        else if (filename.find("geometry") != string::npos)
-            type = GL_GEOMETRY_SHADER;
-        else if (filename.find("vertex") != string::npos)
-            type = GL_VERTEX_SHADER;
-
-        if (type != 0) {
-            printf("Importing %s as type %d shader\n", filename.c_str(), type);
-            auto sfile = ifstream(path.c_str());
-            auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
-            auto shader = std::shared_ptr<Shader>(new Shader(type, e.path().filename().string().c_str(), data.c_str()));
-            shaders.push_back(shader);
-        } else
-            printf("Coudn't find type for shader %s, please update filename\n", filename.c_str());
-        return true;
-    }
-    return false;
-}
-
-bool update_shader(string filename) {
-    string path;
-    for (auto &e : entries) {
-        if (e.path().filename().string().compare(filename) == 0) path = e.path().string();
-    }
-    if (path.size() == 0) return false;
-
-    auto lfilename = boost::algorithm::to_lower_copy(filename);
-    for (auto &shader : shaders) {
-        if (lfilename.compare(shader->filename) == 0) {
-            auto sfile = ifstream(path.c_str());
-            auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
-            printf("Compiling shader for %s\n", shader->filename);
-            shader->update(data.c_str());
-        }
-    }
-    return true;
+void asset_hash_table_add(const std::shared_ptr<File>& file){
+	rpath_asset_ht.insert(std::make_pair(file->rel_path.string(),file));
+	type_asset_ht.insert(std::make_pair(helper::demangle(typeid(file.get()).name()), file));
 }
 
 const float testvertices[]{
@@ -68,75 +22,47 @@ const float testtextcords[]{
 };
 
 void import_assets() {
-    Assimp::Importer importer;
+    // Assimp::Importer importer;
 
     // TEST MESHES
-    auto tmesh = std::shared_ptr<Mesh>(new Mesh("testmesh", 3, false, true));
-    for (int i = 0; i < 3; ++i){
-		memcpy(&tmesh->positions[i], &testvertices[i * 3], 3 * sizeof(float));
-		memcpy(&tmesh->tex_cords[i], &testtextcords[i * 2], 2 * sizeof(float));
-	}
-        
-    tmesh->vbo_set_data();
-    meshes.push_back(tmesh);
+    auto tmesh = std::shared_ptr<Mesh>(new Mesh(fs::path("tmesh")));
+	tmesh->vbo_bind();
+	glBufferData(GL_ARRAY_BUFFER, sizeof(testvertices)+sizeof(testtextcords), nullptr, GL_STATIC_DRAW);
+	
+	auto vao = std::make_unique<Mesh::VAO>();
+	vao->vao_bind();
+	vao->n_vertices = 3;
+	vao->positions = vao->tex_cords = true;
+	
+	unsigned int i=0;auto set_data = [&i](unsigned int size, void*data){glBufferSubData(GL_ARRAY_BUFFER, i, size, data);i+=size;};
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)i);
+	set_data(sizeof(testvertices), (void*)testvertices);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)i);
+	set_data(sizeof(testtextcords), (void*)testtextcords);
+	
+    tmesh->loaded =true;
+    tmesh->vaos.push_back(move(vao));
+    asset_hash_table_add(tmesh);
 
-    // FilledCircleMesh* cmesh = new FilledCircleMesh("circlemesh",.3f, 20);
-    // cmesh->vbo_set_data();
-    // meshes.push_back(cmesh);
     // #################
 
     for (auto &e : entries) {
         if (ENTRY_IS_DIR(e)) continue;
-
-        auto path = e.path().string();
-        auto ext = boost::algorithm::to_lower_copy(e.path().extension().string());
-        auto filename = boost::algorithm::to_lower_copy(e.path().filename().string());
-        if (importer.IsExtensionSupported(ext)) {
-            auto scene = importer.ReadFile(path.c_str(), aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_SortByPType);
-
-            printf("Assimp %sread file %s\n", (!scene) ? "coudn't " : "", path.c_str());
-            if (!scene) continue;
-            printf("Has %d mesh/es, %d material/s\n", scene->mNumMeshes, scene->mNumTextures);
-
-            if (scene->HasMeshes())
-                for (int i = 0; i < scene->mNumMeshes; ++i) {
-                    auto aimesh = scene->mMeshes[i];
-					
-                    if (aimesh->HasPositions()) {
-                        auto mesh = std::shared_ptr<Mesh>(new Mesh(filename.c_str(), aimesh->mNumVertices, aimesh->HasNormals(), aimesh->HasTextureCoords(0)));
-                        for (int i = 0; i < aimesh->mNumVertices; ++i) {
-                            memcpy(
-                                &(mesh->positions[i]),
-                                &(aimesh->mVertices[i]),
-                                sizeof(mesh->positions[i]));
-                            if(aimesh->HasNormals())
-                            	memcpy(
-                            		&(mesh->normals[i]),
-                            		&(aimesh->mNormals[i]),
-                            		sizeof(mesh->normals[i]));
-                            if(aimesh->HasTextureCoords(0))
-                            	memcpy(
-                            		&(mesh->tex_cords[i]),
-                            		&(aimesh->mTextureCoords[0][i]),
-                            		sizeof(mesh->tex_cords[i]));
-                        }
-                        mesh->vbo_set_data();
-                        meshes.push_back(mesh);
-                    }
-                }
-        } else if (init_shader(e)) {
-        } else if (
-            ext.compare(".bmp") == 0 |
-            ext.compare(".tga") == 0 |
-            ext.compare(".dds") == 0 |
-            ext.compare(".png") == 0 |
-            ext.compare(".jpg") == 0 |
-            ext.compare(".jpeg") == 0) {
-            auto t = std::shared_ptr<Texture>(new Texture(filename.c_str(), path.c_str()));
-            printf("Imported image %s\n", filename.c_str());
-			textures.push_back(t);
-            // }else printf(ANSI_COLOR_RED "Error SOIL importing texture %s\n" ANSI_COLOR_RESET, filename.c_str());
-        }
+		
+		auto asset_path = engine::get_relative_to_project(e.path());
+		
+		std::shared_ptr<File> f;
+		
+		if(Mesh::supported(asset_path.extension()))
+			f = std::make_shared<Mesh>(asset_path);
+		else if(Texture::supported(asset_path.extension()))
+			f = std::make_shared<Texture>(asset_path);
+		else if(Shader::supported(asset_path.extension()))
+			f = std::make_shared<Shader>(asset_path);
+		else if(Program::supported(asset_path.extension()))
+			f = std::make_shared<Program>(asset_path);
+		
+		if(f)asset_hash_table_add(f);
     }
 }
 

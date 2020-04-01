@@ -158,7 +158,7 @@ namespace inotify{
 		while (1) {
 			if (exit_thread){exit_thread = false; break;}
 			
-			int poll_num = poll(&fds, nfds, 1);
+			int poll_num = poll(&fds, nfds, 200);
 			if (poll_num == -1) {
 				if (errno == EINTR)
 					continue;

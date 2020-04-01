@@ -4,13 +4,28 @@
 using namespace std;
 // using namespace engine;
 
+bool ser_ref=true;
 namespace engine{
     bool run = true;
     std::vector<std::shared_ptr<GameObject>> objects;
     std::vector<std::shared_ptr<GameObject>> selected;
-    std::string project_path;
+    fs::path project_path;
+	fs::path get_absolute_from_project(const fs::path &asset_path){
+		// cout << "Asset path: " << fs::absolute(asset_path) << endl;
+		// cout << "Project path: " << project_path << endl;
+		// Make sure asset path is relative
+		assert(asset_path.is_relative());
+		// Make sure asset path is inside project
+		// assert(fs::absolute(asset_path).string().find(project_path.string()) != std::string::npos);
+		auto pp = project_path.string();
+		return fs::path(pp + "/" + asset_path.string());
+	}
+	fs::path get_relative_to_project(const fs::path &asset_path){
+		// Make sure asset path is inside project
+		assert(fs::absolute(asset_path).string().find(project_path.string()) != std::string::npos);
+		return project_path.lexically_relative(asset_path);
+	}
 }
-
 
 using namespace engine;
 
@@ -23,9 +38,10 @@ const int SCREEN_HEIGHT = 480;
 int main( int argc, char* args[] )
 {
 	
-    if (argc == 1){cout << "need path to project folder" << endl;run=false;return -1;}
-	cout << argc << endl;
-	engine::project_path = string(args[1]);
+    if (argc <= 1){cout << "Need path to project folder" << endl;return -1;}
+	// cout << argc << endl;
+	engine::project_path = fs::absolute(fs::path(args[1])).lexically_normal();
+	if(engine::project_path.empty()){cout << "Path to project empty" << endl;return -1;}
 
     SDL_Window* window = NULL;
     SDL_Surface* screenSurface = NULL;
@@ -36,9 +52,9 @@ int main( int argc, char* args[] )
         return -1;
     }
     
-    // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 150";
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+    // GL 4.5 + GLSL 450
+    const char* glsl_version = "#version 450";
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
@@ -74,8 +90,11 @@ int main( int argc, char* args[] )
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-	static auto iniPath=(project_path + "/imgui.ini");
-	io.IniFilename = iniPath.c_str();
+	// auto iniPath=;
+	auto is = (std::string(project_path) + "/imgui.ini");
+	char* ini_path = new char[is.length()+1];
+	strcpy(ini_path, is.c_str());
+	io.IniFilename = ini_path;
     //ImGui::StyleColorsClassic();
     
     cout << glGetString(GL_VERSION) << endl;
@@ -112,7 +131,14 @@ int main( int argc, char* args[] )
         
         engine::update();
         
+		ImGui::Render();
+        glViewport(0, 0, (int)io.DisplaySize.x/2, (int)io.DisplaySize.y/2);
+        glClear(GL_COLOR_BUFFER_BIT);
+		
         engine::render(window, io);
+		
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(window);
     }
 	
 	engine::exit();

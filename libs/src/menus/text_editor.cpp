@@ -13,10 +13,10 @@ struct File {
     fs::path path;
     string data;
     bool open = true;
-    static int resize_callback(ImGuiInputTextCallbackData* data) {
-        cout << data->EventFlag << endl;
-        return 0;
-    }
+    // static int resize_callback(ImGuiInputTextCallbackData* data) {
+    //     cout << data->EventFlag << endl;
+    //     return 0;
+    // }
 };
 static vector<File> text_files;
 static int current = 0;
@@ -52,8 +52,9 @@ void text_editor() {
         }
 
         ImGui::InputTextMultiline("", &file.data, ImVec2(-1, -1),
-                                  ImGuiInputTextFlags_AllowTabInput,
-                                  File::resize_callback);
+                                  ImGuiInputTextFlags_AllowTabInput
+								//   ,File::resize_callback
+								  );
 
         ImGui::End();
     }

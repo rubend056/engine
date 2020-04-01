@@ -2,6 +2,7 @@
 
 #include "menus/menus.h"
 #include "assets.h"
+#include "groups/helper.h"
 #include "components/components.h"
 
 #include "groups/gl.h"
@@ -53,28 +54,8 @@ using namespace std;
     
 // }
 
-// #include "cereal/types/polymorphic.hpp"
-// struct A{
-	
-// };
-// struct B{
-// 	int j=4;
-// 	virtual void t()=0;
-// 	template<class Archive>
-// 	void serialize(Archive & ar){
-// 		ar(CEREAL_NVP(j));
-// 	}
-// };
-// struct J:public B{
-// 	void t(){};
-// 	int l=2;
-// 	template<class Archive>
-// 	void serialize(Archive & ar){
-// 		ar(cereal::make_nvp("B",cereal::base_class<B>(this)), CEREAL_NVP(l));
-// 	}
-// };
-// #include <cereal/archives/json.hpp>
-// CEREAL_REGISTER_TYPE_WITH_NAME(J, "JType");
+
+
 // // CEREAL_REGISTER_POLYMORPHIC_RELATION(B, J)
 
 
@@ -88,8 +69,6 @@ namespace engine
 		
         load_settings_glEnable();
 		auto go = instantiate();
-		strcpy(go->filename,"First GObject");
-		selected.push_back(go);
 		assets::init();
         
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
@@ -107,9 +86,7 @@ namespace engine
     void render(SDL_Window* window, ImGuiIO& io){
 		
         // Rendering
-        ImGui::Render();
-        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-        glClear(GL_COLOR_BUFFER_BIT);
+        
         
         // testing_draw();
         // RENDER
@@ -117,26 +94,30 @@ namespace engine
         // auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
         // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
         
-		if(assets::textures.size()){
-			auto &texture = assets::textures[0];
-			glBindTexture(GL_TEXTURE_2D, texture->t_id);
-		}
 		
-        auto& program = assets::programs[0];
-        if (program->link_status){
-			program->use();
-			for(auto&m:assets::meshes){
-				m->vao_bind();
-				m->vao_attrib_enable(program->attribs_enabled());
-				m->gl_draw();
-				m->vao_attrib_disable();
-			}
-		}
+		// if(assets::textures.size()){
+		// 	auto &texture = assets::textures[0];
+		// 	glBindTexture(GL_TEXTURE_2D, texture->t_id);
+		// }
+		
+		// for(auto&go:engine::objects){
+		// 	helper::find_type_in_vector<Program>(go->comps);
+		// }
+		
+        // auto& program = assets::programs[0];
+        // if (program->link_status){
+		// 	program->use();
+		// 	for(auto&m:assets::meshes){
+		// 		m->vao_bind();
+		// 		m->vao_attrib_enable(program->attribs_enabled());
+		// 		m->gl_draw();
+		// 		m->vao_attrib_disable();
+		// 	}
+		// }
         
         
         
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(window);
+        
     }
 	
 	void exit(){

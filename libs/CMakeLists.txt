@@ -7,6 +7,11 @@ add_library(assets STATIC
     src/assets_inotify.cpp
 )
 
+add_library(helper STATIC
+	src/type_name.cpp
+	src/serialize.cpp
+)
+
 add_library(menus STATIC 
     src/menus/inspector.cpp
     src/menus/files.cpp
@@ -14,7 +19,7 @@ add_library(menus STATIC
     src/menus/stats.cpp
     src/menus/imgui_engine.cpp
 )
-target_link_libraries(menus imgui assets)
+target_link_libraries(menus imgui assets helper)
 
 add_library(components STATIC 
     src/gameobject.cpp
@@ -23,5 +28,8 @@ add_library(components STATIC
 )
 
 add_library(rendering STATIC
-    src/rendering/gl_helper.cpp
+	src/rendering/mesh.cpp
+	src/rendering/texture.cpp
+	src/rendering/program.cpp
 )
+target_link_libraries(rendering menus imgui)

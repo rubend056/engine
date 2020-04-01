@@ -3,8 +3,9 @@
 
 using namespace std;
 
-namespace menus {
+// #include "rendering/program.h"
 
+namespace menus {
 void files(bool* p_open) {
     ImGui::Begin("Files", p_open);
 
@@ -20,10 +21,15 @@ void files(bool* p_open) {
             filter.PassFilter(f.path().filename().c_str())
             // && filter1.PassFilter(f.path().filename().c_str())
         ) {
-            ImGui::Text("%s", f.path().filename().string().c_str());
+            ImGui::Text(f.path().filename().string().c_str());
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
                 menus::open_text_editor(f.path());
             }
+			// else if (ImGui::IsItemClicked()){
+			// 	auto o = assets::get_file<IDraw>( f.path());
+			// 	if ()inspector_o = 
+			// }
+				
         }
     }
     ImGui::End();

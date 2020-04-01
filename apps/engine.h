@@ -2,20 +2,20 @@
 #define Engine_h
 
 #include "engine_globals.h"
-
-#include <vector>
-#include <type_traits>
 #include "gameobject.h"
-
-#include <iostream>
-#include <string>
-
-#include <SDL.h>
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include "groups/gl.h"
+
+#include <vector>
+#include <type_traits>
+
+#include <iostream>
+#include <string>
+
+#include <SDL.h>
 
 
 // Has initialization of everything as well as basic functions init, update, render, etc...
@@ -26,11 +26,34 @@ namespace engine{
     void render(SDL_Window* window, ImGuiIO& io);
 	void exit();
     
-    std::shared_ptr<GameObject> instantiate();
+    
     // void destroy(GameObject* gobj);
 }
 
+// struct A{
+	
+// };
+// struct B{
+// 	int j=4;
+// 	virtual void t()=0;
+// 	template<class Archive>
+// 	void serialize(Archive & ar){
+// 		ar(CEREAL_NVP(j));
+// 	}
+// };
+// class J:public B{
+// public:
+// 	void t(){};
+// 	int l=2;
+// 	template<class Archive>
+// 	void serialize(Archive & ar){
+// 		ar(cereal::base_class<B>(this), CEREAL_NVP(l));
+// 	}
+// };
+// #include "cereal/types/polymorphic.hpp"
+// #include "cereal/archives/json.hpp"
 
+// CEREAL_REGISTER_TYPE(J);
 
 // class Engine{
 //     static Engine* _instance;
