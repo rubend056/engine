@@ -4,9 +4,8 @@
 #include "engine_globals.h"
 #include "assets.h"
 
-#include "rendering/gl_helper.h"
+#include "rendering/rendering.h"
 #include "groups/debug.h"
-// #include "rendering/mesh.h"
 
 #include "inotify_imp.h"
 
@@ -31,10 +30,7 @@ namespace assets{
     extern thread* inotify_thread;
     void inotify_init();
     
-    // extern 
     void import_assets();
-    
-    bool update_shader(string filename);
 }
 
 #endif // _assets_h

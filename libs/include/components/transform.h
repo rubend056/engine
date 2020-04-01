@@ -11,9 +11,16 @@ public:
 	rot=glm::vec3(0),
 	sca=glm::vec3(0);
 	
-	COMPONENT_IMGUI_DRAW override;
-	COMPONENT_IMGUI_NAME override {return "Transform";}
-	COMPONENT_NAME {return "Transform";}
+	IDRAW_IMGUI_DRAW override;
+	IDRAW_IMGUI_NAME override {return "Transform";}
+	// COMPONENT_NAME {return "Transform";}
+	
+	template<class Archive>
+	void serialize(Archive& ar){
+		ar(pos.x, pos.y, pos.z, 
+		   rot.x, rot.y, rot.z,
+		   sca.x, sca.y, sca.z);
+	}
 };
 
 #endif // transform_h

@@ -35,7 +35,7 @@ Gl_Enable_Setting gl_enable_settings[] = {
 
 #include <fstream>
 
-#define GLENABLE_ARCHIVE_NAME (engine::project_path + "/glEnable_settings.json").c_str()
+#define GLENABLE_ARCHIVE_NAME (std::string(engine::project_path) + "/glEnable_settings.json").c_str()
 
 // void glEnable_apply_settings() {
     
@@ -153,7 +153,8 @@ void menus::imgui_engine_update() {
         show_open = false,
         show_metrics_window = true,
         show_stats = false,
-        show_inspector = false,
+        show_inspector = true,
+		show_scene = true,
 		// show_textures = true,
 		// show_programs = true,
         show_files = true;
@@ -164,7 +165,8 @@ void menus::imgui_engine_update() {
     if (show_metrics_window) ImGui::ShowMetricsWindow(&show_metrics_window);
 
     if (show_stats) menus::stats(&show_stats);
-    if (show_inspector) menus::inspector(engine::selected[0], &show_inspector);
+    if (show_inspector) menus::inspector(&show_inspector);
+	if (show_scene) menus::scene();
     if (show_files) menus::files(&show_files);
 
     menus::text_editor();

@@ -1,58 +1,51 @@
+#include <typeinfo>
+
+#include "assets.h"
+#include "engine_globals.h"
+#include "groups/helper.h"
+#include "groups/type_name.h"
 #include "menus/menus.h"
+#include "rendering/rendering.h"
 
-// #include <type
-// void add_component_popup() {
-
-// }
-#include "rendering/gl_helper.h"
 using namespace std;
 
-template<class T>
-shared_ptr<T> component_button(){
-	static_assert(std::is_base_of<Component, T>::value, "T not derived from Component");
-	if(ImGui::Button(T::name()))return shared_ptr<T>(new T);
-	else return nullptr;
-}
+
 
 namespace menus {
-// bool _inspector_open=true;
-// bool inspector_open(){return _inspector_open;}
-void inspector(shared_ptr<GameObject> o, bool* p_open) {
-    //? INSPECTOR NAME AND COMPONENT LOOP
-    ImGui::Begin("Inspector", p_open);
-	// ImGui::SetNextItemWidth(0);
-    ImGui::InputText("Name", o->filename, sizeof(o->filename));
-	ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-    int i = 0;
-    for (auto& c : o->comps) {
-        char name[20];
-        sprintf(name, "%s##%d",c->imgui_name(), i++);
-        if (ImGui::TreeNode(name)) {
-            c->imgui_draw();
-            ImGui::TreePop();
-        }
-    }
-    ImGui::PopStyleVar();
+#define MAX_WIN_NAME 100
+std::shared_ptr<IDraw> inspector_o;
+void inspector(bool* p_open) {
+	//? INSPECTOR NAME AND COMPONENT LOOP
+	if(!inspector_o)return;
+	
+	// char d[MAX_WIN_NAME];snprintf(d, MAX_WIN_NAME,"Inspector <%s>##inspector", inspector_o->imgui_name());
+	ImGui::Begin("Inspector", p_open);
+	
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+	inspector_o->imgui_draw();
 	ImGui::PopStyleVar();
 	
-    //? ADD COMPONENT POPUP
-    if (ImGui::Button("Add Component"))
-        ImGui::OpenPopup("add_component_popup");
-
-    if(ImGui::BeginPopup("add_component_popup")){
-		// Filter code
-		static ImGuiTextFilter filter;
-		filter.Draw("Filter0", -1);
-		shared_ptr<Component> c;
-		if(c=component_button<Transform>()){o->comps.push_back(c); ImGui::CloseCurrentPopup();};
-		if(c=component_button<Program>()){o->comps.push_back(c); ImGui::CloseCurrentPopup();};
-		
-		ImGui::EndPopup();
-	}
-
-    ImGui::End();
-	
-	
+	ImGui::End();
 }
+
+void scene(bool* p_open){
+	// char d[MAX_WIN_NAME];snprintf(d, MAX_WIN_NAME,"Scene <%s>##scene", "name");
+	ImGui::Begin("Scene", p_open);
+	
+	static_assert(std::is_base_of<IDraw, GameObject>::value, "IDraw not derived from GameObject");
+	
+	if (ImGui::Button("Add GObject", ImVec2(-1,0)))
+		engine::instantiate(new GameObject("Test GO"));
+	
+	ImGui::Separator();
+	
+	for(auto&obj:engine::objects){
+		ImGui::Text(obj->filename().c_str());
+		if(ImGui::IsItemClicked())
+			inspector_o = std::static_pointer_cast<IDraw>(obj);
+	}
+	
+	ImGui::End();
+}
+
 }  // namespace menus

@@ -44,15 +44,14 @@
 -Draw on Inspector(as component)/Themselves(window)
 
 IDraw(Interface, handles drawing) // ANY CLASS THAT SHOWS SOMETHING ON THE GUI
-	const char* imgui_name()=0
-	void imgui_draw()=0
+	virtual const char* imgui_name()=0
+	virtual void imgui_preview(){}
+	virtual void imgui_draw(){}
 File(Serialize/Deserialize) // ANY CLASS REPRESENTED BY A FILE
-	save()
-	load()
-Component(Component interaction) // ANY CLASS THAT'S A COMPONENT
-	enabled
-	max_num()
-
+	serialize()
+Component:IDraw(Component interaction) // ANY CLASS THAT'S A COMPONENT
+	bool enabled
+	virtual uint max_num(){return 0;}
 Mesh : File(load options),IDraw
 	vbo_id
 	vao_id

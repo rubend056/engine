@@ -6,6 +6,7 @@
 
 #include <algorithm>
 namespace assets{
+	
 	//? ENTRIES **************************
 	vector<fs::directory_entry> entries;
 	void list_dir(string d){
@@ -22,37 +23,11 @@ namespace assets{
 		printf("Assets path is %s\n", engine::project_path.c_str());
 		
 		// List all files
-		list_dir(string(engine::project_path));
+		list_dir(engine::project_path);
 		
 		inotify_init();
 		
 		import_assets();
-		
-		auto p = std::shared_ptr<Program>(new Program("test"));
-		programs.push_back(p);
-		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_VERTEX_SHADER;})
-		);
-		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_FRAGMENT_SHADER;})
-		);
-		p->attach_shader(
-			*find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_FRAGMENT_SHADER;})
-		);
-		p->detach_shader(
-			find_if(shaders.begin(), shaders.end(), [](std::shared_ptr<Shader> &s) -> bool{return s->type == GL_FRAGMENT_SHADER;}) - shaders.begin()
-		);
-		// if(p->link_status){
-		// 	p->use();
-		// 	auto u = glGetUniformLocation(p->p_id, "color_uniform");
-		// 	if(u>=0)glUniform3f(u, 0, 0, 1);
-		// }
-		
-		
-		// auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
-        // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
-		// p->link();
-		
 	}
 	
 	
@@ -72,7 +47,11 @@ namespace assets{
 		if(inotify::events.size()){
 			for(auto&event:inotify::events){
 				if(event->event ==  inotify::MODIFY){
-					auto g = update_shader(string(event->filename));
+					auto p = fs::path(event->folder_path);
+					p/= event->filename;
+					
+					auto shader = get_file<Shader> (p);
+    				if(shader)shader->load();
 				}
 			}
 			inotify::events.clear();
