@@ -1,3 +1,4 @@
-/build*
+/build
+/game1
 *imgui.ini*
 *.zip

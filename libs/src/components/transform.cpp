@@ -1,6 +1,6 @@
-#include "components/transform.h"
+#include "transform.h"
 
-#include "imgui.h"
+#include "my_imgui.h"
 
 void Transform::imgui_draw(){
 	ImGui::DragFloat3("Position",&pos[0]);

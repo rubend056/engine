@@ -1,5 +1,6 @@
 
 #if(__GNUC__ < 7)
+# define OLD_GNU
 #define ENTRY_IS_DIR(e) (fs::is_directory(e.path()))
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
