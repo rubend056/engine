@@ -9,4 +9,6 @@
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+#define ANSI_COLOR_CHAR_ARRAY(ANSI_COLOR, char_array) ANSI_COLOR char_array ANSI_COLOR_RESET
+
 #endif // Debug_h

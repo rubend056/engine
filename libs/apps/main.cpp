@@ -1,39 +1,14 @@
-#include "engine.h"
-
+#include "_engine.h"
 
 using namespace std;
-// using namespace engine;
 
-bool ser_ref=true;
-namespace engine{
-    bool run = true;
-    std::vector<std::shared_ptr<GameObject>> objects;
-    std::vector<std::shared_ptr<GameObject>> selected;
-    fs::path project_path;
-	fs::path get_absolute_from_project(const fs::path &asset_path){
-		// cout << "Asset path: " << fs::absolute(asset_path) << endl;
-		// cout << "Project path: " << project_path << endl;
-		// Make sure asset path is relative
-		assert(asset_path.is_relative());
-		// Make sure asset path is inside project
-		// assert(fs::absolute(asset_path).string().find(project_path.string()) != std::string::npos);
-		auto pp = project_path.string();
-		return fs::path(pp + "/" + asset_path.string());
-	}
-	fs::path get_relative_to_project(const fs::path &asset_path){
-		// Make sure asset path is inside project
-		assert(fs::absolute(asset_path).string().find(project_path.string()) != std::string::npos);
-		return project_path.lexically_relative(asset_path);
-	}
-}
-
-using namespace engine;
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-// vector<GameObject> engine::objects = vector<GameObject>();
-// vector<GameObject*> engine::selected = vector<GameObject*>();
 
 int main( int argc, char* args[] )
 {
@@ -63,7 +38,7 @@ int main( int argc, char* args[] )
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     // Create Window
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_UTILITY);
     window = SDL_CreateWindow( "Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, window_flags );
     if( window == NULL ){printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );}
     
@@ -91,7 +66,7 @@ int main( int argc, char* args[] )
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
 	// auto iniPath=;
-	auto is = (std::string(project_path) + "/imgui.ini");
+	auto is = (std::string(engine::project_path) + "/imgui.ini");
 	char* ini_path = new char[is.length()+1];
 	strcpy(ini_path, is.c_str());
 	io.IniFilename = ini_path;
@@ -105,7 +80,7 @@ int main( int argc, char* args[] )
     
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     engine::init();
-    while (run)
+    while (engine::run)
     {
         
         SDL_Event event;
@@ -113,9 +88,9 @@ int main( int argc, char* args[] )
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
-                run = false;
+                engine::run = false;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                run = false;
+            	engine::run = false;
         }
 
         // Start the Dear ImGui frame
@@ -135,7 +110,7 @@ int main( int argc, char* args[] )
         glViewport(0, 0, (int)io.DisplaySize.x/2, (int)io.DisplaySize.y/2);
         glClear(GL_COLOR_BUFFER_BIT);
 		
-        engine::render(window, io);
+        engine::render();
 		
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);

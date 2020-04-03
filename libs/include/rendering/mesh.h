@@ -10,7 +10,7 @@ class Mesh : public File, public IDraw {
     unsigned int vbo_id;
 	
    public:
-   	friend class cereal::access;
+   	
     unsigned int import_flags=aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_SortByPType;
     // Can't modify the size after constructor is called
     // glm::vec3 *positions = nullptr;
@@ -19,6 +19,7 @@ class Mesh : public File, public IDraw {
 	
 	// Every VAO represents a different mesh
 	struct VAO{
+		std::string name;
 		unsigned int vao_id;
 		unsigned int n_vertices;
 		unsigned int draw_function=GL_TRIANGLES;
@@ -52,22 +53,23 @@ class Mesh : public File, public IDraw {
 	static bool supported(const std::string& ext);
 	void load();
 	
+	// friend class cereal::access;
 	template<class Archive>
 	void serialize(Archive& ar){
-		ar(cereal::base_class<File>(this));
+		ar(FILE_SERIALIZE);
 		ar(CEREAL_NVP(import_flags));
 		load();
 	}
 	
-	const char* imgui_name(){return filename().c_str();}
-	Mesh(const fs::path& path=""):File(path){
-		create_metadata();
+	IDRAW_IMGUI_NAME override{return filename().c_str();}
+	Mesh(FILE_CONSTRUCT_PARAM):File(FILE_CONSTRUCT_VARS){
+		// create_supposed_ext();
 		glGenBuffers(1, &vbo_id);
-		if(!path.empty())load();
+		if(!rpath.empty())load();
 	}
 	// Mesh(){glGenBuffers(1, &vbo_id);}
 	~Mesh(){glDeleteBuffers(1, &vbo_id);}
 };
-// CEREAL_REGISTER_TYPE(Mesh)
+CEREAL_REGISTER_TYPE(Mesh)
 
 #endif // mesh_h

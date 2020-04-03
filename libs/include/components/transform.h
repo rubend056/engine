@@ -2,7 +2,7 @@
 #define transform_h
 
 #include <glm/vec3.hpp>
-#include "components/component.h"
+#include "component.h"
 
 class Transform: public Component{
 public:

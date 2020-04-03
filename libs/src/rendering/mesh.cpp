@@ -1,4 +1,4 @@
-#include "rendering/mesh.h"
+#include "mesh.h"
 
 #include "engine_globals.h"
 #include "assimp/Importer.hpp"
@@ -11,6 +11,7 @@ bool Mesh::supported(const std::string& ext){return importer.IsExtensionSupporte
 
 void Mesh::load(){
 	loaded = false;
+	vaos.clear();
 	// Set d_path to the actual data path
 	fs::path d_path = engine::get_absolute_from_project(data_path());
 	auto ext = d_path.extension();
@@ -37,6 +38,7 @@ void Mesh::load(){
 				}
 			}
 			vbo_bind();
+			// Allocate VBO
 			glBufferData(GL_ARRAY_BUFFER, vbo_size, NULL , GL_STATIC_DRAW);
 			
 			unsigned int i=0;auto set_data = [&i](unsigned int size, void*data){glBufferSubData(GL_ARRAY_BUFFER, i, size, data);i+=size;};
@@ -45,6 +47,7 @@ void Mesh::load(){
 				if (!mesh->HasPositions()) continue;
 				
 				auto vao = std::unique_ptr<VAO>(new VAO());
+				vao->name = std::string(mesh->mName.C_Str());
 				vao->positions = mesh->HasPositions();
 				vao->normals = mesh->HasNormals();
 				vao->tex_cords = mesh->HasTextureCoords(0);
@@ -62,7 +65,7 @@ void Mesh::load(){
 					set_data(vao->n_vertices*3*sizeof(float), mesh->mTextureCoords[0]);
 				}
 				
-				vaos.push_back(move(vao));
+				vaos.push_back(std::move(vao));
 			}
 			
 		}

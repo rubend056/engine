@@ -1,20 +1,22 @@
-#include "rendering/program.h"
+#include "program.h"
 
 #include "glm/glm.hpp"
 
-#include "groups/debug.h"
+#include "debug.h"
 #include "assets.h"
-#include "menus/menus.h"
+#include "menus.h"
 
 #include <fstream>
 using namespace std;
+
+#include "engine_globals.h"
 
 // ? SHADER ***************
 bool Shader::supported(const std::string& ext){
 	return ext.compare(".glsl") == 0 || ext.compare(".vert") == 0 || ext.compare(".frag") == 0;
 }
 void Shader::load(){
-	auto d_path = data_path();
+	auto d_path = engine::get_absolute_from_project(data_path());
 	auto filename = d_path.filename().string();
 	auto ext = d_path.extension().string();
 	
@@ -32,17 +34,20 @@ void Shader::load(){
             type = GL_VERTEX_SHADER;
 
         if (type != 0) {
+			
             printf("Importing %s as type %d shader\n", filename.c_str(), type);
-            auto sfile = ifstream(d_path.c_str());
+            std::ifstream sfile(d_path);
             auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
 			
 			auto src = data.c_str();
+			if(s_id)glDeleteShader(s_id);
+			s_id = glCreateShader(type);
             glShaderSource(s_id, 1, &src, NULL);
 			glCompileShader(s_id);
 			glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
 			
 			printf((status == GL_TRUE)?ANSI_COLOR_GREEN:ANSI_COLOR_RED);
-			printf("Shader %s compilation %s\n" ANSI_COLOR_RESET, filename, (status == GL_TRUE)?"success!":"ERROR");
+			printf("Shader %s compilation %s\n" ANSI_COLOR_RESET, filename.c_str(), (status == GL_TRUE)?"success!":"ERROR");
 			
 			GLsizei log_length;
 			// glGetShaderiv(s_id, GL_INFO_LOG_LENGTH, &log_length);
@@ -112,7 +117,7 @@ void Program::link(){
 	for(GLsizei i=0;i<_shaders_count;++i){
 		function<bool(Shader*)> f = [&](Shader* s){return s->s_id == _shaders[i];};
 		auto s = assets::get_file(f);
-		if(s)shaders.insert(s->rel_path.string());
+		if(s)shaders.insert(s->data_path());
 	}
 	
 	glLinkProgram(p_id);
@@ -206,8 +211,10 @@ void Program::imgui_draw(){
 	ImGui::PushID("add_shader");
 	if(ImGui::Button("Add Shader", ImVec2(-1,0))){
 		ImGui::OpenPopup("add_popup");}
-	auto shader_files = assets::get_files<Shader>();
-	auto shader = menus::add_popup(shader_files);
+		
+	#warning "Shader class used here"
+	auto shader_files = assets::get_files("Shader");
+	auto shader = std::dynamic_pointer_cast<Shader>(menus::add_popup(shader_files));
 	if(shader)
 		{attach_shader(shader->s_id);link();}
 	ImGui::PopID();
