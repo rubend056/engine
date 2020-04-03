@@ -9,11 +9,12 @@ if (NOT CMAKE_VERSION VERSION_LESS 3.12.4) # Means greater than or equal
 	add_compile_definitions(DEBUG_GUI)	
 endif()
 
-list(INSERT CMAKE_MODULE_PATH 0 "extern/sdl2/lib/cmake extern/assimp/lib/cmake")
+# list(INSERT CMAKE_MODULE_PATH 0 "extern/sdl2/lib/cmake extern/assimp/lib/cmake")
 link_directories(
 	extern/assimp/lib
 	extern/sdl2/lib
 	extern/soil/lib
+	extern/glad
 )
 
 SET(CMAKE_BUILD_TYPE Debug)
@@ -53,7 +54,6 @@ include_directories(
 	libs/include/rendering
 )
 
-add_library(glad STATIC extern/glad/glad.c)
 add_subdirectory(extern/imgui)
 add_subdirectory(libs)
 
@@ -70,19 +70,17 @@ target_link_libraries(engine
 	# components 
 	my_libs
 	
-	imgui 
-	glad
+	imgui
 	
 	#Core libraries for engine
 	libSOIL.a
 	libSDL2d.a
 	libSDL2maind.a
+	libglad.a
 	
 	assimp
 	libIrrXML.a
 	libzlibstatic.a
-	
-	
 	
 	#Very low level
 	inotifytools
