@@ -1,29 +1,104 @@
-SDL
-OpenGL
+  LIBRARIES 
+	 |
+	 V
+	SDL
+	OpenGL
 
-imgui
-assimp
+	imgui
+	assimp
 
-inotify
+	inotify
 
-glad or GLEW
+	glad or GLEW
 
-  engine
-     |
-  _imgui
-  |    |
- SDL OpenGL 
-
+	     -------engine---------------
+	     |				   |        |
+	  _imgui             assimp  inotify
+	  |    |
+	 SDL OpenGL 
 
 ./engine <project folder>
 
 
-RIGHT NOW***********************
-Watch for changes in project asset folder and reimport/compile accordingly ------------------- DONE
-IMPLEMENT VERTEX DATA FOR OPENGL -
+
+	Shader       Programs
+	in -> out  mesh/textures     
+				    | 
+				 	V
+				  shader
+					V
+				  shader
+					V
+				   ...
+				    V
+				pixel_color
+				
+				-attributes	(vec3,mat2) 		<- BUFFER_ARRAY
+				-uniforms 	(vec3,sampler2D) 	<- TEXTURE
+
+	Mesh          	Textures/Bump
+	-Verteices		-2D Image
+	-Normals
+	-UV's
+
+-Draw on Inspector(as component)/Themselves(window)
+
+IDraw(Interface, handles drawing) // ANY CLASS THAT SHOWS SOMETHING ON THE GUI
+	virtual const char* imgui_name()=0
+	virtual void imgui_preview(){}
+	virtual void imgui_draw(){}
+File(Serialize/Deserialize) // ANY CLASS REPRESENTED BY A FILE
+	serialize()
+Component:IDraw(Component interaction) // ANY CLASS THAT'S A COMPONENT
+	bool enabled
+	virtual uint max_num(){return 0;}
+Mesh : File(load options),IDraw
+	vbo_id
+	vao_id
+	n_vertices
+	?positions
+	?normals
+	?tex_cords
+	vbo_bind()
+	vao_bind()
+	vao_attrib_enable()
+	vao_attrib_diable()
+	vbo_set_data()
+	gl_draw()
+Texture: File(load options),IDraw
+	t_id
+Shader : File,IDraw
+	s_id
+Program : File,Component,IDraw
+	p_id
+	link_status
+	log
+	?Shader*/int // Hold pointer or just gpu id
+	?attachShader(id)/Shader*
+	?detachShader(id)/Shader*
+	clearShaders()
+	link()
+	use()
+	
 
 
-LATER+++++++++++++++++
+Load and compile Shaders
+Load and upload meshes to OpenGL
+Now we have SHADERS and MESHES, we can create Programs
+Create Program, add shaders, 
+
+				
+RIGHT NOW**************************************    STATUS
+Shader and Program initial classes  				DONE
+
+Watch for changes in project asset 
+folder and reimport/compile accordingly				DONE
+
+Implement vertex data for gl_helper 				Working..
+
+
+
+LATER++++++++++++++++++++++++++++++++++++++++++
 
 Camera Object to Render (Perspective Matrix)
 	Transform

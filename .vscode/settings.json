@@ -85,7 +85,13 @@
 		"*.rh": "cpp",
 		"csetjmp": "cpp",
 		"strstream": "cpp",
-		"cfenv": "cpp"
+		"cfenv": "cpp",
+		"*.inc": "cpp",
+		"version": "cpp"
 	},
-	"C_Cpp.errorSquiggles": "Enabled"
+	"C_Cpp.errorSquiggles": "Enabled",
+	"files.exclude": {
+		"**/cereal": false,
+		"**/extern": false
+	}
 }
