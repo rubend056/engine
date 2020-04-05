@@ -79,12 +79,12 @@ public:
 	
 	// ? Constructors
 	File(FILE_CONSTRUCT_PARAM) {
+		_rel_path = rpath;
 		if(!rpath.empty()){
 			create_supposed_ext();
 			assert(rpath.is_relative());
 			file_id=Next_id();
 		}
-		_rel_path = rpath;
 	}
 	virtual ~File(){}
 	
