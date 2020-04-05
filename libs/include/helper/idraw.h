@@ -1,9 +1,11 @@
 #ifndef idraw_h
 #define idraw_h
 
-#include "imgui.h"
+#include "my_imgui.h"
+#include <string>
 
-#define IDRAW_IMGUI_NAME const char* imgui_name()
+// The name of this class
+#define IDRAW_IMGUI_NAME const std::string imgui_name()
 #define IDRAW_IMGUI_DRAW void imgui_draw()
 
 struct IDraw{

@@ -9,6 +9,8 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 
+#include <thread>
+// #include "my_filesystem.h"
 
 /* Read all available inotify events from the file descriptor 'fd'.
 	wd is the table of watch descriptors for the directories in argv.
@@ -16,14 +18,55 @@
 	argv is the list of watched directories.
 	Entry 0 of wd and argv is unused. */
 
+
+
 using namespace std;
 
 namespace inotify{
-	bool exit_thread = false;
+	std::atomic<bool> exit_thread = false;
 	vector<FileEvent*> events;
 	vector<FileEvent> _events;
 	std::mutex _events_mutex;
-
+	
+	char** copy_char_array(int argc, char const* const* argv){
+		if(!argv || argc==0)return nullptr;
+		char** av=(char**)malloc(argc * sizeof(char*)); // Allocate
+		for(int i=0;i<argc;++i) {
+			int size = strlen(argv[i])+1;
+			av[i]=(char*)malloc(size);
+			memcpy(av[i], argv[i], size);
+		}
+		return av;
+	}
+	void delete_char_array(int argc,char**& argv){
+		if(!argv || argc==0)return;
+		for(int i=0;i<argc;++i) free(argv[i]);
+		free(argv);argv=nullptr;
+	}
+	
+	int init_thread();
+	
+	static int our_argc=0;
+	static char** our_argv=nullptr;
+	static std::thread inotify_thread;
+    void inotify_init(int argc, char const* const* argv){
+		inotify_exit();
+		
+		delete_char_array(our_argc, our_argv);
+		our_argc = argc;
+		our_argv = copy_char_array(argc, argv);
+		
+        if(our_argv)inotify_thread = std::thread(inotify::init_thread);
+    }
+	void inotify_exit(){
+		exit_thread = true;
+		if(inotify_thread.joinable())inotify_thread.join();
+		exit_thread = false;
+		filesnames_allowed.clear();
+		inotify::events.clear();
+		inotify::_events.clear();
+	}
+	
 	static void handle_events(int fd, int *wd, int argc, char** argv)
 	{
 		/* Some systems cannot read integer variables if they are not
@@ -48,7 +91,7 @@ namespace inotify{
 			len = read(fd, buf, sizeof buf);
 			if (len == -1 && errno != EAGAIN) {
 				perror("read");
-				exit(EXIT_FAILURE);
+				return;
 			}
 
 			/* If the nonblocking read() found no events to read, then
@@ -115,10 +158,10 @@ namespace inotify{
 		}
 	}
 
-	int init(int argc, char** argv)
+	int init_thread()
 	{
-		
-		
+		auto argc = our_argc;
+		auto& argv = our_argv;
 		// cout << "Hello there from another thread" << endl;
 		// cout << "Initializing inotify" << endl;
 		// if (argc < 2) {
@@ -129,7 +172,7 @@ namespace inotify{
 		/* Create the file descriptor for accessing the inotify API */
 		
 		int fd = inotify_init1(IN_NONBLOCK);
-		if (fd == -1) {printf("Inotify init failed\n");exit(EXIT_FAILURE);}
+		if (fd == -1) {printf("Inotify init failed\n");return(EXIT_FAILURE);}
 
 		/* Allocate memory for watch descriptors */
 
@@ -143,7 +186,7 @@ namespace inotify{
 															IN_MODIFY | IN_CREATE | IN_DELETE | IN_DELETE_SELF);
 			if (wd[i] == -1) {
 				fprintf(stderr, "Cannot watch %s %s", argv[i], strerror(errno));
-				exit(EXIT_FAILURE);
+				return(EXIT_FAILURE);
 				// return -1;
 			}
 		}
@@ -163,7 +206,7 @@ namespace inotify{
 				if (errno == EINTR)
 					continue;
 				perror("poll");
-				exit(EXIT_FAILURE);
+				return(EXIT_FAILURE);
 			}
 
 			if (poll_num > 0) {
@@ -178,14 +221,14 @@ namespace inotify{
 		
 		close(fd);
 		free(wd);
-		exit(EXIT_SUCCESS);
+		return EXIT_SUCCESS;
 	}
 
 	#include <chrono>
 	// #include <algorithm>
 	vector<string> filesnames_allowed;
 	function<void(FileEvent)> event_handler;
-	void update(){
+	void inotify_update(){
 		
 		static auto start = chrono::steady_clock::now();
 		if (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - start).count() > 500){
@@ -223,5 +266,7 @@ namespace inotify{
 			start = chrono::steady_clock::now();
 		}
 	}
-
+	
+	
+	
 }

@@ -4,8 +4,8 @@
 #include "engine_globals.h"
 #include "assets.h"
 
-#include "rendering/rendering.h"
-#include "groups/debug.h"
+#include "rendering.h"
+#include "debug.h"
 
 #include "inotify_imp.h"
 
@@ -27,8 +27,8 @@ using namespace std;
 #include <boost/algorithm/string/case_conv.hpp>
 
 namespace assets{
-    extern thread* inotify_thread;
-    void inotify_init();
+    // extern thread* inotify_thread;
+    // void inotify_init();
     
     void import_assets();
 }

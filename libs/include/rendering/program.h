@@ -3,7 +3,7 @@
 
 #include "_rendering.h"
 
-#include "components/component.h"
+#include "component.h"
 
 #define FRAGMENT_EXT ".frag"
 #define VERTEX_EXT ".vert"
@@ -31,25 +31,22 @@ public:
 	void load();
     
 	// Careful if shader isn't loaded correctly, shader will not be created
-    Shader(const fs::path& path="") : File(path){
-		if(!path.empty()){
+    Shader(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS){
+		if(!rpath.empty()){
 			load();
-			if(!loaded){
-				std::printf("Shader %s loading failed\n", rel_path.c_str());
-				s_id = glCreateShader(type);
-			}
+			if(!loaded)std::printf("Shader %s loading failed\n", data_path().c_str());
 		}
 	}
 	~Shader(){glDeleteShader(s_id);}
 	
 	template<class Archive>
 	void serialize(Archive& ar){
-		ar(cereal::base_class<File>(this));
+		ar(FILE_SERIALIZE);
 		ar(CEREAL_NVP(type));
 		load();
 	}
 };
-// CEREAL_REGISTER_TYPE(Shader)
+CEREAL_REGISTER_TYPE(Shader)
 
 
 struct Attribute{
@@ -110,7 +107,7 @@ public:
 		return (std::string("Program ") + filename()).c_str();
 	}
 	
-    Program(const fs::path& path="") : File(path){
+    Program(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS){
 		p_id = glCreateProgram();
 	};
     ~Program(){glDeleteProgram(p_id);};
@@ -118,12 +115,12 @@ public:
 	template<class Archive>
 	void serialize(Archive& ar){
 		clear_shaders();
-		ar(cereal::base_class<File>(this));
+		ar(FILE_SERIALIZE);
 		// ar(CEREAL_NVP(type));
 		
 		link();
 	}
 };
-// CEREAL_REGISTER_TYPE(Program)
+CEREAL_REGISTER_TYPE(Program)
 
 #endif // program_h
