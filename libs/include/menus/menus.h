@@ -1,29 +1,26 @@
-#ifndef Menus_h
-#define Menus_h
+#ifndef menus_h
+#define menus_h
 
-#include "imgui.h"
+#include "my_imgui.h"
 #include "gameobject.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
-
 #include "my_filesystem.h"
 
 namespace menus
 {
-    // bool inspector_open();
-    static bool 
-    inspector_open=0,
-    files_open=0
-    // text_editor_open=0
-    ;
-    void inspector(GameObject*o);
-
-    void files(std::string root);
-    
-    void open_text_editor(fs::path path);
-    void text_editor();
-    void stats();
+	void imgui_engine_init();
+	void imgui_engine_update();
+	
+	// Open "add_popup" for picking File derivate, returns pointer to picked
+	// template <class T>
+	std::shared_ptr<File> add_popup(
+		const std::vector<std::shared_ptr<File>>& vector, 
+		bool modal=false, 
+		const char*label="add_popup")
+	;
 }; // namespace menus
 
 

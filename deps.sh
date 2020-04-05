@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if hash pacman ; then
     sudo pacman --needed -S assimp inotify-tools
 elif hash apt ; then 
