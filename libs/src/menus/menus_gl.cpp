@@ -1,7 +1,24 @@
-#include "menus/imgui_engine.h"
+// #pragma once
 
-#include "groups/gl.h"
-#include "imgui.h"
+#include "_menus.h"
+
+#include "engine_globals.h"
+
+#include <algorithm>
+
+#include "gl.h"
+#include "cereal/archives/json.hpp"
+struct Gl_Enable_Setting
+{
+    const int index;
+    const std::string name;
+    const std::string info;
+    bool value = false;
+    template <class Archive>
+    void serialize(Archive &ar, std::uint32_t const version) {
+        ar(cereal::make_nvp(name.c_str(), value));
+    }
+};
 
 Gl_Enable_Setting gl_enable_settings[] = {
     {GL_BLEND, "GL_BLEND", "If enabled, blend the computed fragment color values with the values in the color buffers. See glBlendFunc."},
@@ -33,15 +50,9 @@ Gl_Enable_Setting gl_enable_settings[] = {
     {GL_PROGRAM_POINT_SIZE, "GL_PROGRAM_POINT_SIZE", "If enabled and a vertex or geometry shader is active, then the derived point size is taken from the (potentially clipped) shader builtin gl_PointSize and clamped to the implementation-dependent point size range."},
 };
 
-#include <fstream>
+#define GLENABLE_ARCHIVE_NAME (std::string(engine::project_path) + "/gl_settings.json").c_str()
 
-#define GLENABLE_ARCHIVE_NAME (std::string(engine::project_path) + "/glEnable_settings.json").c_str()
-
-// void glEnable_apply_settings() {
-    
-// }
-
-void load_settings_glEnable() {
+void menus::load_settings_glEnable() {
     std::ifstream fs(GLENABLE_ARCHIVE_NAME);
 	// If there's no file, set current settings
     if (!fs.is_open()) {
@@ -60,9 +71,7 @@ void load_settings_glEnable() {
             glDisable(s.index);
 }
 
-#include <algorithm>
-
-void window_glEnable_config(bool *p_open) {
+void menus::window_glEnable_config(bool *p_open) {
     ImGui::Begin("glEnable", p_open);
     if (ImGui::Button("Save")) {
         std::ofstream fs(GLENABLE_ARCHIVE_NAME);
@@ -145,79 +154,4 @@ void window_glEnable_config(bool *p_open) {
     }
 
     ImGui::End();
-}
-
-void menus::imgui_engine_update() {
-    static bool
-        show_glEnable = false,
-        show_open = false,
-        show_metrics_window = true,
-        show_stats = false,
-        show_inspector = true,
-		show_scene = true,
-		// show_textures = true,
-		// show_programs = true,
-        show_files = true;
-
-    if (show_glEnable) window_glEnable_config(&show_glEnable);
-    if (show_open) window_open_project(&show_open);
-
-    if (show_metrics_window) ImGui::ShowMetricsWindow(&show_metrics_window);
-
-    if (show_stats) menus::stats(&show_stats);
-    if (show_inspector) menus::inspector(&show_inspector);
-	if (show_scene) menus::scene();
-    if (show_files) menus::files(&show_files);
-
-    menus::text_editor();
-
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open")) {
-            }
-
-            if (ImGui::SmallButton("Save Scene"))
-                // if(ImGui::IsItemActivated())
-                ImGui::OpenPopup("SaveAs");
-
-            if (ImGui::BeginPopupModal("SaveAs", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-                ImGui::Text("Save as modal");
-                if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
-                ImGui::EndPopup();
-            }
-
-            if (ImGui::MenuItem("Quit")) {
-                engine::run = false;
-            }
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Settings")) {
-            if (ImGui::BeginMenu("OpenGL")) {
-                ImGui::MenuItem("glEnable", NULL, &show_glEnable);
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("View")) {
-			if(ImGui::BeginMenu("Assets")){
-				ImGui::MenuItem("Files", NULL, &show_files);
-				ImGui::EndMenu();
-			}
-			if(ImGui::BeginMenu("Debug")){
-				ImGui::MenuItem("Metrics", NULL, &show_metrics_window);
-            	ImGui::MenuItem("Stats", NULL, &show_stats);
-				ImGui::EndMenu();
-			}
-            ImGui::MenuItem("Inspector", NULL, &show_inspector);
-            
-            ImGui::EndMenu();
-        }
-
-        ImGui::EndMainMenuBar();
-    }
-}
-
-void window_open_project(bool *p_open) {
-    ImGui::BeginPopup("Open Folder");
-    ImGui::EndPopup();
 }

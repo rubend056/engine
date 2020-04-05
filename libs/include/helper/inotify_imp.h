@@ -5,17 +5,17 @@
 #include <mutex>
 #include <functional>
 #include <string>
-
+#include <atomic>
 
 
 namespace inotify{
 	#define FILTER_EVENTS_DELAY 100
-	extern bool exit_thread; 
+	// extern std::atomic<bool> exit_thread; 
 	
 	enum FILE_EVENT{OPEN, CLOSE, MODIFY, CREATE, DELETE, DELETE_SELF};
 	struct FileEvent{
 		FILE_EVENT event;
-		char* folder_path;
+		const char* folder_path;
 		char* filename;
 		bool isdir;
 	};
@@ -28,8 +28,9 @@ namespace inotify{
 	
 	// std::function<void(FileEvent)> event_handler;
 
-	int init(int argc, char* argv[100]);
-	void update();
+	void inotify_init(int argc, char const* const* argv);
+	void inotify_update();
+	void inotify_exit();
 }
 
 

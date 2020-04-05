@@ -15,20 +15,20 @@ class Texture : public File {
 	static bool supported(const std::string& ext);
 	void load();
 	
-    Texture(const fs::path& path="") : File(path) {
-		create_metadata();
+    Texture(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS) {
+		// create_supposed_ext();
 		glGenTextures(1, &t_id);
-		if(!path.empty())load();
+		if(!rpath.empty())load();
 	}
 	~Texture(){glDeleteTextures(1, &t_id);}
 	
 	template<class Archive>
 	void serialize(Archive& ar){
-		ar(cereal::base_class<File>(this));
+		ar(FILE_SERIALIZE);
 		ar(CEREAL_NVP(type));
 		load();
 	}
 };
-// CEREAL_REGISTER_TYPE(Texture)
+CEREAL_REGISTER_TYPE(Texture)
 
 #endif // texture_h

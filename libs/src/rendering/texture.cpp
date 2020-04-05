@@ -1,4 +1,4 @@
-#include "rendering/texture.h"
+#include "texture.h"
 
 #include "engine_globals.h"
 

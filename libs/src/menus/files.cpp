@@ -1,9 +1,9 @@
 #include "assets.h"
-#include "menus/menus.h"
+#include "_menus.h"
 
 using namespace std;
 
-// #include "rendering/program.h"
+// #include "program.h"
 
 namespace menus {
 void files(bool* p_open) {

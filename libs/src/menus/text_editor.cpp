@@ -1,8 +1,8 @@
 #include <fstream>
 #include <streambuf>
 
-#include "menus/menus.h"
-#include "misc/cpp/imgui_stdlib.h"
+#include "_menus.h"
+
 #include "my_filesystem.h"
 
 using namespace std;
@@ -13,26 +13,22 @@ struct File {
     fs::path path;
     string data;
     bool open = true;
-    // static int resize_callback(ImGuiInputTextCallbackData* data) {
-    //     cout << data->EventFlag << endl;
-    //     return 0;
-    // }
 };
 static vector<File> text_files;
 static int current = 0;
-void open_text_editor(fs::path path) {
+void open_text_editor(fs::path full_path) {
     cout << "Opened " << endl;
     // Looking for file in our list
     for (auto& file : text_files) {
-        if (file.path == path) {
+        if (file.path == full_path) {
             file.open = true;
             return;
         }
     }
     // File doesn't exist in ram, loading.. (creating new file instance and loading new info)
+	ifstream stream(full_path);
     File f;
-    f.path = path;
-    ifstream stream(path);
+    f.path = full_path;
     f.data = string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
     text_files.push_back(f);
 }
@@ -41,11 +37,15 @@ void save_text_editor(File& file) {
     stream << file.data;
 }
 void text_editor() {
+	// int i=0;
     for (auto& file : text_files) {
         if (!file.open) continue;
 
         ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
-        ImGui::Begin(file.path.filename().string().c_str(), &file.open);
+		
+		char name[file.path.filename().string().size()+1];
+		sprintf(name, "Editor <%s>", file.path.filename().c_str());
+        ImGui::Begin(name, &file.open);
 
         if (ImGui::Button("Save")) {
             save_text_editor(file);
