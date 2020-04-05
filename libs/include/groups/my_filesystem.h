@@ -1,5 +1,5 @@
 
-#if(__GNUC__ < 7)
+#if(__GNUC__ < 8)
 # define OLD_GNU
 #define ENTRY_IS_DIR(e) (fs::is_directory(e.path()))
 #include <experimental/filesystem>
