@@ -61,3 +61,4 @@ add_library(my_libs
 	src/rendering/texture.cpp
 	src/rendering/program.cpp
 )
+target_link_libraries(my_libs imgui)

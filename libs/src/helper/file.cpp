@@ -63,7 +63,7 @@ bool File::is_supposed_ext(){
 void File::create_supposed_ext() {
 	if (_rel_path.empty())return;
 	if (!is_supposed_ext()) {
-		_rel_path += METADATA_EXT;
+		_rel_path += supposed_ext();
 	}
 }
 // Returns the relative data path to the project path (checking if it's metadata), should concatenate engine::project_path with it

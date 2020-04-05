@@ -3,7 +3,14 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+project(engine)
 
+# message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+# message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+# message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+# message("CMAKE_CXX_FLAGS_MINSIZEREL is ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
+# DEBUG DEFINES
 if (NOT CMAKE_VERSION VERSION_LESS 3.12.4) # Means greater than or equal
 	# Uncoment this to debug
 	add_compile_definitions(DEBUG_GUI)	
@@ -19,10 +26,7 @@ link_directories(
 
 SET(CMAKE_BUILD_TYPE Debug)
 
-# message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
-# message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
-# message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-# message("CMAKE_CXX_FLAGS_MINSIZEREL is ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
 
 SET(GCC_COVERAGE_COMPILE_FLAGS "")
 SET(GCC_COVERAGE_LINK_FLAGS    "")
@@ -33,7 +37,7 @@ SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS
 # find_package(Boost REQUIRED COMPONENTS algorithm)
 
 
-project(engine)
+
 
 include_directories(
 	extern/assimp/include
@@ -44,7 +48,7 @@ include_directories(
 	extern/imgui
 	extern/imgui/examples
 	
-	libs/apps
+	libs/apps/engine
 	libs/include
 	libs/include/assets
 	libs/include/components
@@ -58,30 +62,35 @@ add_subdirectory(extern/imgui)
 add_subdirectory(libs)
 
 
-add_executable(engine 
-	libs/apps/main.cpp
-	libs/apps/engine.cpp
+add_library(engine_lib
+	libs/apps/engine/engine.cpp
 )
 
-target_link_libraries(engine
-	# assets
-	# rendering
-	# menus
-	# components 
+add_executable(engine 
+	libs/apps/engine/main.cpp
+)
+
+add_executable(tests
+	libs/apps/catch/main.cpp
+	libs/apps/catch/file.cpp
+	libs/apps/catch/template.cpp
+)
+
+set(LIBRARIES 
 	my_libs
-	
+	engine_lib
 	imgui
-	
+
 	#Core libraries for engine
 	libSOIL.a
 	libSDL2d.a
 	libSDL2maind.a
 	libglad.a
-	
+
 	assimp
 	libIrrXML.a
 	libzlibstatic.a
-	
+
 	#Very low level
 	inotifytools
 	GL
@@ -90,3 +99,9 @@ target_link_libraries(engine
 	stdc++fs
 )
 
+target_link_libraries(engine 
+	${LIBRARIES}
+)
+target_link_libraries(tests
+	${LIBRARIES}
+)
