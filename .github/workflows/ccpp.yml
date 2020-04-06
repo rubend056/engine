@@ -16,5 +16,5 @@ jobs:
     - name: config
       run: ./config.sh
     - name: build
-      run: ./build.sh
+      run: ./build.sh 2
     
