@@ -34,7 +34,6 @@
 
 #include "engine_globals.h"
 
-void test_init() {}
 
 std::unordered_set<unsigned int> File::file_ids;
 
@@ -82,7 +81,7 @@ fs::path File::data_path() {
 
 void File::save_file(const std::shared_ptr<File>& f) {
 	if(!f || f->filename().empty())return;
-	auto full_path = engine::get_absolute_from_project(f->rel_path());
+	auto full_path = engine::get_absolute_from_project(f->_rel_path);
 	if (full_path.empty())
 		return;
 	std::cout << "Saving to: " << full_path << std::endl;

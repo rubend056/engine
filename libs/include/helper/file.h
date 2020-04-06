@@ -12,11 +12,6 @@
 #include "my_filesystem.h"
 
 
-
-
-
-void test_init();
-
 #include "cereal/archives/json.hpp"
 #include "cereal/types/polymorphic.hpp"
 
@@ -65,14 +60,16 @@ private:
 	 * 
 	 * (Will start from (last id)/(1) always unless given an id)(static/non static)
 	 */
-	static unsigned int Next_id(unsigned int _f=0);
+
+	static unsigned int Next_id(unsigned int _f=1);
+public:
 	unsigned int file_id=0;
 	fs::path _rel_path="";
 	
 protected:
 	
 public:
-	const std::string rel_path(){return data_path().string();}
+	const std::string hash_path(){return data_path().string();}
    	
 	const std::string filename(){return data_path().filename().string();}
 	void filename_set(const std::string& _filename){_rel_path.replace_filename(_filename);}
@@ -114,7 +111,7 @@ public:
 			printf(ANSI_COLOR_YELLOW "Warning _rel_path changed: old(%s) new(%s)" ANSI_COLOR_RESET "\n", 
 			orel_path.c_str(), _rel_path.c_str());
 		
-		file_id = Next_id(file_id);
+		if(file_id)file_id = Next_id(file_id);
 	}
 };
 
