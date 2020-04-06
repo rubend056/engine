@@ -4,15 +4,16 @@
             "name": "Linux",
             "includePath": [
 				"${workspaceFolder}/extern/assimp/include",
-				"${workspaceFolder}/extern/sdl2/include/SDL2",
-				"${workspaceFolder}/extern/soil/include",
+				"build",
+				"extern/sdl2/include/SDL2",
+				"extern/soil/include",
 				
-				"${workspaceFolder}/extern",
-				"${workspaceFolder}/extern/imgui",
-				"${workspaceFolder}/extern/imgui/examples",
+				"extern",
+				"extern/imgui",
+				"extern/imgui/examples",
 				
-				"${workspaceFolder}/libs/apps",
-				"${workspaceFolder}/libs/include",
+				"libs/apps/engine",
+				"libs/include",
 				"libs/include/assets",
 				"libs/include/components",
 				"libs/include/groups",

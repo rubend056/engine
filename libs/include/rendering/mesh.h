@@ -1,7 +1,7 @@
 #ifndef mesh_h
 #define mesh_h
 
-#include "_rendering.h"
+#include "rendering_common.h"
 #include "assimp/postprocess.h"
 
 class Mesh : public File, public IDraw {

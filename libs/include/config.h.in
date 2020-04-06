@@ -1,0 +1,8 @@
+#define Arch_RELEASE_ID 5
+
+#define Linux_SYSTEM_NAME 0
+#define MacOS_SYSTEM_NAME 1
+#define Windows_SYSTEM_NAME 2
+
+#cmakedefine LSB_RELEASE_ID ${LSB_RELEASE_ID}_RELEASE_ID
+#cmakedefine CMAKE_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}_SYSTEM_NAME
