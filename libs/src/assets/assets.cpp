@@ -60,7 +60,6 @@ namespace assets{
 		if(!engine::project_path.c_str())return;
 		
 		printf("Assets path is %s\n", engine::project_path.c_str());
-		// test_init();
 		
 		// List all files
 		load_project_entries();
