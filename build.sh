@@ -2,9 +2,6 @@
 
 set -e
 
-./deps.sh
-./config.sh
-
 cd extern/glad
 make
 cd ../..
