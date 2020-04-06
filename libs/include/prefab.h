@@ -86,7 +86,7 @@ public:
 		if(count != dirty.size()){
 			printf(
 				ANSI_COLOR_RED "Warning, count is different %d in file, %d in class, file %s" 
-				ANSI_COLOR_RESET "\n",count, dirty.size(), filename().c_str()
+				ANSI_COLOR_RESET "\n",count, (int)dirty.size(), filename().c_str()
 			);
 			// return; //! STOP LOADING, WE HAVE NO IDEA WHAT'S WHAT ANYMORE
 		}
