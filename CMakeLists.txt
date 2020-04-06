@@ -66,6 +66,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		extern
 		extern/imgui
 		extern/imgui/examples
+		extern/glad
 		
 		libs/apps/engine
 		libs/include
