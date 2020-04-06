@@ -16,7 +16,9 @@ message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
 
-
+find_package(SDL2 REQUIRED)
+message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
+message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
 
 # if (NOT CMAKE_VERSION VERSION_LESS 3.12.4) # Means greater than or equal
 # endif
@@ -58,6 +60,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 
 	include_directories(
+		${SDL2_INCLUDE_DIRS}
 		${CMAKE_BINARY_DIR}
 		extern/assimp/include
 		extern/sdl2/include/SDL2
@@ -77,6 +80,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		libs/include/menus
 		libs/include/rendering
 	)
+	
 
 	add_subdirectory(extern/imgui)
 	add_subdirectory(libs)
@@ -95,7 +99,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		libs/apps/catch/file.cpp
 		libs/apps/catch/template.cpp
 	)
-
+	
+	if(LSB_RELEASE_ID MATCHES "Arch")
+		set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
+		string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
+		message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
+	endif()
+	
+	
 	set(LIBRARIES 
 		my_libs
 		engine_lib
@@ -103,8 +114,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 		#Core libraries for engine
 		libSOIL.a
-		libSDL2d.a
-		libSDL2maind.a
+		${SDL2_LIBRARIES}
+		# libSDL2d.a
+		# libSDL2maind.a
 		libglad.a
 
 		assimp
@@ -118,6 +130,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		pthread
 		stdc++fs
 	)
+	
 
 	target_link_libraries(engine 
 		${LIBRARIES}
