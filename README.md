@@ -12,8 +12,10 @@ Trying to get the textures working:<br>
 To build:
 
 - LINUX
-  - Run `./deps.sh` to install dependencies
-  - Run `./cmake.sh` to compile and run the engine with the basic project _game0_
+  - Run `./config.sh` to install dependencies
+  - Run `./build.sh` to compile the engine
+  - Run `./copytestgame.sh` to duplicate the test project folder
+  - Run `./launch.sh` to launch the engine
 	
 - WINDOWS
   -
