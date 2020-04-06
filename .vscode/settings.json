@@ -87,7 +87,8 @@
 		"strstream": "cpp",
 		"cfenv": "cpp",
 		"*.inc": "cpp",
-		"version": "cpp"
+		"version": "cpp",
+		"*.h.in": "c-make"
 	},
 	"C_Cpp.errorSquiggles": "Enabled",
 	"files.exclude": {

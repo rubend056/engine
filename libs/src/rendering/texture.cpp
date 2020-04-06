@@ -2,6 +2,8 @@
 
 #include "engine_globals.h"
 
+#include "SOIL.h"
+
 // ? TEXTURE ******************************************************************
 bool Texture::supported(const std::string& ext){
 	return (ext.compare(".bmp") == 0 ||

@@ -1,8 +1,7 @@
 #ifndef program_h
 #define program_h
 
-#include "_rendering.h"
-
+#include "rendering_common.h"
 #include "component.h"
 
 #define FRAGMENT_EXT ".frag"

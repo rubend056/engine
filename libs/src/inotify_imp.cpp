@@ -6,7 +6,22 @@
 #include <string>
 #include <iostream>
 #include <stdlib.h>
-#include <sys/inotify.h>
+
+#include "config.h"
+#if CMAKE_SYSTEM_NAME == Linux_SYSTEM_NAME // Linux
+#ifndef LSB_RELEASE_ID
+	#error "LSB_RELEASE_ID not set"
+#else
+	#if LSB_RELEASE_ID == Arch_RELEASE_ID
+		#include <sys/inotify.h>
+	#else 
+		#include <sys/inotify.h>
+	#endif
+#endif
+#else // Not Linux
+#endif //CMAKE_SYSTEM_NAME
+
+
 #include <unistd.h>
 
 #include <thread>

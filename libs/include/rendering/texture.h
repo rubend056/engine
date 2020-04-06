@@ -1,14 +1,14 @@
 #ifndef texture_h
 #define texture_h
 
-#include "_rendering.h"
-#include "SOIL.h"
+#include "rendering_common.h"
+
 
 class Texture : public File {
    public:
     unsigned int t_id;
 	
-	int type=SOIL_LOAD_RGB;
+	int type=3; // SOIL_LOAD_RGB
 	int width, height;
 	
 	bool loaded = false;
