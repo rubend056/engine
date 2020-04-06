@@ -1,6 +1,7 @@
 #!/bin/bash
 
-THREADS=${1:-1}
+THREADS=${1:-$(nproc)}
+echo "Make using $THREADS pallalel jobs"
 
 set -e
 
