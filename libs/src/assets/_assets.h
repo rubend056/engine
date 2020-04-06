@@ -24,8 +24,6 @@
 #include "my_filesystem.h"
 using namespace std;
 
-#include <boost/algorithm/string/case_conv.hpp>
-
 namespace assets{
     // extern thread* inotify_thread;
     // void inotify_init();
