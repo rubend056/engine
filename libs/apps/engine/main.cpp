@@ -15,7 +15,7 @@ int main( int argc, char* args[] )
 	
     if (argc <= 1){cout << "Need path to project folder" << endl;return -1;}
 	// cout << argc << endl;
-	engine::project_path = fs::absolute(fs::path(args[1])).lexically_normal();
+	engine::project_path = fs::absolute(fs::path(args[1]));
 	if(engine::project_path.empty()){cout << "Path to project empty" << endl;return -1;}
 
     SDL_Window* window = NULL;
