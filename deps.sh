@@ -3,7 +3,7 @@
 set -e
 
 if hash pacman ; then
-    sudo pacman --needed -S glm assimp inotify-tools
+    sudo pacman --noconfirm --needed -S glm assimp inotify-tools
 elif hash apt ; then 
-    sudo apt-get install cmake build-essential libsdl2-dev libglm-dev libassimp-dev libinotifytools0-dev      libx11-dev 
+    sudo apt-get -y install cmake build-essential libsdl2-dev libglm-dev libassimp-dev libinotifytools0-dev      libx11-dev 
 fi
