@@ -3,29 +3,28 @@
         {
             "name": "Linux",
             "includePath": [
-				"${workspaceFolder}/extern/assimp/include",
-				"build",
-				"extern/sdl2/include/SDL2",
-				"extern/soil/include",
-				
-				"extern",
-				"extern/imgui",
-				"extern/imgui/examples",
-				
-				"libs/apps/engine",
-				"libs/include",
-				"libs/include/assets",
-				"libs/include/components",
-				"libs/include/groups",
-				"libs/include/helper",
-				"libs/include/menus",
-				"libs/include/rendering"
+                "${workspaceFolder}/extern/assimp/include",
+                "build",
+                "extern/sdl2/include/SDL2",
+                "extern/soil/include",
+                "extern",
+                "extern/imgui",
+                "extern/imgui/examples",
+                "libs/apps/engine",
+                "libs/include",
+                "libs/include/assets",
+                "libs/include/components",
+                "libs/include/groups",
+                "libs/include/helper",
+                "libs/include/menus",
+                "libs/include/rendering"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"
+            "intelliSenseMode": "gcc-x64",
+            "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
     "version": 4

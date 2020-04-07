@@ -94,5 +94,6 @@
 	"files.exclude": {
 		"**/cereal": false,
 		"**/extern": false
-	}
+	},
+	"cmake.configureOnOpen": true
 }

@@ -13,8 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: deps
+      run: ./deps.sh
     - name: config
       run: ./config.sh
     - name: build
-      run: ./build.sh 2
+      run: ./build.sh
     
