@@ -23,14 +23,26 @@ namespace assets{
 	extern std::unordered_multimap<std::string, std::shared_ptr<File>> type_asset_ht;
 	// extern std::unordered_map<unsigned int, std::shared_ptr<File>> asset_asset_ht;
 	
-	void add(const std::shared_ptr<File>& file);
+	// Add file to all the hash tables, you can get the typeid_name with 
+	// typeid(file.get()).name() 
+	void add(const std::shared_ptr<File>& file, const char* type_info_name);
 	void clear();
 	
 	template<class T>
 	std::shared_ptr<T> get_file(const fs::path& rel_path){
 		auto it = rpath_asset_ht.find(rel_path);
-		if(it == rpath_asset_ht.end())return nullptr;
+		if(it == rpath_asset_ht.end())return std::shared_ptr<T>();
 		else return std::dynamic_pointer_cast<T>(it->second);
+	}
+	
+	template<class T>
+	std::shared_ptr<T> get_load_file(const fs::path& rel_path){
+		auto f = get_file<File>(rel_path);
+		if(!f){
+			f = File::load_file(rel_path);
+			if(f) assets::add(f, typeid(T).name());
+		}
+		return std::dynamic_pointer_cast<T>(f);
 	}
 	
 	std::vector<std::shared_ptr<File>> get_files(const std::string t_name);

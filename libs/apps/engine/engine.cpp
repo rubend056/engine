@@ -72,9 +72,15 @@ namespace engine{
 		// return asset_path.lexically_relative(project_path);
 		return relativePath(asset_path, project_path);
 	}
+#define ENGINE_CACHE_PATH engine::get_absolute_from_project("cache.json")
 	void save_scene(){
-		if(scene)
+		if(scene){
 			File::save_file(scene);
+			
+			std::ofstream f(ENGINE_CACHE_PATH);
+			cereal::JSONOutputArchive ar(f);
+			ar(scene->hash_path());
+		}
 	}
 	void load_scene(const std::shared_ptr<Scene>& _scene){
 		save_scene();
@@ -89,6 +95,17 @@ namespace engine
     void init(){
         menus::imgui_engine_init();
 		assets::init();
+		
+		if(fs::exists(ENGINE_CACHE_PATH)){
+			std::string last_scene;
+			std::ifstream f(ENGINE_CACHE_PATH);
+			cereal::JSONInputArchive ar(f);
+			ar(last_scene);
+			
+			printf("Loading last scene %s\n", last_scene.c_str());
+			auto scene = assets::get_load_file<Scene>(last_scene);
+			if(scene)engine::load_scene(scene);
+		}
         
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     }

@@ -204,7 +204,12 @@ void Program::imgui_draw(){
 			ImGui::PushID(_i);
 			ImGui::Text("%s",shader->filename().c_str());
 			ImGui::SameLine();
-			if(ImGui::Button("X")){detach_shader(shader->s_id);link();}
+			if(ImGui::Button("X")){
+				detach_shader(shader->s_id);
+				link();
+				ImGui::PopID();
+				break;
+			}
 			ImGui::PopID();
 		}
 	}
