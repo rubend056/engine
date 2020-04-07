@@ -62,6 +62,7 @@ bool File::is_supposed_ext(){
 void File::create_supposed_ext() {
 	if (_rel_path.empty())return;
 	if (!is_supposed_ext()) {
+		std::cout << "Adding supposed ext " << supposed_ext() << " to " << _rel_path << std::endl;
 		_rel_path += supposed_ext();
 	}
 }

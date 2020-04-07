@@ -77,9 +77,9 @@ public:
 	// ? Constructors
 	File(FILE_CONSTRUCT_PARAM) {
 		_rel_path = rpath;
-		if(!rpath.empty()){
-			create_supposed_ext();
-			assert(rpath.is_relative());
+		if(!_rel_path.empty()){
+			// create_supposed_ext();
+			// assert(_rel_path.is_relative());
 			file_id=Next_id();
 		}
 	}

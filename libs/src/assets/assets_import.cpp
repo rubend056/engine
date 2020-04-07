@@ -60,21 +60,18 @@ void import_assets() {
 			auto f = File::load_file(e.path());
 			if(f)add(f);
 		}
-			
 	}
 	
     for (auto &e : entries) {
 		// Skip for all directories
-		// Skip for all metadata
         if (ENTRY_IS_DIR(e)) continue;
 		
 		auto asset_path = engine::get_relative_to_project(e.path());
 		
 		std::shared_ptr<File> f;
 		auto ext = asset_path.extension();
-		// if(e.path().extension().compare(METADATA_EXT) == 0)
 			
-		if(Mesh::supported(ext))
+		    if (Mesh::supported(ext))
 			f = std::make_shared<Mesh>(asset_path);
 		else if(Texture::supported(ext))
 			f = std::make_shared<Texture>(asset_path);
