@@ -86,14 +86,15 @@ void File::save_file(const std::shared_ptr<File>& f) {
 	if (full_path.empty())
 		return;
 	std::cout << "Saving to: " << full_path << std::endl;
-	// std::ofstream file(full_path);
-	cereal::JSONOutputArchive ar(std::cout);
+	std::ofstream file(full_path);
+	cereal::JSONOutputArchive ar(file);
 	ar(f);
 }
-std::shared_ptr<File> File::load_file(const fs::path full_path) {
+std::shared_ptr<File> File::load_file(const fs::path rel_path) {
 	std::shared_ptr<File> f;
-	if (full_path.empty())
+	if (rel_path.empty())
 		return f;
+	auto full_path = engine::get_absolute_from_project(rel_path);
 	std::ifstream file(full_path);
 	cereal::JSONInputArchive ar(file);
 	ar(f);

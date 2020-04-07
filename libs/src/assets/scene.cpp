@@ -1,5 +1,9 @@
 #include "scene.h"
 
+bool Scene::supported(const std::string& ext){
+	return ext.compare(".scene") == 0;
+}
+
 std::shared_ptr<GameObject> Scene::instantiate(const std::string& _name){
 	auto name = _name;
 	if(name.empty())name += "GameObject";

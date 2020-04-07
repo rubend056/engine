@@ -52,15 +52,16 @@ Gl_Enable_Setting gl_enable_settings[] = {
 #endif
 };
 
-#define GLENABLE_ARCHIVE_NAME (std::string(engine::project_path) + "/gl_settings.json").c_str()
+#define GLENABLE_ARCHIVE engine::get_absolute_from_project("gl_settings.json")
 
 void menus::load_settings_glEnable() {
-    std::ifstream fs(GLENABLE_ARCHIVE_NAME);
+    std::ifstream fs(GLENABLE_ARCHIVE);
 	// If there's no file, set current settings
     if (!fs.is_open()) {
         for (auto &s : gl_enable_settings)
             s.value = glIsEnabled(s.index);
         return;
+		
     }
 	// If there is a file, set the file's settings
     cereal::JSONInputArchive ar(fs);
@@ -76,7 +77,7 @@ void menus::load_settings_glEnable() {
 void menus::window_glEnable_config(bool *p_open) {
     ImGui::Begin("glEnable", p_open);
     if (ImGui::Button("Save")) {
-        std::ofstream fs(GLENABLE_ARCHIVE_NAME);
+        std::ofstream fs(GLENABLE_ARCHIVE);
         cereal::JSONOutputArchive ar(fs);
         // ar.makeArray();
         ar(CEREAL_NVP(gl_enable_settings));
