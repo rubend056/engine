@@ -98,7 +98,7 @@ public:
 	virtual FILE_SUPPOSED_EXT{return METADATA_EXT;}
 	
 	static void save_file(const std::shared_ptr<File>& f);
-	static std::shared_ptr<File> load_file(const fs::path full_path);
+	static std::shared_ptr<File> load_file(const fs::path rel_path);
 	
 	template<class Archive>
 	void serialize(Archive& ar){

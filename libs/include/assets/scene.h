@@ -17,6 +17,7 @@ public:
 	std::shared_ptr<GameObject> instantiate(const std::string& _name="");
 	
 	FILE_SUPPOSED_EXT override {return ".scene";}
+	static bool supported(const std::string& ext);
 	
 	template<class Archive>
 	void serialize(Archive& ar){

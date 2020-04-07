@@ -123,31 +123,40 @@ void menus::imgui_engine_update() {
 	ImGui::PushID("popup_id");
 	POPUP_MAIN_MENU_EXPANSION(POPUP_OPEN)
 	
-	ImGui::SetNextWindowSize(ImVec2(200,0));
+	
 	// ? Open scene popup
-	auto scene = add_popup(scenes, true, "open_scene_popup_modal");
-	if(scene) engine::scene = std::dynamic_pointer_cast<Scene>(scene);
-	
-	ImGui::SetNextWindowSize(ImVec2(200,0));
-	
-	if (ImGui::BeginPopupModal("save_as_popup_modal", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
-		ImGui::Text("Save as modal");
-		if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
-		ImGui::EndPopup();
+	{
+		ImGui::SetNextWindowSize(ImVec2(200,0));
+		auto scene = add_popup(scenes, true, "open_scene_popup_modal");
+		if(scene) engine::scene = std::dynamic_pointer_cast<Scene>(scene);
 	}
 	
-	ImGui::SetNextWindowSize(ImVec2(200,0));
-	
-	if(ImGui::BeginPopupModal("new_scene_popup", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
-		static std::string scene_name;
-		ImGui::InputText(".scene", &scene_name);
-		if(ImGui::Button("Ok")){
-			engine::load_scene(std::shared_ptr<Scene>(new Scene(scene_name)));
-			ImGui::CloseCurrentPopup();
+	{
+		ImGui::SetNextWindowSize(ImVec2(200,0));
+		if (ImGui::BeginPopupModal("save_as_popup_modal", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+			ImGui::Text("Save as modal");
+			if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
 		}
-		ImGui::SameLine(ImGui::GetContentRegionAvail().x - 50);
-		if(ImGui::Button("Cancel",ImVec2(50,0)))ImGui::CloseCurrentPopup();
-		ImGui::EndPopup();
+	}
+	
+	
+	{
+		ImGui::SetNextWindowSize(ImVec2(200,0));
+		if(ImGui::BeginPopupModal("new_scene_popup", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
+			static std::string scene_name;
+			ImGui::InputText(".scene", &scene_name);
+			if(ImGui::Button("Ok")){
+				auto scene = std::make_shared<Scene>(scene_name);
+				scene->create_supposed_ext();
+				assets::add(scene, typeid(Scene).name());
+				engine::load_scene(scene);
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - 50);
+			if(ImGui::Button("Cancel",ImVec2(50,0)))ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+		}
 	}
 	ImGui::PopID();
 	
