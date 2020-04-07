@@ -51,26 +51,30 @@ void import_assets() {
     tmesh->loaded =true;
     tmesh->vaos.push_back(move(vao));
     add(tmesh);
-
     // #################
+	
+	// Loading META Files
 	for (auto &e : entries) {
+		// Skip for all directories
 		if (ENTRY_IS_DIR(e)) continue;
 		
 		if(e.path().extension().compare(METADATA_EXT) == 0){
 			auto f = File::load_file(e.path());
-			if(f)add(f);
+			if(f)assets::add(f);
 		}
 	}
 	
+	// Loading all other files that were either previously saved or are new assets
     for (auto &e : entries) {
 		// Skip for all directories
         if (ENTRY_IS_DIR(e)) continue;
 		
 		auto asset_path = engine::get_relative_to_project(e.path());
+		// Skip for files already present
+		if(assets::rpath_asset_ht.find(asset_path) != assets::rpath_asset_ht.end())continue;
 		
 		std::shared_ptr<File> f;
 		auto ext = asset_path.extension();
-			
 		    if (Mesh::supported(ext))
 			f = std::make_shared<Mesh>(asset_path);
 		else if(Texture::supported(ext))
@@ -80,7 +84,7 @@ void import_assets() {
 		else if(Program::supported(ext))
 			f = std::make_shared<Program>(asset_path);
 		
-		if(f)add(f);
+		if(f)assets::add(f);
     }
 	cout << ANSI_COLOR_GREEN << "Finished Importing" << ANSI_COLOR_RESET << endl;
 }
