@@ -29,7 +29,11 @@ void Shader::load(){
         else if (filename.find("fragment") != string::npos || filename.find("frag") != string::npos)
             type = GL_FRAGMENT_SHADER;
         else if (filename.find("geometry") != string::npos)
+#if (GLAD_OPENGL_CORE_VERSION >= 45)
             type = GL_GEOMETRY_SHADER;
+#else
+			type = GL_GEOMETRY_SHADER_ARB;
+#endif
         else if (filename.find("vertex") != string::npos)
             type = GL_VERTEX_SHADER;
 

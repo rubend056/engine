@@ -15,10 +15,15 @@ message("-- CMAKE_SYSTEM_NAME:      	${CMAKE_SYSTEM_NAME}")
 message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
+SET(GLAD_OPENGL_CORE_VERSION "30" CACHE STRING "OPENGL_VERSION: either 30 or 45")
+message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
 
 find_package(SDL2 REQUIRED)
 message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
 message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
+find_package(ASSIMP REQUIRED)
+message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
+message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 
 # if (NOT CMAKE_VERSION VERSION_LESS 3.12.4) # Means greater than or equal
 # endif
@@ -38,10 +43,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 	# list(INSERT CMAKE_MODULE_PATH 0 "extern/sdl2/lib/cmake extern/assimp/lib/cmake")
 	link_directories(
-		extern/assimp/lib
-		extern/sdl2/lib
+		# extern/assimp/lib
+		# extern/sdl2/lib
 		extern/soil/lib
-		extern/glad
+		extern/glad/${GLAD_OPENGL_CORE_VERSION}
 	)
 
 	SET(CMAKE_BUILD_TYPE Debug)
@@ -61,6 +66,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 	include_directories(
 		${SDL2_INCLUDE_DIRS}
+		${ASSIMP_INCLUDE_DIRS}
 		${CMAKE_BINARY_DIR}
 		extern/assimp/include
 		extern/sdl2/include/SDL2
@@ -69,7 +75,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		extern
 		extern/imgui
 		extern/imgui/examples
-		extern/glad
+		extern/glad/${GLAD_OPENGL_CORE_VERSION}
 		
 		libs/apps/engine
 		libs/include
@@ -103,7 +109,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	if(LSB_RELEASE_ID MATCHES "Arch")
 		set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
 		string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
-		message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
+		# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
 	endif()
 	
 	
@@ -115,13 +121,15 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		#Core libraries for engine
 		libSOIL.a
 		${SDL2_LIBRARIES}
+		
 		# libSDL2d.a
 		# libSDL2maind.a
 		libglad.a
 
-		assimp
-		libIrrXML.a
-		libzlibstatic.a
+		# assimp
+		# libIrrXML.a
+		# libzlibstatic.a
+		${ASSIMP_LIBRARIES}
 
 		#Very low level
 		inotifytools

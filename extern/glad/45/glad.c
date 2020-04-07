@@ -850,7 +850,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glad/glad.h>
+#include <glad.h>
 
 void _pre_call_callback_default(const char *name, void *funcptr, int len_args, ...) {
     (void) name;

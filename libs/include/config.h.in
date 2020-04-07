@@ -1,8 +1,21 @@
+//#define str(str) #str
+// #define str2(str) str(str)
+
+// prints out contents of the macro
+//#define macro(m) message (#m " : " str(m))
+
+// this prints out the string and clicking on it you open the proper document on proper line
+// #define line(str) message (__FILE__ "(" str2(__LINE__) ") : " str)
+
+
 #define Arch_RELEASE_ID 5
 
 #define Linux_SYSTEM_NAME 0
 #define MacOS_SYSTEM_NAME 1
 #define Windows_SYSTEM_NAME 2
+
+#cmakedefine GLAD_OPENGL_CORE_VERSION ${GLAD_OPENGL_CORE_VERSION}
+//#pragma (macro(GLAD_OPENGL_CORE_VERSION))
 
 #cmakedefine LSB_RELEASE_ID ${LSB_RELEASE_ID}_RELEASE_ID
 #cmakedefine CMAKE_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}_SYSTEM_NAME
