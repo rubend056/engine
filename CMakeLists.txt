@@ -104,6 +104,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		libs/apps/catch/main.cpp
 		libs/apps/catch/file.cpp
 		libs/apps/catch/template.cpp
+		libs/apps/catch/scene.cpp
 	)
 	
 	if(LSB_RELEASE_ID MATCHES "Arch")
