@@ -51,20 +51,26 @@ File(Serialize/Deserialize) // ANY CLASS REPRESENTED BY A FILE
 	serialize()
 Component:IDraw(Component interaction) // ANY CLASS THAT'S A COMPONENT
 	bool enabled
-	virtual uint max_num(){return 0;}
+	max_num()
+	
 Mesh : File(load options),IDraw
 	vbo_id
-	vao_id
-	n_vertices
-	?positions
-	?normals
-	?tex_cords
+	VAO{
+		vao_id
+		vao_bind()
+		vao_attrib_enable()
+		vao_attrib_diable()
+		
+		n_vertices
+		!positions (not present)
+		!normals (not present)
+		!tex_cords (not present)
+		
+		gl_draw()
+	} vaos;
 	vbo_bind()
-	vao_bind()
-	vao_attrib_enable()
-	vao_attrib_diable()
-	vbo_set_data()
-	gl_draw()
+	load()
+	
 Texture: File(load options),IDraw
 	t_id
 Shader : File,IDraw
@@ -80,6 +86,26 @@ Program : File,Component,IDraw
 	link()
 	use()
 	
+GameObject <a>
+	Component <aa>
+		a,b
+	Component
+	Component
+
+GameObject <b> ref-> <a>
+	Component <ba> ref-> <aa>
+		a,b
+	Component
+	Component
+
+
+
+For each variable in components: `const get()` and `set(value)` methods
+
+files: File,File,File,File
+
+Does a Prefab need to be a file? Do we have to save it always to a file or can it be saved to a ?
+GameObject is a file and a preafab, but we need to figure out how it serializes it's components
 
 
 Load and compile Shaders

@@ -22,14 +22,13 @@ int main( int argc, char* args[] )
     SDL_Window* window = NULL;
     SDL_Surface* screenSurface = NULL;
     
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+    if( SDL_Init( SDL_INIT_VIDEO|SDL_INIT_AUDIO ) < 0 )
     {
         printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
         return -1;
     }
     
 
-    // GL 4.5 + GLSL 450
     const char* glsl_version = GLAD_OPENGL_CORE_VERSION>=45?"#version 450":"#version 330";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -61,7 +60,9 @@ int main( int argc, char* args[] )
 #endif
     if (err){fprintf(stderr, "Failed to initialize OpenGL loader!\n");return 1;}
     
-    // IMGUI *****************
+	cout << glGetString(GL_VERSION) << endl;
+	
+    //? IMGUI *****************
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -77,12 +78,11 @@ int main( int argc, char* args[] )
 	strcpy(ini_path, is.c_str());
 	io.IniFilename = ini_path;
     //ImGui::StyleColorsClassic();
-    
-    cout << glGetString(GL_VERSION) << endl;
-    
+	
     // Setup Platform/Renderer bindings
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
+	//?#########################
     
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     engine::init();
@@ -97,6 +97,8 @@ int main( int argc, char* args[] )
                 engine::run = false;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
             	engine::run = false;
+			
+			// Put your input here
         }
 
         // Start the Dear ImGui frame

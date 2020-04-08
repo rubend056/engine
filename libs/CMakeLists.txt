@@ -56,6 +56,7 @@ add_library(my_libs
 	
 	src/components/camera.cpp
 	src/components/transform.cpp
+	src/components/source.cpp
 	
 	src/rendering/mesh.cpp
 	src/rendering/texture.cpp
