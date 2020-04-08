@@ -31,10 +31,8 @@ void CLASSNAME_NORMAL::imgui_draw(){
 		filter.Draw("##filter0", 100);
 		std::shared_ptr<Component> c;
 		auto push = [&]() -> void {comps.push_back(c); ImGui::CloseCurrentPopup(); };
-		if (c = component_button<Transform>())
-			push();
-		if (c = component_button<Program>())
-			push();
+		if (c = component_button<Transform>())push();
+		if (c = component_button<Program>())push();
 
 		ImGui::EndPopup();
 	}
