@@ -53,8 +53,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 
 
-	SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}    ")
-	SET(GCC_COVERAGE_LINK_FLAGS    "${GCC_COVERAGE_LINK_FLAGS}       ")
+	SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}    -fdata-sections -ffunction-sections")
+	SET(GCC_COVERAGE_LINK_FLAGS    "${GCC_COVERAGE_LINK_FLAGS}       -Wl,--gc-sections")
 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
 
@@ -101,10 +101,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	)
 
 	add_executable(tests
-		libs/apps/catch/main.cpp
-		libs/apps/catch/file.cpp
-		libs/apps/catch/template.cpp
-		libs/apps/catch/scene.cpp
+		libs/apps/catch/main_test.cpp
+		libs/apps/catch/file_test.cpp
+		libs/apps/catch/scene_test.cpp
+		libs/apps/catch/gameobject_test.cpp
 	)
 	
 	if(LSB_RELEASE_ID MATCHES "Arch")

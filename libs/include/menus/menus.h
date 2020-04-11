@@ -9,10 +9,12 @@
 #include <vector>
 #include "my_filesystem.h"
 
-namespace menus
-{
+namespace menus{	
+	extern std::shared_ptr<IDraw> inspector_o;
+	
 	void imgui_engine_init();
 	void imgui_engine_update();
+	void imgui_engine_exit();
 	
 	// Open "add_popup" for picking File derivate, returns pointer to picked
 	// template <class T>

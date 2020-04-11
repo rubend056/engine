@@ -20,4 +20,11 @@ TEST_CASE("Scene class behaviour"){
 		REQUIRE(s->_rel_path.compare("scenes/test.scene") == 0);
 		
 	}
+	SECTION("gamobejct path"){
+		auto s = std::make_shared<Scene>("scenes/test");
+		s->create_supposed_ext();
+		s->instantiate("go");
+		// auto o = s->get_obj("go");
+		REQUIRE(s->get_gameobject_path("go").compare("scenes/test.scene:go") == 0);
+	}
 }

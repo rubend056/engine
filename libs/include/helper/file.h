@@ -73,6 +73,7 @@ public:
    	
 	const std::string filename(){return data_path().filename().string();}
 	void filename_set(const std::string& _filename){_rel_path.replace_filename(_filename);}
+	// const std::string stem();
 	
 	// ? Constructors
 	File(FILE_CONSTRUCT_PARAM) {

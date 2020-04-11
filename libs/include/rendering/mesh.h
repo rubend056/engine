@@ -4,6 +4,8 @@
 #include "rendering_common.h"
 #include "assimp/postprocess.h"
 
+#include "component.h"
+
 class Mesh : public File, public IDraw {
    private:
     // Can't modify this after constructor is called
@@ -18,7 +20,7 @@ class Mesh : public File, public IDraw {
     // glm::vec2 *tex_cords = nullptr;
 	
 	// Every VAO represents a different mesh
-	struct VAO{
+	struct VAO: public Component{
 		std::string name;
 		unsigned int vao_id;
 		unsigned int n_vertices;
@@ -41,6 +43,16 @@ class Mesh : public File, public IDraw {
 		void gl_draw(){
 			vao_bind();
 			glDrawArrays(draw_function, 0, n_vertices);
+		}
+		COMPONENT_MAX_NUM override{return 0;}
+		IDRAW_IMGUI_NAME override{return std::string("VAO ") + name;}
+		IDRAW_IMGUI_DRAW override{
+			ImGui::Text("ID: %d", vao_id);
+			ImGui::Text("Vertices: %d", n_vertices);
+			ImGui::Separator();
+			ImGui::Text("Positions: %s", positions?"true":"false");
+			ImGui::Text("Normals: %s", normals?"true":"false");
+			ImGui::Text("Tex_cords: %s", tex_cords?"true":"false");
 		}
 		VAO(){glGenVertexArrays(1, &vao_id);}
 		~VAO(){glDeleteVertexArrays(1, &vao_id);}

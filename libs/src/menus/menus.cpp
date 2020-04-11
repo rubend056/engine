@@ -8,9 +8,23 @@
 
 #include <fstream>
 
+#define ENGINE_INI engine::get_absolute_from_project("imgui_e.ini")
 
 void menus::imgui_engine_init(){
 	load_settings_glEnable();
+	
+	{
+		std::ifstream f(ENGINE_INI);
+		if(f){
+			cereal::JSONInputArchive ar(f);
+			fs::path p;
+			ar(p);
+			if(!p.empty()){
+				menus::inspector_o = assets::get_file<IDraw>(p);
+			}
+		}
+		
+	}
 }
 
 std::shared_ptr<File> menus::add_popup(const std::vector<std::shared_ptr<File>>& vector, bool modal, const char*label) {
@@ -161,6 +175,18 @@ void menus::imgui_engine_update() {
 	ImGui::PopID();
 	
 	POPUP_MAIN_MENU_EXPANSION(POPUP_RESET) false;
+}
+
+void menus::imgui_engine_exit(){
+	// if(menus::inspector_o){
+		
+	// 	std::ofstream f(ENGINE_INI);
+	// 	if(f){
+	// 		cereal::JSONOutputArchive ar(f);
+	// 		auto ins_file = std::dynamic_pointer_cast<File>(menus::inspector_o);
+	// 		if(ins_file)ar(ins_file->data_path());
+	// 	}
+	// }
 }
 
 // void window_open_project(bool *p_open) {

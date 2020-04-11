@@ -50,6 +50,8 @@ void File::imgui_draw_filename_edit() {
 	std::string t = filename();
 	if (ImGui::InputText("FName", &t))
 		filename_set(t);
+	
+		
 }
 
 // Is this path a metadata (means is just a companion file to something else, texture, mesh, etc...)

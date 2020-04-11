@@ -75,11 +75,20 @@ namespace engine{
 #define ENGINE_CACHE_PATH engine::get_absolute_from_project("cache.json")
 	void save_scene(){
 		if(scene){
-			File::save_file(scene);
-			
 			std::ofstream f(ENGINE_CACHE_PATH);
 			cereal::JSONOutputArchive ar(f);
-			ar(scene->hash_path());
+			
+			// Saving Scene
+			File::save_file(scene);
+			ar(cereal::make_nvp("scene", scene->hash_path()));
+			
+			// Saving Inspector File
+			auto ins_file = std::dynamic_pointer_cast<File>(menus::inspector_o);
+			auto go = std::dynamic_pointer_cast<GameObject>(menus::inspector_o);
+			std::string rel_path;
+			if(go){rel_path = scene->get_gameobject_path(go->filename());
+			}else if(ins_file)rel_path = ins_file->data_path();
+			ar(cereal::make_nvp("inspector", rel_path));
 		}
 	}
 	void load_scene(const std::shared_ptr<Scene>& _scene){
@@ -93,19 +102,33 @@ ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.00f);
 namespace engine
 {
     void init(){
-        menus::imgui_engine_init();
 		assets::init();
 		
 		if(fs::exists(ENGINE_CACHE_PATH)){
-			std::string last_scene;
+			
+			
 			std::ifstream f(ENGINE_CACHE_PATH);
 			cereal::JSONInputArchive ar(f);
-			ar(last_scene);
 			
+			// Loading last scene
+			std::string last_scene;
+			ar(cereal::make_nvp("scene", last_scene));
 			printf("Loading last scene %s\n", last_scene.c_str());
 			auto scene = assets::get_load_file<Scene>(last_scene);
 			if(scene)engine::load_scene(scene);
+			
+			// Loading last inspector
+			std::string rel_path;
+			ar(cereal::make_nvp("inspector", rel_path));
+			auto is_go = Scene::is_gameobject_path(rel_path);
+			menus::inspector_o = std::dynamic_pointer_cast<IDraw>(
+				is_go ? 
+				Scene::find_gameobject_path(assets::get_files<Scene>(), rel_path) : 
+				assets::get_file<IDraw>(rel_path)
+			);
 		}
+		
+		menus::imgui_engine_init();
         
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     }
@@ -148,8 +171,9 @@ namespace engine
     }
 	
 	void exit(){
-		assets::exit();
+		menus::imgui_engine_exit();
 		save_scene();
+		assets::exit();
 	}
 } // namespace engine
 

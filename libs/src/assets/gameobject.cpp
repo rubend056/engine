@@ -2,16 +2,17 @@
 
 #include "components.h"
 
-CLASSNAME_NORMAL::CLASSNAME_NORMAL(const fs::path rpath):Prefab<CLASSNAME_NORMAL>(PREFAB_CONSTRUCT_VARS){
-	comps.push_back(std::make_shared<Transform>());
+GameObject::GameObject(const fs::path rpath):File(FILE_CONSTRUCT_VARS){
+	// components.push_back();
+	add(std::make_shared<Transform>(), typeid(Transform).name());
 }
 
-void CLASSNAME_NORMAL::imgui_draw(){
+void GameObject::imgui_draw(){
 	//? COMPONENT DRAW LOOP
 	File::imgui_draw_filename_edit();
 	ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
 	int i = 0;
-	for (auto& c : comps) {
+	for (auto& c : components) {
 		char name[20];
 		sprintf(name, "%s##%d", c->imgui_name().c_str(), i++);
 		if (ImGui::TreeNode(name)) {
@@ -29,9 +30,9 @@ void CLASSNAME_NORMAL::imgui_draw(){
 		// Filter code
 		static ImGuiTextFilter filter;
 		filter.Draw("##filter0", 100);
-		std::shared_ptr<Component> c;
-		auto push = [&]() -> void {comps.push_back(c); ImGui::CloseCurrentPopup(); };
-		if (c = component_button<Transform>())push();
+		std::shared_ptr<Component> c; const char* type_id_name;
+		auto push = [&]() -> void {add(c, type_id_name); ImGui::CloseCurrentPopup(); };
+		if (c = component_button<Transform>()){type_id_name = typeid(Transform).name(); push();}
 		if (c = component_button<Program>())push();
 
 		ImGui::EndPopup();

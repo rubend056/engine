@@ -8,7 +8,7 @@
 #include "menus.h"
 
 namespace menus{
-	extern std::shared_ptr<IDraw> inspector_o;
+	
     void inspector(bool* p_open=NULL);
     void files(bool* p_open=NULL);
 	void programs(bool* p_open=NULL);

@@ -48,6 +48,9 @@ Now compiles for Ubuntu 18.04 as well as Archlinux and is configurable to use Op
 :----:|:---------:
 |![](images/day25_1.png) | ![](images/day25_0.png) |
 
+<p align="center">
+<img src="images/lapse0_movie_loosy.gif">
+
 </div>
 <br>
 

@@ -52,10 +52,11 @@ File(Serialize/Deserialize) // ANY CLASS REPRESENTED BY A FILE
 Component:IDraw(Component interaction) // ANY CLASS THAT'S A COMPONENT
 	bool enabled
 	max_num()
+<Class>_Prefab (Prefab serialization and definitions)
 	
 Mesh : File(load options),IDraw
 	vbo_id
-	VAO{
+	VAO:Component{
 		vao_id
 		vao_bind()
 		vao_attrib_enable()
@@ -85,26 +86,40 @@ Program : File,Component,IDraw
 	clearShaders()
 	link()
 	use()
+
+
+
+GameObject <a> ref-> NULL
+	Component (Transform) ref-> NULL
+		p,r,s
+	Component (VAO) 		-> a.obj:a
+	Component (Program) 	-> a.prog
+
+GameObject <b> ref-> <a> (When Gameobject instatiates, it links refs of components inside)
+	Component (Transform) ref-> <a>(Transform)
+		p,r,s
+	Component (VAO) 		-> a.obj:a
+	Component (Program) 	-> a.prog
+
+
+	Component:IDraw
+
+
+PREFAB
+	 Prefab Linking
+	 	 MATTERS
+			|
+			V
+	-Initialize 	(ref -> load_cereal() -> file)  (file -> load_cereal)
+	-Modify file	(load() -> if(!is_ref) -> if(!is_ref))
 	
-GameObject <a>
-	Component <aa>
-		a,b
-	Component
-	Component
-
-GameObject <b> ref-> <a>
-	Component <ba> ref-> <aa>
-		a,b
-	Component
-	Component
-
-
+	Destroy (ref and file get saved the same way)
 
 For each variable in components: `const get()` and `set(value)` methods
 
 files: File,File,File,File
 
-Does a Prefab need to be a file? Do we have to save it always to a file or can it be saved to a ?
+Does a Prefab need to be a file? Not necessarily, Transform is also a prefab? or is it? Perhaps Transform needs another, different class as base. No, bc it also needs to save dirties. Ok, all components in Gameobject need to save dirties, in case GameObject has a ref,  Do we have to save it always to a file or can it be saved to a ?
 GameObject is a file and a preafab, but we need to figure out how it serializes it's components
 
 
