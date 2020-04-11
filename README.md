@@ -11,18 +11,18 @@ One of the things I aim to overcome is my utter lack to plan ahead and set goals
 
 <br>
 
-<p align="center"><b>Day 1<b></p>
+<p align="center"><b>Day 1</b></p>
 <p align="center">
 <img class="image" width="90%" style="width: 90%;" alt="A simple screen" src="images/day1.png">
 
 -----
-<p align="center"><b>Day 3<b></p>
+<p align="center"><b>Day 3</b></p>
 <p align="center">
 <img class="image" width="90%" alt="File Editor, and file events with inotify" src="images/day3.png">
 
 -----
 
-<p align="center"><b>Day 10<b></p>
+<p align="center"><b>Day 10</b></p>
 <p align="center">
 Trying to get the textures working:
 
@@ -30,7 +30,7 @@ Trying to get the textures working:
 <img class="image" alt="Still trying to get the textures working" src="images/day10.png">
 
 -----
-<p align="center"><b>Day 25<b></p>
+<p align="center"><b>Day 25</b></p>
 <p align="center">
 Now compiles for Ubuntu 18.04 as well as Archlinux and is configurable to use OpenGL Core 3.0 or 4.5:
 
