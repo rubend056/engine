@@ -8,13 +8,6 @@
 #define VERTEX_EXT ".vert"
 #define PROGRAM_EXT ".prgm"
 
-// enum SHADER_ENUM {
-//     NOTHING = 0,
-//     VERTEX,
-//     GEOMETRY,
-//     FRAGMENT
-// };
-
 class Shader : public File {
 public:
     unsigned int s_id=0;

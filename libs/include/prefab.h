@@ -1,7 +1,6 @@
-#ifndef prefab_h
-#define prefab_h
-
 #include <memory>
+
+#define PREFAB_SERIALIZE cereal::make_nvp("template", cereal::base_class<PREFAB_NAME>(this))
 
 #define PREFAB_VAR_ENUM_NAME(name) name##_enum
 #define PREFAB_VAR_ENUM_DIRTY(type, name) PREFAB_VAR_ENUM_NAME(name),
@@ -20,15 +19,19 @@
 // #define PREFAB_VAR_CHECK(name) PREFAB_VAR_DIRTY_NAME(name) = ref.name == name;
 // #define PREFAB_VAR_CHECK(name, type) PREFAB_VAR_DIRTY_NAME(name) = ref.name == name;
 
-#define PREFAB_VAR_CHECK_DEF(type, name) void check_##name () {\
-		if(ref)PREFAB_VAR_DIRTY_NAME(name) = ref.name == name;\
+//? CHECK
+#define PREFAB_VAR_CHECK_DEF(type, name) \
+	void check_##name () { \
+		if(ref)PREFAB_VAR_DIRTY_NAME(name) = ref->name == name;\
 		else {PREFAB_VAR_DIRTY_NAME(name) = true;}\
 	}
 #define PREFAB_VAR_CHECK(type, name) check_##name();
-#define PREFAB_VAR_GET_DEF(type, name) const type& get_##name () inline {return name;}
-#define PREFAB_VAR_SET_DEF(type, name) void set_##name () inline {name = val; check_##name ();}
 
-
+//? GET AND SET
+#define PREFAB_VAR_GET_DEF(type, name) \
+	inline const type& get_##name () {return name;}
+#define PREFAB_VAR_SET_DEF(type, name) \
+	inline void set_##name (const type& val) {name = val; check_##name ();}
 
 #ifndef CLASSNAME
 // #define CLASSNAME GAMEOBJECT
@@ -43,66 +46,77 @@
 #define _CLASSNAME_EXPANSION(classname, func) __CLASSNAME_EXPANSION(classname,func)
 #define CLASSNAME_EXPANSION(func) _CLASSNAME_EXPANSION(CLASSNAME,func)
 
-#define PREFAB_CONSTRUCT_PARAM FILE_CONSTRUCT_PARAM
-#define PREFAB_CONSTRUCT_VARS FILE_CONSTRUCT_VARS
+#define __PREFAB_NAME(classname) classname##_Prefab
+#define _PREFAB_NAME(classname) __PREFAB_NAME(classname)
+// KEEP IN MIND, you need to override set_ref
+#define PREFAB_NAME _PREFAB_NAME(CLASSNAME_NORMAL)
+
+// #define PREFAB_CONSTRUCT_PARAM FILE_CONSTRUCT_PARAM
+// #define PREFAB_CONSTRUCT_VARS FILE_CONSTRUCT_VARS
 
 #include "file.h"
 #include "assets.h"
 #include "cereal/types/vector.hpp"
 
 // This class will have the prefab functionality
-template<class T>
-class Prefab:public File{
+// template<class T>
+
+class PREFAB_NAME{
 private:
-	std::shared_ptr<T> ref; // Link to our prefab inst
 	
 protected:
 	// Prefab vars
-	enum DIRTY_ENUM{First, CLASSNAME_EXPANSION(PREFAB_VAR_ENUM_DIRTY) Last};
+	std::shared_ptr<PREFAB_NAME> ref; // Link to our prefab inst 
+	enum class DIRTY_ENUM{First=-1, CLASSNAME_EXPANSION(PREFAB_VAR_ENUM_DIRTY) Last};
 public:
 	CLASSNAME_EXPANSION(PREFAB_VAR_DEF)
+	CLASSNAME_EXPANSION(PREFAB_VAR_CHECK_DEF)
+	CLASSNAME_EXPANSION(PREFAB_VAR_GET_DEF)
+	CLASSNAME_EXPANSION(PREFAB_VAR_SET_DEF)
 	
-	Prefab(FILE_CONSTRUCT_PARAM):File(FILE_CONSTRUCT_VARS){}
-	
-	// Is this instance a prefab instantiation (are u the sole owner of a file?)
-	// 		Should have ref null and a name that's not a supposed ext
-	// 
-	// bool is_prefab()
+	// Prefab(FILE_CONSTRUCT_PARAM):File(FILE_CONSTRUCT_VARS){}
+	// Prefab(FILE_CONSTRUCT_PARAM){}
+	virtual ~PREFAB_NAME(){};
 	
 	template<class Archive>
 	void serialize(Archive& ar){
-		// ? Base Class
-		ar(FILE_SERIALIZE);
 		// ? Serailize ref
-		std::string d_name = ref?ref->data_path():"";
-		ar(cereal::make_nvp("ref",d_name));
-		if(!ref && !d_name.empty())ref = assets::get_file<T>(d_name);
+		// std::string d_name = ref?ref->data_path():"";
+		// ar(cereal::make_nvp("ref",d_name));
+		// if(!ref && !d_name.empty())ref = assets::get_file<T>(d_name);
 		
-		// ? Serailize dirty and vars
-		std::vector<bool> dirty;CLASSNAME_EXPANSION(PREFAB_VAR_ADD_DIRTY)
+		// bool good_ref = ref;
+		// Print error if we have a ref_name serialized 
+		// but can't find the actual reference
+		// if(!ref && !d_name.empty()) 
+		// 	printf("%s ref not found\n", d_name.c_str()); 
+		
+		// ? Serailize dirty
+		std::vector<bool> dirty;
+		if(ref){CLASSNAME_EXPANSION(PREFAB_VAR_ADD_DIRTY)}
+		else {for(int i=0;i<(int)DIRTY_ENUM::Last;++i)dirty.push_back(true);}
 		
 		int count = dirty.size();
 		ar(cereal::make_nvp("var_count", count));
 		if(count != dirty.size()){
 			printf(
-				ANSI_COLOR_RED "Warning, count is different %d in file, %d in class, file %s" 
-				ANSI_COLOR_RESET "\n",count, (int)dirty.size(), filename().c_str()
+				ANSI_COLOR_RED "Warning, count is different: %d in file, %d in class" 
+				ANSI_COLOR_RESET "\n",count, (int)dirty.size()
 			);
 			// return; //! STOP LOADING, WE HAVE NO IDEA WHAT'S WHAT ANYMORE
 		}
-		
 		ar(CEREAL_NVP(dirty));
+		
+		// ? Serialize vars
 		int i=0;
 #define PREFAB_VAR_SERIALIZE_VARS(type, name) \
-		if(i++<count && dirty[PREFAB_VAR_ENUM_NAME(name)]) PREFAB_VAR_SERIALIZE(type, name)
+		if(i++<count && dirty[(int)DIRTY_ENUM::PREFAB_VAR_ENUM_NAME(name)]) PREFAB_VAR_SERIALIZE(type, name)
 		CLASSNAME_EXPANSION(PREFAB_VAR_SERIALIZE_VARS)
 	}
 };
 
 #define _CRT(classname) CEREAL_REGISTER_TYPE(classname)
-_CRT(Prefab<CLASSNAME_NORMAL>)
-// #define _CSFAA(classname, member) CEREAL_SPECIALIZE_FOR_ALL_ARCHIVES(classname, member)
-// _CSFAA(Prefab<CLASSNAME_NORMAL>,cereal::specialization::member_load_save)
+_CRT(PREFAB_NAME)
 
 
-#endif // prefab_h
+// #endif // prefab_h
