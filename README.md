@@ -25,7 +25,7 @@ To Build
 - MAC
   - Not available yet
 
-Progress of Engine
+Progress
 -------
 
 <p align="center"><b>Day 1</b></p>
