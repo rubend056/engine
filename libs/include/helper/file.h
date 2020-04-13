@@ -45,7 +45,7 @@ inline void load(Archive& ar, path& val) {
 
 #define FILENAME_SIZE 30
 #define METADATA_EXT ".meta"
-#define FILE_CONSTRUCT_PARAM const fs::path rpath=""
+#define FILE_CONSTRUCT_PARAM const fs::path& rpath=""
 #define FILE_CONSTRUCT_VARS rpath
 #define FILE_SUPPOSED_EXT const std::string supposed_ext()
 #define FILE_SERIALIZE cereal::make_nvp("file", cereal::base_class<File>(this))
@@ -64,8 +64,7 @@ private:
 	static unsigned int Next_id(unsigned int _f=1);
 public:
 	unsigned int file_id=0;
-	fs::path _rel_path="";
-	
+	fs::path _rel_path;
 protected:
 	
 public:
@@ -93,7 +92,6 @@ public:
 	bool is_supposed_ext();
 	void create_supposed_ext();
 	// Returns the relative data path to the project path (checking if it's metadata)
-	//   should concatenate engine::project_path with it
 	fs::path data_path();
 	
 	virtual FILE_SUPPOSED_EXT{return METADATA_EXT;}

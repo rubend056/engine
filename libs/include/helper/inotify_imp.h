@@ -22,7 +22,7 @@ namespace inotify{
 
 	extern std::vector<FileEvent*> events;
 	extern std::vector<FileEvent> _events;
-	extern std::vector<std::string> filesnames_allowed;
+	extern std::vector<std::string> filenames_allowed;
 	// extern 
 	
 	

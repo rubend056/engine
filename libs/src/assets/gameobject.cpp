@@ -2,7 +2,7 @@
 
 #include "components.h"
 
-GameObject::GameObject(const fs::path rpath):File(FILE_CONSTRUCT_VARS){
+GameObject::GameObject(const fs::path& rpath):File(FILE_CONSTRUCT_VARS){
 	// components.push_back();
 	add(std::make_shared<Transform>(), typeid(Transform).name());
 }
