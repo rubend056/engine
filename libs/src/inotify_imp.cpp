@@ -77,7 +77,6 @@ namespace inotify{
 		exit_thread = true;
 		if(inotify_thread.joinable())inotify_thread.join();
 		exit_thread = false;
-		filesnames_allowed.clear();
 		inotify::events.clear();
 		inotify::_events.clear();
 	}
@@ -241,7 +240,7 @@ namespace inotify{
 
 	#include <chrono>
 	// #include <algorithm>
-	vector<string> filesnames_allowed;
+	vector<string> filenames_allowed;
 	function<void(FileEvent)> event_handler;
 	void inotify_update(){
 		
@@ -265,7 +264,8 @@ namespace inotify{
 					{_events_found=true;break;}}
 				if(_events_found) continue;
 				
-				for(auto&f:filesnames_allowed){int d = f.compare((*it).filename);if(!d){filelist_found=true;break;}}
+				for(auto&f:filenames_allowed)
+				{int d = f.compare((*it).filename);if(!d || (*it).event == FILE_EVENT::CREATE){filelist_found=true;break;}}
 				
 					
 				if(!_events_found){

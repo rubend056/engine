@@ -7,13 +7,13 @@ bool Scene::supported(const std::string& ext){
 bool Scene::exists(const std::string& name_or_rpath){
 	return rpath_object_ht.find(name_or_rpath) != rpath_object_ht.end();
 }
-std::string Scene::get_gameobject_path(const std::string& name_or_rpath){
-	if(name_or_rpath.empty())return "";
-	auto go = get_obj(name_or_rpath);
-	if(go){
-		return data_path().string() + ":" + go->filename();
-	}else return "";
-}
+// std::string Scene::get_gameobject_path(const std::shared_ptr<GameObject>& go){
+// 	if(name_or_rpath.empty())return "";
+// 	auto go = get_obj(name_or_rpath);
+// 	if(go){
+// 		return data_path().string() + ":" + go->filename();
+// 	}else return "";
+// }
 std::shared_ptr<GameObject> Scene::find_gameobject_path(const std::vector<std::shared_ptr<Scene>>& scenes, const std::string& gameobject_path){
 	if(!gameobject_path.empty()){
 		auto pos = gameobject_path.find(':');

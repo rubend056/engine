@@ -95,14 +95,14 @@ GameObject <a> ref-> NULL
 	Component (VAO) 		-> a.obj:a
 	Component (Program) 	-> a.prog
 
-GameObject <b> ref-> <a> (When Gameobject instatiates, it links refs of components inside)
-	Component (Transform) ref-> <a>(Transform)
-		p,r,s
-	Component (VAO) 		-> a.obj:a
-	Component (Program) 	-> a.prog
+Scene <s>
+	GameObject <b> ref-> <a> (When Gameobject instatiates, it links refs of components inside)
+		Component (Transform) ref-> <a>(Transform)
+			p,r,s
+		Component (VAO) 		-> a.obj:a
+		Component (Program) 	-> a.prog
 
-
-	Component:IDraw
+		Component:IDraw
 
 
 PREFAB

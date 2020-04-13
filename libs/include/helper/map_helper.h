@@ -10,7 +10,7 @@
 		else return it->second; \
 	} \
 	template<class T> \
-	std::shared_ptr<T> get_comp(){ \
+	std::shared_ptr<T> get_##s_name(){ \
 		return std::dynamic_pointer_cast<T>(get_##s_name(helper::demangle(typeid(T).name()))); \
 	}
 	

@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 #include "component.h"
 
-#include "helper/cereal_glmvec3.h"
+#include "helper/cereal_glm.h"
 
 // ? PREFAB ####################################################################
 #define CLASSNAME TRANSFORM

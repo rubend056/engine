@@ -79,21 +79,18 @@ namespace engine{
 			cereal::JSONOutputArchive ar(f);
 			
 			// Saving Scene
-			File::save_file(scene);
+			// File::save_file(scene);
 			ar(cereal::make_nvp("scene", scene->hash_path()));
 			
 			// Saving Inspector File
-			auto ins_file = std::dynamic_pointer_cast<File>(menus::inspector_o);
-			auto go = std::dynamic_pointer_cast<GameObject>(menus::inspector_o);
-			std::string rel_path;
-			if(go){rel_path = scene->get_gameobject_path(go->filename());
-			}else if(ins_file)rel_path = ins_file->data_path();
-			ar(cereal::make_nvp("inspector", rel_path));
+			auto ins_paths = assets::data_path(std::dynamic_pointer_cast<File>(menus::inspector_o));
+			ar(cereal::make_nvp("inspector", ins_paths));
 		}
 	}
 	void load_scene(const std::shared_ptr<Scene>& _scene){
 		save_scene();
 		scene = _scene;
+		menus::inspector_o.reset();
 	}
 }
 
@@ -118,14 +115,9 @@ namespace engine
 			if(scene)engine::load_scene(scene);
 			
 			// Loading last inspector
-			std::string rel_path;
-			ar(cereal::make_nvp("inspector", rel_path));
-			auto is_go = Scene::is_gameobject_path(rel_path);
-			menus::inspector_o = std::dynamic_pointer_cast<IDraw>(
-				is_go ? 
-				Scene::find_gameobject_path(assets::get_files<Scene>(), rel_path) : 
-				assets::get_file<IDraw>(rel_path)
-			);
+			std::vector<fs::path> ins_paths;
+			ar(cereal::make_nvp("inspector", ins_paths));
+			menus::inspector_o = std::dynamic_pointer_cast<IDraw>(assets::data_path_find(ins_paths));
 		}
 		
 		menus::imgui_engine_init();

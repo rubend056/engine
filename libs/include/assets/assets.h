@@ -65,6 +65,11 @@ namespace assets{
 		return std::make_shared<T>();
 	}
 	
+	
+	std::vector<fs::path> data_path(const std::shared_ptr<File>& file);
+	std::shared_ptr<File> data_path_find(const std::vector<fs::path>& paths);
+	
+	
 	void init();
 	void update();
 	void exit();

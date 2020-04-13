@@ -25,8 +25,9 @@ public:
 	static bool supported(const std::string& ext);
 	bool exists(const std::string& name_or_rpath);
 	
-	static bool is_gameobject_path(const std::string& gameobject_path){return gameobject_path.find(':') != std::string::npos;};
-	std::string get_gameobject_path(const std::string& name_or_rpath);
+	static bool is_gameobject_path(const std::string& gameobject_path)
+		{return gameobject_path.find(':') != std::string::npos;};
+	
 	static std::shared_ptr<GameObject> find_gameobject_path(const std::vector<std::shared_ptr<Scene>>& scenes, const std::string& gameobject_path);
 	
 	template<class Archive>

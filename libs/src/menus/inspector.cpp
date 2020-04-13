@@ -18,6 +18,7 @@ void inspector(bool* p_open) {
 	//? INSPECTOR NAME AND COMPONENT LOOP
 	if(!inspector_o)return;
 	
+	ImGui::SetNextWindowSize(ImVec2(250, 300), ImGuiCond_FirstUseEver);
 	char d[inspector_o->imgui_name().size()+1];sprintf(d,"Inspector <%s>###inspector", inspector_o->imgui_name().c_str());
 	ImGui::Begin(d, p_open);
 	

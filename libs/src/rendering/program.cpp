@@ -65,6 +65,9 @@ void Shader::load(){
     }
 	loaded = false;
 }
+void Shader::imgui_draw(){
+	ImGui::Text("Type: %d", type);
+}
 
 
 // ? PROGRAM ***************
@@ -85,10 +88,10 @@ void Program::clear_shaders(){
 bool Program::supported(const std::string& ext){
 	return ext.compare(".prgm") == 0;
 }
-
-std::unique_ptr<Attribute> create_attrib_val(GLenum type, void*_last_val=nullptr){
+// Attribute::
+std::unique_ptr<Attribute> create_attrib_val(GLenum _type, void*_last_val=nullptr){
 	// Return if we're erasing and pointer is null, if there is no type defined, or if we're creating but pointer is not null
-	switch (type)
+	switch (_type)
 	{
 	case GL_FLOAT: 		return std::unique_ptr<Attribute>(new AttributeVar<float>    (_last_val)); break;
 	case GL_FLOAT_VEC2: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec2>(_last_val)); break;
@@ -97,7 +100,7 @@ std::unique_ptr<Attribute> create_attrib_val(GLenum type, void*_last_val=nullptr
 	case GL_FLOAT_MAT2: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat2>(_last_val)); break;
 	case GL_FLOAT_MAT3: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat3>(_last_val)); break;
 	case GL_FLOAT_MAT4: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat4>(_last_val)); break;
-	case GL_SAMPLER_2D: return std::unique_ptr<Attribute>(new AttributeVar<GLuint>   (_last_val)); break;
+	case GL_SAMPLER_2D: return std::unique_ptr<Attribute>(new AttributeVar<unsigned int>   (_last_val)); break;
 	default:
 		throw std::range_error("Type not defined");
 		break;
@@ -143,6 +146,7 @@ void Program::link(){
 		GLint count;
 		
 		std::vector<std::unique_ptr<Attribute>> new_attributes;
+		// The function tries to match the attribute with an old one and returns the old one's pointer
 		auto merge_attrib = [&](Attribute &a) -> void*{
 			auto b = find_if(attributes.begin(), attributes.end(), [&a](std::unique_ptr<Attribute>& b) -> bool{return strcmp(b->name,a.name) == 0 && a.uniform == b->uniform && b->size == a.size;});
 			
@@ -154,12 +158,12 @@ void Program::link(){
 		glGetProgramiv(p_id, GL_ACTIVE_ATTRIBUTES, &count);
 		for(int i=0;i<count;++i){
 			Attribute a;a.i=i;a.uniform=false;
-			glGetActiveAttrib(p_id, i, a.max_name, &a.length, &a.size, &a.type, a.name);
+			glGetActiveAttrib(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
 			a.location = glGetAttribLocation(p_id, a.name);
 			std::unique_ptr<Attribute> av = create_attrib_val(a.type,merge_attrib(a));
 			av->i = a.i;
 			av->uniform = a.uniform;
-			av->length = a.length;
+			av->name_length = a.name_length;
 			av->size = a.size;
 			av->type = a.type;
 			strcpy(av->name, a.name);
@@ -170,12 +174,12 @@ void Program::link(){
 		glGetProgramiv(p_id, GL_ACTIVE_UNIFORMS, &count);
 		for(int i=0;i<count;++i){
 			Attribute a;a.i=i;a.uniform=true;
-			glGetActiveUniform(p_id, i, a.max_name, &a.length, &a.size, &a.type, a.name);
+			glGetActiveUniform(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
 			a.location = glGetUniformLocation(p_id, a.name);
 			std::unique_ptr<Attribute> av = create_attrib_val(a.type,merge_attrib(a));
 			av->i = a.i;
 			av->uniform = a.uniform;
-			av->length = a.length;
+			av->name_length = a.name_length;
 			av->size = a.size;
 			av->type = a.type;
 			strcpy(av->name, a.name);
@@ -188,6 +192,14 @@ void Program::link(){
 void Program::use(){
 	if(link_status)glUseProgram(p_id);
 	else {printf("Can't use "); print_link_status(link_status, filename().c_str());}
+}
+void Program::add_shaders(){
+	for(auto&s:shaders){
+		auto f = assets::get_load_file<Shader>(s);
+		if(f){
+			attach_shader(f->s_id);
+		}
+	}
 }
 
 void Program::imgui_draw(){
@@ -253,8 +265,14 @@ void Program::imgui_draw(){
 		ImGui::TextDisabled(a->name);
 		if(a->type == GL_FLOAT_VEC3){
 			ImGui::SameLine();
-			ImGui::SetNextItemWidth(100);
+			ImGui::SetNextItemWidth(-1);
 			ImGui::DragFloat3("##Picker",(float*)a->val);
+		}else if (a->type == GL_SAMPLER_2D){
+			auto val = (int*)a->val;
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(-1);
+			ImGui::InputInt("##Picker", val, 1, 1);
+			if(*val < 0)*val=0;
 		}
 		ImGui::PopID();
 	}

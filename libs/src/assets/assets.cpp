@@ -1,6 +1,7 @@
 #include "_assets.h"
 // #include "my_imgui.h"
 
+#include "mesh.h"
 
 #include <algorithm>
 namespace assets{
@@ -30,6 +31,8 @@ namespace assets{
 		
 		// Initialize inotify
 		{
+			inotify::filenames_allowed.clear();
+			
 			int argc=0;
 			for(auto&e:entries)if(ENTRY_IS_DIR(e))++argc;
 			char* argv[argc];
@@ -37,7 +40,7 @@ namespace assets{
 			int c=0;
 			for(auto&e:entries){
 				// Populate filenames and argv
-				if(!ENTRY_IS_DIR(e))inotify::filesnames_allowed.push_back(e.path().filename().string());
+				if(!ENTRY_IS_DIR(e))inotify::filenames_allowed.push_back(e.path().filename().string());
 				else {
 					// String and length defined
 					auto path = e.path().string();
@@ -56,6 +59,58 @@ namespace assets{
 		
 	}
 	
+	std::vector<fs::path> data_path(const std::shared_ptr<File>& file){
+		std::vector<fs::path> v;
+		auto pb = [&](const std::shared_ptr<File>& f){v.push_back(f->data_path());};
+		
+		if(!file)goto found;
+		
+		// If file is within root files, send it back
+		for(auto&f:files){if(f == file) {pb(f);goto found;}}
+		
+		// Keep searching in root
+		for(auto&f:files){
+			// If f in root file is scene, then search inside scene
+			if(auto s = std::dynamic_pointer_cast<Scene>(f)){
+				for(auto&o:s->objects){
+					// If file is an object, send it back
+					if(o == file){pb(s); pb(o); goto found;}
+					// Else search through components in the object
+					else for(auto&c:o->components){
+						// If file is a component, send it back
+						if(std::dynamic_pointer_cast<File>(c) == file){pb(s); pb(o); pb(file); goto found;}
+					}
+				}
+			}
+		}
+	
+	found:
+		return std::move(v);
+	}
+	std::shared_ptr<File> data_path_find(const std::vector<fs::path>& paths){
+		if(!paths.size())return std::shared_ptr<File>();
+		int count=0;
+		
+		auto print = [](const char* mes){printf(ANSI_COLOR_RED "%s" ANSI_COLOR_RESET "\n", mes); throw("Check this");};
+		
+		auto f = get_file<File>(paths[count++]);
+		// Make sure this is a scene
+		if(paths.size() > count){
+			if(auto s = std::dynamic_pointer_cast<Scene>(f)){
+				// Get gameobject by name/path
+				if(auto o = s->get_obj(paths[count++])){
+					if(paths.size() > count){
+						if(auto c = o->get_comp(paths[count++])){
+							if(paths.size()>count)print("paths size too big, what else are u putting there my friend");
+							else f=std::dynamic_pointer_cast<File>(c);
+						}else print("no component with such name");
+					}else f=o;
+				}else print("no gameobject with such name");
+			}else print ("path > 1 but not a scene?");
+		}
+		return f;
+	}
+	
 	void init(){
 		if(!engine::project_path.c_str())return;
 		
@@ -67,8 +122,6 @@ namespace assets{
 		import_assets();
 	}
 	
-	
-	
 	void update(){
 		
 		{// INOTIFY EVENT HANDLING
@@ -76,9 +129,11 @@ namespace assets{
 			bool reload=false;
 			if(inotify::events.size()){
 				for(auto&event:inotify::events){
+					std::printf("Event %d on %s\n", (int)event->event, std::string(event->filename).c_str());
 					if(event->event == inotify::MODIFY){
 						auto p = fs::path(event->folder_path);
 						p/= event->filename;
+						p = engine::get_relative_to_project(p);
 						
 						auto shader = get_file<Shader> (p);
 						if(shader)shader->load();
@@ -92,7 +147,6 @@ namespace assets{
 			if(reload)load_project_entries();
 		}
 	}
-	
 	
 	void exit(){
 		// INOTIFY EXIT
