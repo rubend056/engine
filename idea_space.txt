@@ -1,0 +1,112 @@
+Building (Kerbal Space Program, Minecraft, Surviving Mars)
+-Peaceful, lots of time involved
+-Semi/full story telling
+-Mostly single player
+-Always with a survival aspect
+	KSP: a bad understanding of physics or mechanics of the ship building and you die so, so easily
+	Minecraft: everything rosy in the day, but at night monsters will kill you
+	Surviving Mars: asteroids, storms, disasters, broken things
+	
+
+Real time strategy:
+-A lot of AI controlled things, lots of animations
+-Player gives general orders
+-Things should be able to be automated
+-Sense of mystery, occluded map.
+-Series of levels and buildings you're allowed
+-Mostly multi-player
+
+
+
+https://www.nyfa.edu/student-resources/three-principles-every-game-designer-should-follow/
+-More Rewards than Punishments, More Power-Ups than Obstacles
+-Start With A Core Mechanic And Build From It
+-Easy to Learn, Hard to Master
+
+https://www.gamasutra.com/view/feature/132341/the_13_basic_principles_of_.php?page=2
+1. Focal Point
+    Never allow the player to guess what they should focus on. At the same time, always allow secondary subject matter, but it is the designer's job to clearly provide the primary focus at all times. This applies to both visual and visceral aspects of gameplay.
+2. Anticipation
+	Time is needed to inform the player that something is about to happen. Always factor in Anticipation when designing and implementing events and behaviors. 
+3. Announce Change
+	Communicate all changes to the player. This short step occurs between Anticipation and the event itself. 
+4. Believable Events and Behavior
+    Every event or behavior must occur according to the logic and expectations of the player. Every action, reaction, results, emotion and conveyance must satisfy the players' subconscious acceptance test.
+5. Overlapping Events and Behavior
+	Dynamic is lost if only one change occurs at a time. Discover the right amount of events to occur at any given moment of time. 
+6. Physics
+    The player's primary logic operates within the known possibilities of physics. Keep in mind gravity, weight, mass, density, force, buoyancy, elasticity, etc. Use this as the starting point, but do not be limited by it.
+7. Sound
+    Ask yourself, "What sound does it make when ________ happens?" "Is the sound appropriate?" "Is the sound necessary?" "Does it benefit the experience or hinder it?" If players close their eyes, the sound alone should still achieve the desired affect.
+8. Pacing
+    Keep in mind the desired sense of urgency, the rate in which events occur, the level of concentration required and how often events are being repeated. Spread out the moments of high concentration, mix up the sense of urgency, and change things wherever possible to achieve the proper affect.
+9. Spacing
+    Understand how much space is available both on-screen and in-world, recognize the spatial relationship between elements and take into account the effects of modifying those spaces.
+10. Linear Design versus Component Breakdown
+    Linear Design involves solving challenges as they come. All solutions and possibilities hold the same institutional value. Focus can be lost with this method, but it provides creative and spontaneous solutions.
+    Component Breakdown involves systemic categorization and forming a logical hierarchy of all solutions. This method can restrict innovation but preserves clarity of primary design objectives.
+
+Foundation
+The final three principles mark the foundation of gameplay design, which are listed in reverse order of importance. These should be a surprise to no one. 
+11. Player
+    How does the player factor into this? How does the player interact with everything that has been designed? More than just device input, address how the player contributes to the experience. If it's a good idea and you're able to convey it correctly but the player is not into it, change it or scrap it!
+12. Communication
+    Is the appropriate team member correctly aware of the objective? Are the appropriate developers clear on the solution? If it's a good idea but you can't communicate it correctly, it might as well be a bad idea because it's very likely to be received as such.
+13. Appeal
+    When addressing anyone, ask yourself, "Does this draw the audience in?" This applies to (but is not limited to) the player, the spectator, your fellow developers, the publisher, and their marketing team. If it's not a good idea, there's no need to continue until it becomes a good idea or is replaced by something better.
+
+
+
+MOTO (THIS WILL NEVER BE CHANGED)
+A game that teaches you science,
+in which the more things you know, 
+the more things you're able to do. 
+A game that rewards knowledge
+
+
+There will be planets. There will be rockets. There will be rocket science.
+
+The CORE MECHANIC ? Leaning, but how? The game is a simple plataformer for begginers, a complex physics world (like KSP) for experts.
+How should the transition be made then? 
+
+
+-Do I want this to have a story?
+	PROS
+	Story gives structure and life to the game
+	CONS
+	Story takes away control from player, making gameplay more linear
+
+		What if it could be a story that doesn't take away control 
+		from the player while also guiding them in the beggining
+
+I'm leaning towards semi story telling. A story in which the player can control things while a "cutscene" is happening. 
+It wouldn't really be a custscene, but more like portal, the AI was talking but you still had full control over the character, except in some parts of the story.
+
+
+Every planet is a different challenge/puzzle. After every planet you will gain a new ability. 
+
+Your ability's power is based on how well you did the challenge/puzzle.
+	PROS
+	Will make the player do their best on planets.
+	CONS
+	A new planet will require ablities at a certain power level.
+
+What should I make the 
+
+
+"The important thing is to never stop questioning" Albert Einstein
+
+
+Planet 0 will have, 
+
+GAMEPLAY IDEAS (REWARDS)
+Kids might get bored if the game is not enough story based
+Coins to get things in the game, maybe to buy items for your base, or your ship
+
+
+
+NAME IDEAS
+The name should be the last thing you pick. not now
+
+
+
