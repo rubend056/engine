@@ -25,7 +25,9 @@ public:
 	IDRAW_IMGUI_DRAW override;
 	IDRAW_IMGUI_NAME override {return "Transform";if(pos == rot);}
 	COMPONENT_MAX_NUM override {return 1;}
+	
 	COMPONENT_IS_REF override {return false;}
+	CLASSNAME_NORMAL* clone() override{return new CLASSNAME_NORMAL(*this);}
 	
 	template<class Archive>
 	void serialize(Archive& ar){

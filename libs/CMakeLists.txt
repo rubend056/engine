@@ -36,15 +36,14 @@
 # )
 # target_link_libraries(rendering menus imgui)
 
-add_library(my_libs
-	src/inotify_imp.cpp
-	
+add_library(my_libs	
     src/assets/assets.cpp
     src/assets/assets_import.cpp
 	src/assets/gameobject.cpp
 	src/assets/scene.cpp
 	
 	src/helper/type_name.cpp
+	src/helper/inotify_imp.cpp
 	src/helper/file.cpp
 
 	src/menus/inspector.cpp

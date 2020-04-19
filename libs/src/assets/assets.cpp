@@ -6,13 +6,19 @@
 #include <algorithm>
 namespace assets{
 	
-	std::vector<std::shared_ptr<File>> get_files(const std::string t_name){
+	std::vector<std::shared_ptr<File>> get_files(const std::string& t_name){
 		// #warning "t_name calls for erroneous/nonexistent types"
 		auto eq_range = type_asset_ht.equal_range(t_name);
 		std::vector<std::shared_ptr<File>> v;
 		for(auto it = eq_range.first; it!=eq_range.second;++it)
 			v.push_back(it->second);
 		return v;
+	}
+	template<>
+	std::shared_ptr<File> get_file<File>(const std::function<bool(File*)>& pred){
+		for(auto&v:assets::files)
+			if(pred(v.get()))return v;
+		return std::shared_ptr<File>();
 	}
 	
 	//? ENTRIES **************************
@@ -24,7 +30,7 @@ namespace assets{
 			if (ENTRY_IS_DIR(entry)){list_dir(entry.path().string());}
 		}
 	}
-	void load_project_entries(){
+	void reload_project(){
 		entries.clear();
 		entries.push_back(fs::directory_entry(engine::project_path));
 		list_dir(engine::project_path);
@@ -117,7 +123,7 @@ namespace assets{
 		printf("Assets path is %s\n", engine::project_path.c_str());
 		
 		// List all files
-		load_project_entries();
+		reload_project();
 		
 		import_assets();
 	}
@@ -144,7 +150,7 @@ namespace assets{
 				inotify::events.clear();
 				inotify::_events.clear();
 			}
-			if(reload)load_project_entries();
+			if(reload)reload_project();
 		}
 	}
 	

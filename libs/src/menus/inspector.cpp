@@ -13,17 +13,26 @@ using namespace std;
 
 namespace menus {
 #define MAX_WIN_NAME 100
-std::shared_ptr<IDraw> inspector_o;
+std::set<std::shared_ptr<IDraw>> inspector_o;
 void inspector(bool* p_open) {
 	//? INSPECTOR NAME AND COMPONENT LOOP
-	if(!inspector_o)return;
+	if(!inspector_o.size())return;
 	
 	ImGui::SetNextWindowSize(ImVec2(250, 300), ImGuiCond_FirstUseEver);
-	char d[inspector_o->imgui_name().size()+1];sprintf(d,"Inspector <%s>###inspector", inspector_o->imgui_name().c_str());
-	ImGui::Begin(d, p_open);
+	auto d = helper::string_format("Inspector");
+	ImGui::Begin(d.c_str(), p_open);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
-	inspector_o->imgui_draw();
+	if(ImGui::BeginTabBar("Items")){
+		int i=0;
+		for(auto&item:inspector_o){
+			if(ImGui::BeginTabItem(helper::string_format("%s###%d", item->imgui_name().c_str(), i++).c_str())){
+				item->imgui_draw();
+				ImGui::EndTabItem();
+			}
+		}
+		ImGui::EndTabBar();
+	}
 	ImGui::PopStyleVar();
 	
 	ImGui::End();
@@ -46,7 +55,7 @@ void scene(bool* p_open){
 	for(auto&obj:engine::scene->objects){
 		ImGui::Text(obj->filename().c_str());
 		if(ImGui::IsItemClicked())
-			inspector_o = std::static_pointer_cast<IDraw>(obj);
+			if(auto draw = std::static_pointer_cast<IDraw>(obj))inspector_o.insert(draw);
 	}
 	
 	ImGui::End();

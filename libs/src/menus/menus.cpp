@@ -8,7 +8,19 @@
 
 #include <fstream>
 
-#define ENGINE_INI engine::get_absolute_from_project("imgui_e.ini")
+#define ENGINE_INI engine::get_absolute_from_project("cache_menus.json")
+
+static bool
+        show_glEnable = false,
+        // show_open = false,
+        show_metrics_window = true,
+        show_stats = false,
+        show_inspector = true,
+		show_scene = true,
+		// show_textures = true,
+		// show_programs = true,
+        show_files = true,
+		show_assets = true;
 
 void menus::imgui_engine_init(){
 	load_settings_glEnable();
@@ -17,11 +29,21 @@ void menus::imgui_engine_init(){
 		std::ifstream f(ENGINE_INI);
 		if(f){
 			cereal::JSONInputArchive ar(f);
-			fs::path p;
-			ar(p);
-			if(!p.empty()){
-				menus::inspector_o = assets::get_file<IDraw>(p);
-			}
+			// fs::path p;
+			// ar(p);
+			// if(!p.empty()){
+			// 	menus::inspector_o = assets::get_file<IDraw>(p);
+			// }
+			ar( show_glEnable,
+				// show_open = false,
+				show_metrics_window,
+				show_stats,
+				show_inspector,
+				show_scene,
+				// show_textures,
+				// show_programs,
+				show_files,
+				show_assets);
 		}
 		
 	}
@@ -46,17 +68,7 @@ std::shared_ptr<File> menus::add_popup(const std::vector<std::shared_ptr<File>>&
 }
 
 void menus::imgui_engine_update() {
-    static bool
-        show_glEnable = false,
-        // show_open = false,
-        show_metrics_window = true,
-        show_stats = false,
-        show_inspector = true,
-		show_scene = true,
-		// show_textures = true,
-		// show_programs = true,
-        show_files = true;
-
+    
     if (show_glEnable) menus::window_glEnable_config(&show_glEnable);
     // if (show_open) menus::window_open_project(&show_open);
     if (show_metrics_window) ImGui::ShowMetricsWindow(&show_metrics_window);
@@ -65,6 +77,7 @@ void menus::imgui_engine_update() {
     if (show_inspector) menus::inspector(&show_inspector);
 	if (show_scene) menus::scene();
     if (show_files) menus::files(&show_files);
+	if (show_assets) menus::assets(&show_assets);
 
     menus::text_editor();
 	
@@ -180,12 +193,22 @@ void menus::imgui_engine_update() {
 void menus::imgui_engine_exit(){
 	// if(menus::inspector_o){
 		
-	// 	std::ofstream f(ENGINE_INI);
-	// 	if(f){
-	// 		cereal::JSONOutputArchive ar(f);
-	// 		auto ins_file = std::dynamic_pointer_cast<File>(menus::inspector_o);
-	// 		if(ins_file)ar(ins_file->data_path());
-	// 	}
+		std::ofstream f(ENGINE_INI);
+		if(f){
+			cereal::JSONOutputArchive ar(f);
+			// auto ins_file = std::dynamic_pointer_cast<File>(menus::inspector_o);
+			// if(ins_file)ar(ins_file->data_path());
+			ar( show_glEnable,
+				// show_open = false,
+				show_metrics_window,
+				show_stats,
+				show_inspector,
+				show_scene,
+				// show_textures,
+				// show_programs,
+				show_files,
+				show_assets);
+		}
 	// }
 }
 

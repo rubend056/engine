@@ -64,6 +64,8 @@ private:
 	static unsigned int Next_id(unsigned int _f=1);
 public:
 	unsigned int file_id=0;
+	void next_id(){file_id=Next_id();}
+	
 	fs::path _rel_path;
 protected:
 	
@@ -80,13 +82,14 @@ public:
 		if(!_rel_path.empty()){
 			// create_supposed_ext();
 			// assert(_rel_path.is_relative());
-			file_id=Next_id();
+			next_id();
 		}
 	}
 	virtual ~File(){}
 	
 	// Draw imgui filename edit text
 	void imgui_draw_filename_edit();
+	
 	// Is this path a metadata (means is just a companion file to something else, texture, mesh, etc...)
 	bool is_metadata();
 	bool is_supposed_ext();

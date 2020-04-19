@@ -8,7 +8,9 @@
 #define PREFAB_VAR_DIRTY_NAME(name) name##_dirty
 #define PREFAB_VAR_DEF(type, name) type name;bool PREFAB_VAR_DIRTY_NAME(name) = false;
 
-#define PREFAB_VAR_SERIALIZE(type, name) ar(CEREAL_NVP(name));
+#ifndef PREFAB_VAR_SERIALIZE
+#define PREFAB_VAR_SERIALIZE(type, name) ar(name);
+#endif
 #define PREFAB_VAR_ADD_DIRTY(type, name) dirty.push_back(PREFAB_VAR_DIRTY_NAME(name));
 
 
@@ -109,6 +111,7 @@ public:
 		
 		// ? Serialize vars
 		int i=0;
+		// If var dirty, serailize it
 #define PREFAB_VAR_SERIALIZE_VARS(type, name) \
 		if(i++<count && dirty[(int)DIRTY_ENUM::PREFAB_VAR_ENUM_NAME(name)]) PREFAB_VAR_SERIALIZE(type, name)
 		CLASSNAME_EXPANSION(PREFAB_VAR_SERIALIZE_VARS)
@@ -119,4 +122,6 @@ public:
 _CRT(PREFAB_NAME)
 
 
+
+#undef PREFAB_VAR_SERIALIZE
 // #endif // prefab_h

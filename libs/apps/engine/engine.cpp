@@ -4,6 +4,7 @@
 #include "assets.h"
 #include "helper.h"
 #include "components.h"
+#include "mesh.h"
 
 #include "gl.h"
 
@@ -83,14 +84,14 @@ namespace engine{
 			ar(cereal::make_nvp("scene", scene->hash_path()));
 			
 			// Saving Inspector File
-			auto ins_paths = assets::data_path(std::dynamic_pointer_cast<File>(menus::inspector_o));
-			ar(cereal::make_nvp("inspector", ins_paths));
+			// auto ins_paths = assets::data_path(std::dynamic_pointer_cast<File>(menus::inspector_o));
+			// ar(cereal::make_nvp("inspector", ins_paths));
 		}
 	}
 	void load_scene(const std::shared_ptr<Scene>& _scene){
 		save_scene();
 		scene = _scene;
-		menus::inspector_o.reset();
+		menus::inspector_o.clear();
 	}
 }
 
@@ -115,9 +116,10 @@ namespace engine
 			if(scene)engine::load_scene(scene);
 			
 			// Loading last inspector
-			std::vector<fs::path> ins_paths;
-			ar(cereal::make_nvp("inspector", ins_paths));
-			menus::inspector_o = std::dynamic_pointer_cast<IDraw>(assets::data_path_find(ins_paths));
+			// std::vector<fs::path> ins_paths;
+			// ar(cereal::make_nvp("inspector", ins_paths));
+			// if(auto draw = std::dynamic_pointer_cast<IDraw>(assets::data_path_find(ins_paths)))
+			// 	menus::inspector_o.insert(draw);
 		}
 		
 		menus::imgui_engine_init();
@@ -133,6 +135,24 @@ namespace engine
 		
         // Rendering
         
+		if(engine::scene){
+			for(auto&go:engine::scene->objects){
+				auto progs = go->get_comps<Program>();
+				if(progs.size()>0){
+					auto trans = go->get_comp<Transform>();
+					auto vaos = go->get_comps<Mesh::VAO>();
+					for(auto&prog:progs){
+						if(!prog->link_status)continue;
+						prog->use();
+						for(auto&vao:vaos){
+							vao->vao_bind();
+							vao->vao_attrib_enable(0xff);
+							vao->gl_draw();
+						}
+					}
+				}
+			}
+		}
         
         // testing_draw();
         // RENDER

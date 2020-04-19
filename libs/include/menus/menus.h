@@ -10,7 +10,7 @@
 #include "my_filesystem.h"
 
 namespace menus{	
-	extern std::shared_ptr<IDraw> inspector_o;
+	extern std::set<std::shared_ptr<IDraw>> inspector_o;
 	
 	void imgui_engine_init();
 	void imgui_engine_update();

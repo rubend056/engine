@@ -88,8 +88,10 @@ void Program::clear_shaders(){
 bool Program::supported(const std::string& ext){
 	return ext.compare(".prgm") == 0;
 }
-// Attribute::
-std::unique_ptr<Attribute> create_attrib_val(GLenum _type, void*_last_val=nullptr){
+
+
+
+std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void*_last_val=nullptr){
 	// Return if we're erasing and pointer is null, if there is no type defined, or if we're creating but pointer is not null
 	switch (_type)
 	{
@@ -106,6 +108,25 @@ std::unique_ptr<Attribute> create_attrib_val(GLenum _type, void*_last_val=nullpt
 		break;
 	}
 	return nullptr;
+}
+void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib){
+	if(!attrib->uniform)return; // Return if it's not a uniform
+	#define TOM(type, offset) (*((type*)attrib->val+offset))
+	switch (attrib->type)
+	{
+	case GL_FLOAT: glUniform1fv(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC2: glUniform2fv(attrib->location, 2, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC3: glUniform3fv(attrib->location, 3, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC4: glUniform4fv(attrib->location, 4, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT2: glUniformMatrix2fv(attrib->location, 4, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT3: glUniformMatrix2fv(attrib->location, 9, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT4: glUniformMatrix2fv(attrib->location, 16, false, ((float*)attrib->val)); break;
+	case GL_SAMPLER_2D:  break;
+	default:
+		throw std::range_error("Type not defined");
+		break;
+	}
+	#undef TOM
 }
 
 void print_link_status(int link_status, const char* filename){
@@ -160,7 +181,7 @@ void Program::link(){
 			Attribute a;a.i=i;a.uniform=false;
 			glGetActiveAttrib(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
 			a.location = glGetAttribLocation(p_id, a.name);
-			std::unique_ptr<Attribute> av = create_attrib_val(a.type,merge_attrib(a));
+			std::unique_ptr<Attribute> av = attrib_create_val(a.type,merge_attrib(a));
 			av->i = a.i;
 			av->uniform = a.uniform;
 			av->name_length = a.name_length;
@@ -176,7 +197,7 @@ void Program::link(){
 			Attribute a;a.i=i;a.uniform=true;
 			glGetActiveUniform(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
 			a.location = glGetUniformLocation(p_id, a.name);
-			std::unique_ptr<Attribute> av = create_attrib_val(a.type,merge_attrib(a));
+			std::unique_ptr<Attribute> av = attrib_create_val(a.type,merge_attrib(a));
 			av->i = a.i;
 			av->uniform = a.uniform;
 			av->name_length = a.name_length;
@@ -190,8 +211,23 @@ void Program::link(){
 	}
 }
 void Program::use(){
-	if(link_status)glUseProgram(p_id);
-	else {printf("Can't use "); print_link_status(link_status, filename().c_str());}
+	if(link_status){
+		// Use the program
+		glUseProgram(p_id);
+		// Set the uniforms
+		for(auto&a:attributes){
+			attrib_set_uniform(a);
+		}
+		// Binding all textures to their appropriate texture unit
+		static uint16_t gl_texture[] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2};
+		for(
+			auto it = textures.begin(); it < textures.end() && 
+			it - textures.begin() < sizeof(gl_texture)/sizeof(gl_texture[0]); 
+			++it){
+			glActiveTexture(gl_texture[it-textures.begin()]);
+			glBindTexture(GL_TEXTURE_2D, (*it)->t_id);
+		}
+	}else {printf("Can't use "); print_link_status(link_status, filename().c_str());}
 }
 void Program::add_shaders(){
 	for(auto&s:shaders){
@@ -201,6 +237,10 @@ void Program::add_shaders(){
 		}
 	}
 }
+void Program::add_textures(const std::vector<std::string>& t_names){
+	for(auto&t_name:t_names)textures.push_back(assets::get_load_file<Texture>(t_name));
+}
+
 
 void Program::imgui_draw(){
 	// ImGui::Text("Program %s",filename);
@@ -216,7 +256,7 @@ void Program::imgui_draw(){
 			ImGui::PushID(_i);
 			ImGui::Text("%s",shader->filename().c_str());
 			ImGui::SameLine();
-			if(ImGui::Button("X")){
+			if(ImGui::SmallButton("X")){
 				detach_shader(shader->s_id);
 				link();
 				ImGui::PopID();
@@ -231,7 +271,8 @@ void Program::imgui_draw(){
 	
 	ImGui::PushID("add_shader");
 	if(ImGui::Button("Add Shader", ImVec2(-1,0))){
-		ImGui::OpenPopup("add_popup");}
+		ImGui::OpenPopup("add_popup");
+	}
 		
 	#warning "Shader class used here"
 	auto shader_files = assets::get_files("Shader");
@@ -252,6 +293,57 @@ void Program::imgui_draw(){
 		ImGui::TextDisabled(a->name);
 		ImGui::PopID();
 	}
+	
+	ImGui::Separator();
+	
+	ImGui::TextDisabled("Textures");
+	for(auto it=textures.begin();it<textures.end();++it){
+		int index = it-textures.begin();
+		ImGui::PushID(index);
+		ImGui::Image((void*)((*it)->t_id), ImVec2(50,50));
+		ImGui::SameLine();
+		ImGui::Text("GL_TEXTURE%d", index);
+		ImGui::SameLine();
+		if(index && ImGui::SmallButton("Up")){
+			auto temp = *it; // Store this index
+			*it = *(it-1); // Copy previous to this
+			*(it-1) = temp; // Copy temp to previous
+		}
+		ImGui::SameLine();
+		if(index < textures.size()-1 && ImGui::SmallButton("Down")){
+			auto temp = *it; // Store this index
+			*it = *(it+1); // Copy next to this
+			*(it+1) = temp; // Copy temp to next
+		}
+		ImGui::SameLine();
+		if(ImGui::SmallButton("X")){
+			textures.erase(it);
+			ImGui::PopID();
+			break;
+		}
+		ImGui::PopID();
+	}
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.1,.1,.1,.2));
+	if(ImGui::Button("Drag Textures Here",ImVec2(-1,0)))ImGui::OpenPopup("add_texture_popup");
+	//? IMAGE DRAG N DROP
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_FILE"))
+		{
+			IM_ASSERT(payload->DataSize == sizeof(int));
+			auto f_id = *(int*)payload->Data;
+			auto texture = assets::get_file<Texture>([&](Texture*t){return t->file_id == f_id;});
+			if(texture)
+				textures.push_back(texture);
+		}
+		ImGui::EndDragDropTarget();
+	}
+	//? ############ IMAGE DRAG N DROP
+	#warning "Texture class used here"
+	menus::add_popup(assets::get_files("Texture"), false, "add_texture_popup");
+	
+	ImGui::PopStyleColor();
 	
 	ImGui::Separator();
 	
@@ -276,5 +368,7 @@ void Program::imgui_draw(){
 		}
 		ImGui::PopID();
 	}
+	
+	
 	// ImGui::PopID();
 }

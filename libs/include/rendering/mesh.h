@@ -57,7 +57,7 @@ class Mesh : public File, public IDraw {
 		VAO(){glGenVertexArrays(1, &vao_id);}
 		~VAO(){glDeleteVertexArrays(1, &vao_id);}
 	};
-	std::vector<std::unique_ptr<VAO>> vaos;
+	std::vector<std::shared_ptr<VAO>> vaos;
 	
     void vbo_bind(){glBindBuffer(GL_ARRAY_BUFFER, vbo_id);}
     
@@ -74,6 +74,7 @@ class Mesh : public File, public IDraw {
 	}
 	
 	IDRAW_IMGUI_NAME override{return filename().c_str();}
+	IDRAW_IMGUI_DRAW override;
 	Mesh(FILE_CONSTRUCT_PARAM):File(FILE_CONSTRUCT_VARS){
 		// create_supposed_ext();
 		glGenBuffers(1, &vbo_id);

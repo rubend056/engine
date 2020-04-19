@@ -11,17 +11,6 @@
 
 #include "type_name.h"
 
-template <class T>
-std::shared_ptr<T> component_button() {
-	static_assert(std::is_base_of<Component, T>::value, "T not derived from Component");
-	if (ImGui::Button(helper::demangle(typeid(T).name()).c_str()))
-		return std::shared_ptr<T>(new T);
-	else
-		return std::shared_ptr<T>();
-}
-
-
-
 // ? PREFAB ####################################################################
 #define CLASSNAME GAMEOBJECT
 #define CLASSNAME_NORMAL GameObject
@@ -29,6 +18,16 @@ std::shared_ptr<T> component_button() {
 	FUNC(std::vector<std::shared_ptr<Component>>, components)
 
 class CLASSNAME_NORMAL;
+
+// #define PREFAB_VAR_SERIALIZE(type, name)\
+// 	if(#name == "components"){\
+// 		ar(cereal::make_nvp("n_comps", components.size()));\
+// 		for(auto&c:components){\
+// 			if(c->is_ref()){\
+// 				ar()\
+// 			}else ar(c);\
+// 		}\
+// 	}else ar(name);
 
 #include "prefab.h"
 // ? ###########################################################################
