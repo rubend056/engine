@@ -75,6 +75,28 @@ void Mesh::load(){
 	
 }
 
+void Mesh::imgui_draw(){
+	ImGui::TextDisabled("VAO's");
+	for(auto it = vaos.begin();it<vaos.end();++it){
+		auto& vao = *it;int index = it-vaos.begin();
+		ImGui::BeginChild(vao->name.c_str(), ImVec2(-1, 0), true);
+		
+		ImGui::Button("Drag Me", ImVec2(-1,0));
+		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover 
+		| ImGuiDragDropFlags_SourceAllowNullID
+		))
+		{
+			struct FILEId_VAOIndex{int f_id; int vao_i;} f = {file_id, index};
+			ImGui::SetDragDropPayload("DND_VAO", &f, sizeof(f));
+			
+			ImGui::Text("File_id: %d vao_index: %d", f.f_id, f.vao_i);
+			ImGui::EndDragDropSource();
+		}
+		vao->imgui_draw();
+		ImGui::EndChild();
+	}
+}
+
 // Mesh::Mesh(const char* _f,int n, bool _normals, bool _tex_cords)
 
 // Mesh::Mesh(const fs::path _f):File(_f){

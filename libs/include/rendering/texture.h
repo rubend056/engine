@@ -4,11 +4,11 @@
 #include "rendering_common.h"
 
 
-class Texture : public File {
+class Texture : public File, public IDraw {
    public:
     unsigned int t_id;
 	
-	int type=3; // SOIL_LOAD_RGB
+	int type=0; // SOIL_LOAD_AUTO
 	int width, height;
 	
 	bool loaded = false;
@@ -21,6 +21,9 @@ class Texture : public File {
 		if(!rpath.empty())load();
 	}
 	~Texture(){glDeleteTextures(1, &t_id);}
+	
+	IDRAW_IMGUI_NAME override {return filename();}
+	IDRAW_IMGUI_DRAW override ;
 	
 	template<class Archive>
 	void serialize(Archive& ar){

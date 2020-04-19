@@ -88,12 +88,14 @@ Program : File,Component,IDraw
 	use()
 
 
-
+PREFABS
 GameObject <a> ref-> NULL
 	Component (Transform) ref-> NULL
 		p,r,s
 	Component (VAO) 		-> a.obj:a
 	Component (Program) 	-> a.prog
+
+Progam <p>
 
 Scene <s>
 	GameObject <b> ref-> <a> (When Gameobject instatiates, it links refs of components inside)
@@ -103,7 +105,7 @@ Scene <s>
 		Component (Program) 	-> a.prog
 
 		Component:IDraw
-
+#########
 
 PREFAB
 	 Prefab Linking

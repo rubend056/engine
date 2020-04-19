@@ -30,6 +30,7 @@ class Component : public IDraw{
 		virtual IDRAW_IMGUI_DRAW override {ImGui::Text ("imgui_draw is not set here");}
 		
 		virtual ~Component(){}
+		virtual Component* clone(){throw("Trying to clone unclonable");};
 		
 		template<class Archive>
 		void serialize(Archive& ar){

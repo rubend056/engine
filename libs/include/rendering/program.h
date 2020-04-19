@@ -14,6 +14,8 @@
 #include "cereal/types/unordered_set.hpp"
 #include "cereal_glm.h"
 
+// #include "helper.h"
+
 class Shader : public File, public IDraw {
 public:
     unsigned int s_id=0;
@@ -38,8 +40,10 @@ public:
 	}
 	~Shader(){glDeleteShader(s_id);}
 	
-	IDRAW_IMGUI_NAME override {return "Shader";}
+	IDRAW_IMGUI_NAME override {return filename();}
 	IDRAW_IMGUI_DRAW override ;
+	
+	FILE_SUPPOSED_EXT override {return "";}
 	
 	template<class Archive>
 	void serialize(Archive& ar){
@@ -50,6 +54,7 @@ public:
 	}
 };
 CEREAL_REGISTER_TYPE(Shader)
+
 
 
 
@@ -123,13 +128,15 @@ CEREAL_REGISTER_TYPE(AttributeVar<glm::mat2>)
 CEREAL_REGISTER_TYPE(AttributeVar<glm::mat3>)
 CEREAL_REGISTER_TYPE(AttributeVar<glm::mat4>)
 
-
+#include "texture.h"
 
 class Program : public File, public Component {
 private:
 	void add_shaders();
+	void add_textures(const std::vector<std::string>& t_names);
 public:
     unsigned int p_id;
+	// 1 means OK, 0 means Failed
     int link_status = 1;
     uint32_t attribs_enabled (){
 		uint32_t t=0;
@@ -140,6 +147,7 @@ public:
     // std::vector<std::shared_ptr<Shader>> _shaders;
 	std::unordered_set<std::string> shaders;
 	std::vector<std::unique_ptr<Attribute>> attributes;
+	std::vector<std::shared_ptr<Texture>> textures;
 
     /**
 	 * Adds a shader to the program
@@ -159,16 +167,14 @@ public:
 	static bool supported(const std::string& ext);
 	
 	IDRAW_IMGUI_DRAW override;
-	IDRAW_IMGUI_NAME override{
-		return (std::string("Program ") + filename()).c_str();
-	}
+	IDRAW_IMGUI_NAME override{return filename();}
 	
     Program(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS){
 		p_id = glCreateProgram();
 	};
     ~Program(){glDeleteProgram(p_id);};
 	
-	
+	FILE_SUPPOSED_EXT override {return ".prgm";}
 	
 	template<class Archive>
 	void serialize(Archive& ar){
@@ -182,6 +188,10 @@ public:
 		if(s_empty)add_shaders();
 		
 		ar(CEREAL_NVP(attributes));
+		
+		std::vector<std::string> t_names;for(auto&t:textures)t_names.push_back(t->hash_path());
+		ar(cereal::make_nvp("textures", t_names));
+		if(textures.empty() && t_names.size())add_textures(t_names);
 		
 		link();
 	}

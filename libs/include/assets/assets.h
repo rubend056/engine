@@ -14,8 +14,6 @@
 
 
 namespace assets{
-	
-	
 	extern std::vector<fs::directory_entry> entries;
 	
 	extern std::vector<std::shared_ptr<File>> files;
@@ -45,7 +43,7 @@ namespace assets{
 		return std::dynamic_pointer_cast<T>(f);
 	}
 	
-	std::vector<std::shared_ptr<File>> get_files(const std::string t_name);
+	std::vector<std::shared_ptr<File>> get_files(const std::string& t_name);
 	
 	template<class T>
 	std::vector<std::shared_ptr<T>> get_files(){
@@ -57,19 +55,22 @@ namespace assets{
 		return std::move(v);
 	}
 	
+	
+	
 	template<class T>
 	std::shared_ptr<T> get_file(const std::function<bool(T*)>& pred){
 		auto files = get_files<T>();
 		for(auto&v:files)
 			if(pred(v.get()))return v;
-		return std::make_shared<T>();
+		return std::shared_ptr<T>();
 	}
-	
-	
+	template<>
+	std::shared_ptr<File> get_file<File>(const std::function<bool(File*)>& pred);
+		
 	std::vector<fs::path> data_path(const std::shared_ptr<File>& file);
 	std::shared_ptr<File> data_path_find(const std::vector<fs::path>& paths);
 	
-	
+	void reload_project();
 	void init();
 	void update();
 	void exit();

@@ -20,19 +20,23 @@ void Texture::load(){
 	
 	if (!supported(ext)) {loaded = false;return;}
 	
+	int channels;
 	auto image = SOIL_load_image(
 		d_path.c_str(),
 		&width,
 		&height,
-		0,
+		&channels,
 		type);
 	
 	if (!image) {loaded = false;return;}
 	
+	// glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, t_id);
 	// glTextureStorage2D(GL_TEXTURE_2D, 1, GL_RGB, width, height);
 	// glTextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, image);
-	glTexImage2D(GL_TEXTURE_2D, 0, type==SOIL_LOAD_RGB?GL_RGB:GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	auto format = channels==SOIL_LOAD_RGB?GL_RGB:GL_RGBA;
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+	printf("Loaded image %s, channels %d %s\n", filename().c_str(), channels, channels==SOIL_LOAD_RGB?"GL_RGB":"GL_RGBA");
 	glGenerateMipmap(GL_TEXTURE_2D);
 	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	SOIL_free_image_data(image);
@@ -40,7 +44,18 @@ void Texture::load(){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	
 	loaded = true;
+}
+
+void Texture::imgui_draw(){
+	
+	ImGui::Text("Size %d x %d", width, height);
+	ImGui::SameLine();
+	auto max_rect = ImGui::GetItemRectMax();
+	ImGui::Image((void*)t_id, ImVec2(max_rect.x, (int)((float) height / width * max_rect.x)));
+	
+	// I'll do this later
+	// ImGui::Combo()
 }
