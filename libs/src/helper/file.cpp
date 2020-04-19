@@ -35,23 +35,12 @@
 #include "engine_globals.h"
 
 
-std::unordered_set<unsigned int> File::file_ids;
-
-unsigned int File::Next_id(unsigned int _f){
-	// static 
-	unsigned int file_id_next=1;if(_f)file_id_next=_f; 
-	// If file_id exists, move forward
-	while(file_ids.find(file_id_next) != file_ids.end()){++file_id_next;}
-	file_ids.insert(file_id_next);
-	return file_id_next;
-}
+std::unordered_set<unsigned int> Referentiable::used_ids;
 
 void File::imgui_draw_filename_edit() {
 	std::string t = filename();
 	if (ImGui::InputText("FName", &t))
-		filename_set(t);
-	
-		
+		filename_set(t);	
 }
 
 // Is this path a metadata (means is just a companion file to something else, texture, mesh, etc...)
