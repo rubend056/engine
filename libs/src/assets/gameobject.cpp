@@ -36,7 +36,7 @@ void GameObject::imgui_draw(){
 		}
 		int i=0;
 		for (auto&c:components) {++i;
-			if(!c)break;
+			if(!c)continue;
 			char name[20];
 			sprintf(name, "%s##%d", c->imgui_name().c_str(), i);
 			if (ImGui::TreeNode(name)) {

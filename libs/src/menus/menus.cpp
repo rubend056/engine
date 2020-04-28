@@ -163,7 +163,7 @@ void menus::imgui_engine_update() {
 		ImGui::SetNextWindowSize(ImVec2(200,0));
 		if (ImGui::BeginPopupModal("save_as_popup_modal", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
 			ImGui::Text("Save as modal");
-			if (ImGui::Button("Ok")) ImGui::CloseCurrentPopup();
+			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) ImGui::CloseCurrentPopup();
 			ImGui::EndPopup();
 		}
 	}
@@ -174,7 +174,7 @@ void menus::imgui_engine_update() {
 		if(ImGui::BeginPopupModal("new_scene_popup", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
 			static std::string scene_name;
 			ImGui::InputText(".scene", &scene_name);
-			if(ImGui::Button("Ok")){
+			if(ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))){
 				auto scene = std::make_shared<Scene>(scene_name);
 				scene->create_supposed_ext();
 				assets::add(scene);

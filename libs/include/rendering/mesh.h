@@ -41,7 +41,7 @@ class Mesh : public File, public Parent, public IDraw {
 				glDisableVertexArrayAttrib(vao_id, i);
 		};
 		void gl_draw(){
-			vao_bind();
+			// vao_bind();
 			glDrawArrays(draw_function, 0, n_vertices);
 		}
 		COMPONENT_MAX_NUM override{return 0;}
