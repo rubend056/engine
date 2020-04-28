@@ -11,7 +11,9 @@ bool Mesh::supported(const std::string& ext){return importer.IsExtensionSupporte
 
 void Mesh::load(){
 	loaded = false;
-	vaos.clear();
+	// Copy children before clearing since they'll be used later on
+	auto old_children = children;
+	children.clear();
 	// Set d_path to the actual data path
 	fs::path d_path = engine::get_absolute_from_project(data_path());
 	auto ext = d_path.extension();
@@ -46,7 +48,17 @@ void Mesh::load(){
 				auto& mesh = scene->mMeshes[i];
 				if (!mesh->HasPositions()) continue;
 				
-				auto vao = std::unique_ptr<VAO>(new VAO());
+				auto mesh_name = std::string(mesh->mName.C_Str());
+				auto vao = std::shared_ptr<VAO>();
+				// Try to find the last VAO
+				{
+					auto it = std::find_if(old_children.begin(), old_children.end(), [&](std::shared_ptr<Referentiable>& v){
+						return std::dynamic_pointer_cast<VAO>(v)->name  == mesh_name;
+					});
+					if(it != old_children.end())
+						vao = std::dynamic_pointer_cast<VAO>(*it);
+				}
+				if(!vao)vao = std::make_shared<VAO>();
 				vao->name = std::string(mesh->mName.C_Str());
 				vao->positions = mesh->HasPositions();
 				vao->normals = mesh->HasNormals();
@@ -54,18 +66,17 @@ void Mesh::load(){
 				vao->n_vertices = mesh->mNumVertices;
 				vao->vao_bind();
 				
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)i);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)(intptr_t)i);
 				set_data(vao->n_vertices*3*sizeof(float), mesh->mVertices);
 				if(vao->normals){
-					glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)i);
+					glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(intptr_t)i);
 					set_data(vao->n_vertices*3*sizeof(float), mesh->mNormals);
 				}
 				if(vao->tex_cords){
-					glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)i);
+					glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)(intptr_t)i);
 					set_data(vao->n_vertices*3*sizeof(float), mesh->mTextureCoords[0]);
 				}
-				
-				vaos.push_back(std::move(vao));
+				foster(vao);
 			}
 			
 		}
@@ -75,10 +86,13 @@ void Mesh::load(){
 	
 }
 
+#include "helper.h"
+
 void Mesh::imgui_draw(){
+	auto vaos = helper::dynamic_pointer_cast<VAO>(children);
 	ImGui::TextDisabled("VAO's");
-	for(auto it = vaos.begin();it<vaos.end();++it){
-		auto& vao = *it;int index = it-vaos.begin();
+	for(auto&vao:vaos){
+		// auto& vao = *it;int index = it-vaos.begin();
 		ImGui::BeginChild(vao->name.c_str(), ImVec2(-1, 0), true);
 		
 		ImGui::Button("Drag Me", ImVec2(-1,0));
@@ -86,10 +100,21 @@ void Mesh::imgui_draw(){
 		| ImGuiDragDropFlags_SourceAllowNullID
 		))
 		{
-			struct FILEId_VAOIndex{int f_id; int vao_i;} f = {file_id, index};
-			ImGui::SetDragDropPayload("DND_VAO", &f, sizeof(f));
+			auto refs = vao->my_ref(); // Get the refs to the current referentiable
 			
-			ImGui::Text("File_id: %d vao_index: %d", f.f_id, f.vao_i);
+			// Create a static data package and fill it
+			unsigned int data[11];
+			data[0]=refs.size()>10?0:refs.size();
+			int c=0;for(auto&ref:refs)data[++c]=ref;
+			
+			ImGui::SetDragDropPayload("DND_REF", &data[0], sizeof(data));
+			
+			std::string r_string = "Refs: ";for(auto&ref:refs){r_string+=std::to_string(ref)+' ';}
+			
+			ImGui::Text(
+				refs.size()>10?"Refs size too big?":
+				r_string.c_str()
+			);
 			ImGui::EndDragDropSource();
 		}
 		vao->imgui_draw();

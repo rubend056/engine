@@ -109,6 +109,7 @@ int main( int argc, char* args[] )
         GLenum err;
         while((err = glGetError()) != GL_NO_ERROR)
         {
+			
             printf("OpenGL error %d\n", err);
         }
         

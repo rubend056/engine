@@ -34,9 +34,6 @@
 
 #include "engine_globals.h"
 
-
-std::unordered_set<unsigned int> Referentiable::used_ids;
-
 void File::imgui_draw_filename_edit() {
 	std::string t = filename();
 	if (ImGui::InputText("FName", &t))

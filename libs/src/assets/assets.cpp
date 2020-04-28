@@ -3,22 +3,75 @@
 
 #include "mesh.h"
 
+#include "cereal/archives/json.hpp"
+#include "cereal/types/unordered_map.hpp"
+
 #include <algorithm>
 namespace assets{
 	
-	std::vector<std::shared_ptr<File>> get_files(const std::string& t_name){
-		// #warning "t_name calls for erroneous/nonexistent types"
-		auto eq_range = type_asset_ht.equal_range(t_name);
-		std::vector<std::shared_ptr<File>> v;
-		for(auto it = eq_range.first; it!=eq_range.second;++it)
-			v.push_back(it->second);
-		return v;
-	}
+	std::shared_ptr<File> get_file_type (const std::string& t_name){\
+		auto it = type_asset_ht.find(t_name);\
+		if(it == type_asset_ht.end())return std::shared_ptr<File>();\
+		else return it->second;\
+	}\
+	
+	std::vector<std::shared_ptr<File>> get_files_type (const std::string& t_name){\
+		auto eq_range = type_asset_ht.equal_range(t_name);\
+		std::vector<std::shared_ptr<File>> v;\
+		for(auto it = eq_range.first; it!=eq_range.second;++it)\
+			v.push_back(it->second);\
+		return v;\
+	}\
+	
 	template<>
-	std::shared_ptr<File> get_file<File>(const std::function<bool(File*)>& pred){
-		for(auto&v:assets::files)
-			if(pred(v.get()))return v;
-		return std::shared_ptr<File>();
+	std::shared_ptr<File> get_file_path (const std::string& t_name){
+		auto it = rpath_asset_ht.find(t_name);
+		if(it == rpath_asset_ht.end())return std::shared_ptr<File>();
+		else return it->second;
+	}
+	
+	template<>
+	std::shared_ptr<Referentiable> get_file(const std::vector<unsigned int>& refs){
+		if (!refs.size())return std::shared_ptr<Referentiable>();
+		
+		int c=0;
+		std::shared_ptr<Referentiable> target;
+		// If finding path was successful
+		
+		auto path_it = id_rpath_ht.find(refs[c++]);
+		if(path_it != id_rpath_ht.end()){
+			auto path = path_it->second;
+			// Get target object based on path
+			if(target = get_load_file(path)){
+				// As long as refs has more references we keep going
+				while(c<refs.size()){
+					// Convert taget to parent
+					auto parent = std::dynamic_pointer_cast<Parent>(target);
+					if(!parent)break; // Stop searching, refs is asking for more but you're not a parent?
+					
+					int id = refs[c++];
+					// Find a child with the desired id
+					auto it_child = std::find_if(parent->children.begin(),parent->children.end(), 
+					[&](const std::shared_ptr<Referentiable>& r){
+						return r?r->get_id()==id:false;
+					});
+					// Set target to child if it was found
+					if(it_child != parent->children.end())target = *it_child;
+					else if(auto go = std::dynamic_pointer_cast<GameObject>(target)){
+						// Find a child with the desired id
+						auto it_component = std::find_if(go->components.begin(),go->components.end(), 
+						[&](const std::shared_ptr<Component>& r){
+							return r?r->get_id()==id:false;
+						});
+						if(it_component != go->components.end())target = *it_component;
+						else break;
+					}else break;
+				}
+			}
+		}
+		
+		// Only return target if we reached the end of the refs vector in the search
+		return c==refs.size()?target:std::shared_ptr<Referentiable>();
 	}
 	
 	//? ENTRIES **************************
@@ -65,56 +118,19 @@ namespace assets{
 		
 	}
 	
-	std::vector<fs::path> data_path(const std::shared_ptr<File>& file){
-		std::vector<fs::path> v;
-		auto pb = [&](const std::shared_ptr<File>& f){v.push_back(f->data_path());};
-		
-		if(!file)goto found;
-		
-		// If file is within root files, send it back
-		for(auto&f:files){if(f == file) {pb(f);goto found;}}
-		
-		// Keep searching in root
-		for(auto&f:files){
-			// If f in root file is scene, then search inside scene
-			if(auto s = std::dynamic_pointer_cast<Scene>(f)){
-				for(auto&o:s->objects){
-					// If file is an object, send it back
-					if(o == file){pb(s); pb(o); goto found;}
-					// Else search through components in the object
-					else for(auto&c:o->components){
-						// If file is a component, send it back
-						if(std::dynamic_pointer_cast<File>(c) == file){pb(s); pb(o); pb(file); goto found;}
-					}
-				}
-			}
-		}
 	
-	found:
-		return std::move(v);
+#define ASSETS_CACHE engine::get_absolute_from_project("cache_assets.json")
+	void save_cache(){
+		std::ofstream file(ASSETS_CACHE);
+		if(!file.is_open())return;
+		cereal::JSONOutputArchive ar(file);
+		ar(id_rpath_ht);
 	}
-	std::shared_ptr<File> data_path_find(const std::vector<fs::path>& paths){
-		if(!paths.size())return std::shared_ptr<File>();
-		int count=0;
-		
-		auto print = [](const char* mes){printf(ANSI_COLOR_RED "%s" ANSI_COLOR_RESET "\n", mes); throw("Check this");};
-		
-		auto f = get_file<File>(paths[count++]);
-		// Make sure this is a scene
-		if(paths.size() > count){
-			if(auto s = std::dynamic_pointer_cast<Scene>(f)){
-				// Get gameobject by name/path
-				if(auto o = s->get_obj(paths[count++])){
-					if(paths.size() > count){
-						if(auto c = o->get_comp(paths[count++])){
-							if(paths.size()>count)print("paths size too big, what else are u putting there my friend");
-							else f=std::dynamic_pointer_cast<File>(c);
-						}else print("no component with such name");
-					}else f=o;
-				}else print("no gameobject with such name");
-			}else print ("path > 1 but not a scene?");
-		}
-		return f;
+	void load_cache(){
+		std::ifstream file(ASSETS_CACHE);
+		if(!file.is_open())return;
+		cereal::JSONInputArchive ar(file);
+		ar(id_rpath_ht);
 	}
 	
 	void init(){
@@ -125,6 +141,7 @@ namespace assets{
 		// List all files
 		reload_project();
 		
+		load_cache();
 		import_assets();
 	}
 	
@@ -141,7 +158,7 @@ namespace assets{
 						p/= event->filename;
 						p = engine::get_relative_to_project(p);
 						
-						auto shader = get_file<Shader> (p);
+						auto shader = assets::get_file_path<Shader>(p);
 						if(shader)shader->load();
 					}else if(event->event == inotify::CREATE || event->event == inotify::DELETE){
 						reload = true;
@@ -162,5 +179,7 @@ namespace assets{
 		for(auto&f:assets::files){
 			File::save_file(f);
 		}
+		
+		save_cache();
 	}
 }

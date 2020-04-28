@@ -8,67 +8,97 @@
 
 // Ext
 #include "type_name.h"
-#include <vector>
-#include <string>
-#include <unordered_map>
 
+#include <string>
+
+#include <vector>
+#include <unordered_map>
+// #include <unordered_set>
+#include "map_helper.h"
 
 namespace assets{
 	extern std::vector<fs::directory_entry> entries;
 	
-	extern std::vector<std::shared_ptr<File>> files;
+	extern std::vector<std::shared_ptr<File>> files; // All the assets currently loaded
 	extern std::unordered_map<std::string, std::shared_ptr<File>> rpath_asset_ht;
+	extern std::unordered_map<unsigned int, std::string> id_rpath_ht;
 	extern std::unordered_multimap<std::string, std::shared_ptr<File>> type_asset_ht;
 	// extern std::unordered_map<unsigned int, std::shared_ptr<File>> asset_asset_ht;
 	
 	// Add file to all the hash tables, you can get the typeid_name with 
-	// typeid(file.get()).name() 
-	void add(const std::shared_ptr<File>& file, const char* type_info_name);
+	void add(const std::shared_ptr<File>& file);
 	void clear();
 	
-	template<class T>
-	std::shared_ptr<T> get_file(const fs::path& rel_path){
-		auto it = rpath_asset_ht.find(rel_path);
-		if(it == rpath_asset_ht.end())return std::shared_ptr<T>();
-		else return std::dynamic_pointer_cast<T>(it->second);
+	// MAP_GET_ELEMENT(File, file_path, rpath_asset_ht)
+	// Get file by path
+	template<class T=File>
+	std::shared_ptr<T> get_file_path (const std::string& t_name){
+		return std::dynamic_pointer_cast<T>(get_file_path<File>(t_name));
+	}
+	template<>
+	std::shared_ptr<File> get_file_path (const std::string& t_name);
+	
+	// MAP_GET_ELEMENT(File, file_type, type_asset_ht)
+	// MAP_GET_ELEMENTS(File, files_type, type_asset_ht)
+	
+	// GET_ELEMENT
+	std::shared_ptr<File> get_file_type (const std::string& t_name);
+	template<class T>\
+	std::shared_ptr<T> get_file_type(){\
+		return std::dynamic_pointer_cast<T>(\
+			get_file_type(helper::demangle(typeid(T).name()))\
+		);\
 	}
 	
-	template<class T>
+	// GET_ELEMENTS
+	/* t_name is string to search in map */
+	std::vector<std::shared_ptr<File>> get_files_type (const std::string& t_name);
+	/* T is return type, D is type to search for */
+	template<class T, class D=T>\
+	std::vector<std::shared_ptr<T>> get_files_type (){\
+		std::string t_name = helper::demangle(typeid(D).name());\
+		auto o = get_files_type(t_name);\
+		std::vector<std::shared_ptr<T>> v;v.reserve(o.size());\
+		for(auto&a:o)\
+			v.push_back(std::dynamic_pointer_cast<T>(a));\
+		return v;\
+	}
+	
+	
+	template<class T=File>
 	std::shared_ptr<T> get_load_file(const fs::path& rel_path){
-		auto f = get_file<File>(rel_path);
+		auto f = get_file_path(rel_path);
 		if(!f){
 			f = File::load_file(rel_path);
-			if(f) assets::add(f, typeid(T).name());
+			if(f) assets::add(f);
 		}
 		return std::dynamic_pointer_cast<T>(f);
 	}
 	
-	std::vector<std::shared_ptr<File>> get_files(const std::string& t_name);
-	
-	template<class T>
-	std::vector<std::shared_ptr<T>> get_files(){
-		std::string t_name = helper::demangle(typeid(T).name());
-		auto o = get_files(t_name);
-		std::vector<std::shared_ptr<T>> v;v.reserve(o.size());
-		for(auto&a:o)
-			v.push_back(std::dynamic_pointer_cast<T>(a));
-		return std::move(v);
-	}
-	
-	
-	
-	template<class T>
-	std::shared_ptr<T> get_file(const std::function<bool(T*)>& pred){
-		auto files = get_files<T>();
+	// Filter files for type D, then filter through pred, return casted to T
+	template<class T=File, class D>
+	std::shared_ptr<T> get_file(const std::function<bool(D*)>& pred){
+		auto files = get_files_type<D>();
 		for(auto&v:files)
-			if(pred(v.get()))return v;
+			if(pred(v.get()))return std::dynamic_pointer_cast<T>(v);
 		return std::shared_ptr<T>();
 	}
-	template<>
-	std::shared_ptr<File> get_file<File>(const std::function<bool(File*)>& pred);
+	// Filter files through pred, return casted to T
+	template<class T>
+	std::shared_ptr<T> get_file(const std::function<bool(File*)>& pred){
+		for(auto&v:assets::files)
+			if(pred(v.get()))return std::dynamic_pointer_cast<T>(v);
+		return std::shared_ptr<T>();
+	}
 		
-	std::vector<fs::path> data_path(const std::shared_ptr<File>& file);
-	std::shared_ptr<File> data_path_find(const std::vector<fs::path>& paths);
+	// Find file by id
+	
+	template<class T=Referentiable>
+	std::shared_ptr<T> get_file(const std::vector<unsigned int>& refs){
+		return std::dynamic_pointer_cast<T>(get_file<Referentiable>(refs));
+	}
+	template<>
+	std::shared_ptr<Referentiable> get_file(const std::vector<unsigned int>& refs);
 	
 	void reload_project();
 	void init();

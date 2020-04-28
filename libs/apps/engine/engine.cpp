@@ -136,50 +136,26 @@ namespace engine
         // Rendering
         
 		if(engine::scene){
-			for(auto&go:engine::scene->objects){
+			auto objects = helper::dynamic_pointer_cast<GameObject>(engine::scene->children);
+			for(auto&go:objects){
 				auto progs = go->get_comps<Program>();
-				if(progs.size()>0){
-					auto trans = go->get_comp<Transform>();
-					auto vaos = go->get_comps<Mesh::VAO>();
-					for(auto&prog:progs){
-						if(!prog->link_status)continue;
-						prog->use();
-						for(auto&vao:vaos){
-							vao->vao_bind();
-							vao->vao_attrib_enable(0xff);
-							vao->gl_draw();
-						}
+				if(!progs.size())continue;
+				auto vaos = go->get_comps<Mesh::VAO>();
+				if(!vaos.size())continue;
+				
+				for(auto&prog:progs){
+					if(!prog->link_status)continue;
+					prog->use();
+					for(auto&vao:vaos){
+						if(!vao->parent)throw(std::string("VAO has no parent???"));
+						dynamic_cast<Mesh*>(vao->parent)->vbo_bind();
+						vao->vao_bind();
+						vao->vao_attrib_enable(0xff);
+						vao->gl_draw();
 					}
 				}
 			}
 		}
-        
-        // testing_draw();
-        // RENDER
-        
-        // auto pred = [](Mesh*&m) -> bool{return string(m->filename).compare("testmesh") == 0;};
-        // auto mesh = *find_if(assets::meshes.begin(), assets::meshes.end(), pred);
-        
-		
-		// if(assets::textures.size()){
-		// 	auto &texture = assets::textures[0];
-		// 	glBindTexture(GL_TEXTURE_2D, texture->t_id);
-		// }
-		
-		// for(auto&go:engine::objects){
-		// 	helper::find_type_in_vector<Program>(go->comps);
-		// }
-		
-        // auto& program = assets::programs[0];
-        // if (program->link_status){
-		// 	program->use();
-		// 	for(auto&m:assets::meshes){
-		// 		m->vao_bind();
-		// 		m->vao_attrib_enable(program->attribs_enabled());
-		// 		m->gl_draw();
-		// 		m->vao_attrib_disable();
-		// 	}
-		// }
     }
 	
 	void exit(){

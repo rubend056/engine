@@ -42,51 +42,7 @@ inline void load(Archive& ar, path& val) {
 #endif
 }  // namespace std
 
-// ? REFERENTIABLE ###################
-class Referentiable{
-public:
-	static std::unordered_set<unsigned int> used_ids;
-	unsigned int id=0;
-	// Generate a unique id
-	void gen(unsigned int l_id=0){
-		if(id)used_ids.erase(id);
-		// Set the id to the id we want
-		id = l_id;
-		// Limits the execution to find a uniqueid to 10 times
-		int max_it=10;
-		// Generate random id until what you don't find it 
-		while(used_ids.find(id) != used_ids.end() && max_it > 0)
-			{id=rand()+1;--max_it;}
-		
-		if(!max_it){printf("ERROR max_it == 0");return;}
-		used_ids.insert(id);
-	}
-	
-	
-	// Parent referentiable to get the reference vector recursively
-	std::shared_ptr<Referentiable> parent; // Backward link
-//	std::shared_ptr<Referentiable> object;
-	
-	// Get vector of id's up until this object
-	std::vector<unsigned int> my_ref(){
-		std::vector<unsigned int> v;
-		_my_ref(v);
-		return v;
-	}
-	
-	template<class Archive>
-	void serialize(Archive& ar){
-		unsigned int sid=id;
-		ar(sid);
-		gen(sid);
-	}
-private:
-	void _my_ref(std::vector<unsigned int>& v){
-		if(parent)_my_ref(v); // If I have a parent, push back parent id
-		v.push_back(id); // Then push back my ID
-	}
-};
-// ?################### REFERENTIABLE
+#include "referentiable.h"
 
 #define FILENAME_SIZE 30
 #define METADATA_EXT ".meta"
@@ -98,7 +54,7 @@ private:
 #define FILE_SERIALIZE cereal::make_nvp("file", cereal::base_class<File>(this))
 
 // ? FILE ********************
-class File : public Referentiable{
+class File : public virtual Referentiable{
 private:
 	// static std::unordered_set<unsigned int> file_ids;
 	/**
@@ -123,11 +79,7 @@ public:
 	// ? Constructors
 	File(FILE_CONSTRUCT_PARAM) {
 		_rel_path = rpath;
-		if(!_rel_path.empty()){
-			// create_supposed_ext();
-			// assert(_rel_path.is_relative());
-			gen();
-		}
+		if(!_rel_path.empty()){}
 	}
 	virtual ~File(){}
 	
@@ -148,7 +100,7 @@ public:
 	
 	template<class Archive>
 	void serialize(Archive& ar){
-		ar(cereal::base_class<Referentiable>(this));
+		ar(cereal::virtual_base_class<Referentiable>(this));
 		
 		auto orel_path = _rel_path;
 		ar(cereal::make_nvp("rel_path",_rel_path));

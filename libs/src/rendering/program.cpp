@@ -20,50 +20,47 @@ void Shader::load(){
 	auto filename = d_path.filename().string();
 	auto ext = d_path.extension().string();
 	
-	if (supported(ext)) {
-        GLenum type = 0;
-        if (ext.compare(FRAGMENT_EXT) == 0)
-            type = GL_FRAGMENT_SHADER;
-        else if (ext.compare(VERTEX_EXT) == 0)
-            type = GL_VERTEX_SHADER;
-        else if (filename.find("fragment") != string::npos || filename.find("frag") != string::npos)
-            type = GL_FRAGMENT_SHADER;
-        else if (filename.find("geometry") != string::npos)
+	if (!supported(ext))return;
+        
+	if (ext.compare(FRAGMENT_EXT) == 0)
+		type = GL_FRAGMENT_SHADER;
+	else if (ext.compare(VERTEX_EXT) == 0)
+		type = GL_VERTEX_SHADER;
+	else if (filename.find("fragment") != string::npos || filename.find("frag") != string::npos)
+		type = GL_FRAGMENT_SHADER;
+	else if (filename.find("geometry") != string::npos)
 #if (GLAD_OPENGL_CORE_VERSION >= 45)
-            type = GL_GEOMETRY_SHADER;
+		type = GL_GEOMETRY_SHADER;
 #else
-			type = GL_GEOMETRY_SHADER_ARB;
+		type = GL_GEOMETRY_SHADER_ARB;
 #endif
-        else if (filename.find("vertex") != string::npos)
-            type = GL_VERTEX_SHADER;
+	else if (filename.find("vertex") != string::npos)
+		type = GL_VERTEX_SHADER;
 
-        if (type != 0) {
-			
-            printf("Importing %s as type %d shader\n", filename.c_str(), type);
-            std::ifstream sfile(d_path);
-            auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
-			
-			auto src = data.c_str();
-			if(s_id)glDeleteShader(s_id);
-			s_id = glCreateShader(type);
-            glShaderSource(s_id, 1, &src, NULL);
-			glCompileShader(s_id);
-			glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
-			
-			printf((status == GL_TRUE)?ANSI_COLOR_GREEN:ANSI_COLOR_RED);
-			printf("Shader %s compilation %s\n" ANSI_COLOR_RESET, filename.c_str(), (status == GL_TRUE)?"success!":"ERROR");
-			
-			GLsizei log_length;
-			// glGetShaderiv(s_id, GL_INFO_LOG_LENGTH, &log_length);
-			glGetShaderInfoLog(s_id, sizeof(log), &log_length, log);
-			if(log_length)cout << log << endl;
-            
-			loaded = true;
-			return;
-        }
-        printf("Coudn't find type for shader %s, please update filename\n", filename.c_str());
-    }
-	loaded = false;
+	if (type == 0) 
+		printf("Coudn't find type for shader %s, please update filename\n", filename.c_str());
+	
+	printf("Importing %s as type %d shader\n", filename.c_str(), type);
+	std::ifstream sfile(d_path);
+	auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
+	
+	auto src = data.c_str();
+	if(s_id)glDeleteShader(s_id);
+	s_id = glCreateShader(type);
+	glShaderSource(s_id, 1, &src, NULL);
+	glCompileShader(s_id);
+	glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
+	
+	printf((status == GL_TRUE)?ANSI_COLOR_GREEN:ANSI_COLOR_RED);
+	printf("Shader %s compilation %s\n" ANSI_COLOR_RESET, filename.c_str(), (status == GL_TRUE)?"success!":"ERROR");
+	
+	GLsizei log_length;
+	// glGetShaderiv(s_id, GL_INFO_LOG_LENGTH, &log_length);
+	glGetShaderInfoLog(s_id, sizeof(log), &log_length, log);
+	if(log_length)cout << log << endl;
+	
+	// loaded = true;
+	return;
 }
 void Shader::imgui_draw(){
 	ImGui::Text("Type: %d", type);
@@ -89,6 +86,18 @@ bool Program::supported(const std::string& ext){
 	return ext.compare(".prgm") == 0;
 }
 
+
+void Program::add_shaders(){
+	for(auto&s:shaders){
+		auto f = assets::get_file<Shader>(s);
+		if(f){
+			attach_shader(f->s_id);
+		}
+	}
+}
+void Program::add_textures(const std::vector<std::string>& t_names){
+	for(auto&t_name:t_names)textures.push_back(assets::get_load_file<Texture>(t_name));
+}
 
 
 std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void*_last_val=nullptr){
@@ -134,6 +143,28 @@ void print_link_status(int link_status, const char* filename){
 	printf("Program %s link %s" ANSI_COLOR_RESET "\n", filename, (link_status)?"OK":"BAD");
 }
 
+void Program::use(){
+	if(link_status){
+		// Use the program
+		glUseProgram(p_id);
+		// Set the uniforms
+		for(auto&a:attributes){
+			attrib_set_uniform(a);
+		}
+		// Binding all textures to their appropriate texture unit
+		static uint16_t gl_texture[] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2};
+		for(
+			auto it = textures.begin(); it < textures.end() && 
+			it - textures.begin() < sizeof(gl_texture)/sizeof(gl_texture[0]); 
+			++it){
+			glActiveTexture(gl_texture[it-textures.begin()]);
+			glBindTexture(GL_TEXTURE_2D, (*it)->t_id);
+		}
+	}else {printf("Can't use "); print_link_status(link_status, filename().c_str());}
+}
+
+
+
 void Program::link(){
 	// if(!_shaders_count)return; 
 	// glBindFragDataLocation(p_id, 0, "outColor"); 
@@ -145,7 +176,7 @@ void Program::link(){
 	for(GLsizei i=0;i<_shaders_count;++i){
 		function<bool(Shader*)> f = [&](Shader* s){return s->s_id == _shaders[i];};
 		auto s = assets::get_file(f);
-		if(s)shaders.insert(s->data_path());
+		if(s)shaders.push_back(s->my_ref());
 	}
 	
 	glLinkProgram(p_id);
@@ -210,36 +241,7 @@ void Program::link(){
 		attributes = std::move(new_attributes);
 	}
 }
-void Program::use(){
-	if(link_status){
-		// Use the program
-		glUseProgram(p_id);
-		// Set the uniforms
-		for(auto&a:attributes){
-			attrib_set_uniform(a);
-		}
-		// Binding all textures to their appropriate texture unit
-		static uint16_t gl_texture[] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2};
-		for(
-			auto it = textures.begin(); it < textures.end() && 
-			it - textures.begin() < sizeof(gl_texture)/sizeof(gl_texture[0]); 
-			++it){
-			glActiveTexture(gl_texture[it-textures.begin()]);
-			glBindTexture(GL_TEXTURE_2D, (*it)->t_id);
-		}
-	}else {printf("Can't use "); print_link_status(link_status, filename().c_str());}
-}
-void Program::add_shaders(){
-	for(auto&s:shaders){
-		auto f = assets::get_load_file<Shader>(s);
-		if(f){
-			attach_shader(f->s_id);
-		}
-	}
-}
-void Program::add_textures(const std::vector<std::string>& t_names){
-	for(auto&t_name:t_names)textures.push_back(assets::get_load_file<Texture>(t_name));
-}
+
 
 
 void Program::imgui_draw(){
@@ -273,12 +275,13 @@ void Program::imgui_draw(){
 	if(ImGui::Button("Add Shader", ImVec2(-1,0))){
 		ImGui::OpenPopup("add_popup");
 	}
-		
-	#warning "Shader class used here"
-	auto shader_files = assets::get_files("Shader");
+	
+	auto shader_files = assets::get_files_type<File,Shader>();
 	auto shader = std::dynamic_pointer_cast<Shader>(menus::add_popup(shader_files));
 	if(shader)
-		{attach_shader(shader->s_id);link();}
+		{
+			attach_shader(shader->s_id);link();
+		}
 	ImGui::PopID();
 	
 	ImGui::Separator();
@@ -300,7 +303,7 @@ void Program::imgui_draw(){
 	for(auto it=textures.begin();it<textures.end();++it){
 		int index = it-textures.begin();
 		ImGui::PushID(index);
-		ImGui::Image((void*)((*it)->t_id), ImVec2(50,50));
+		ImGui::Image((void*)(intptr_t)((*it)->t_id), ImVec2(50,50));
 		ImGui::SameLine();
 		ImGui::Text("GL_TEXTURE%d", index);
 		ImGui::SameLine();
@@ -329,19 +332,19 @@ void Program::imgui_draw(){
 	//? IMAGE DRAG N DROP
 	if (ImGui::BeginDragDropTarget())
 	{
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_FILE"))
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_REF"))
 		{
-			IM_ASSERT(payload->DataSize == sizeof(int));
-			auto f_id = *(int*)payload->Data;
-			auto texture = assets::get_file<Texture>([&](Texture*t){return t->file_id == f_id;});
-			if(texture)
-				textures.push_back(texture);
+			unsigned int data[11];
+			assert(payload->DataSize == sizeof(data));
+			memcpy(data, payload->Data, sizeof(data));
+			std::vector<unsigned int> refs;for(int i=0;i<data[0];++i)refs.push_back(data[i+1]);
+			auto texture = assets::get_file<Texture>(refs);
+			if(texture)textures.push_back(texture);
 		}
 		ImGui::EndDragDropTarget();
 	}
 	//? ############ IMAGE DRAG N DROP
-	#warning "Texture class used here"
-	menus::add_popup(assets::get_files("Texture"), false, "add_texture_popup");
+	menus::add_popup(assets::get_files_type<File,Texture>(), false, "add_texture_popup");
 	
 	ImGui::PopStyleColor();
 	

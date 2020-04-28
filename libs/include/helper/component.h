@@ -5,6 +5,7 @@
 
 #include "cereal/archives/json.hpp"
 #include "idraw.h"
+#include "referentiable.h"
 
 // Max num of components of this type in an GObj (0 means unlimited)[default]
 #define COMPONENT_MAX_NUM unsigned int max_num()
@@ -14,7 +15,7 @@
 
 #define COMPONENT_SERIALIZE cereal::make_nvp("component", cereal::base_class<Component>(this))
 
-class Component : public IDraw{
+class Component : public IDraw, public virtual Referentiable{
 	protected:
 		// std::shared_ptr<Component> c_ref; // Link to our prefab inst 
     public:
@@ -30,10 +31,11 @@ class Component : public IDraw{
 		virtual IDRAW_IMGUI_DRAW override {ImGui::Text ("imgui_draw is not set here");}
 		
 		virtual ~Component(){}
-		virtual Component* clone(){throw("Trying to clone unclonable");};
+		virtual std::shared_ptr<Component> clone(){throw("Trying to clone unclonable");};
 		
 		template<class Archive>
 		void serialize(Archive& ar){
+			ar(cereal::virtual_base_class<Referentiable>(this));
 			ar(CEREAL_NVP(enabled));
 		}
 };
