@@ -6,7 +6,7 @@
 
 #include "component.h"
 
-class Mesh : public File, public IDraw {
+class Mesh : public File, public Parent, public IDraw {
    private:
     // Can't modify this after constructor is called
     unsigned int vbo_id;
@@ -55,9 +55,14 @@ class Mesh : public File, public IDraw {
 			ImGui::Text("Tex_cords: %s", tex_cords?"true":"false");
 		}
 		VAO(){glGenVertexArrays(1, &vao_id);}
-		~VAO(){glDeleteVertexArrays(1, &vao_id);}
+		virtual ~VAO(){glDeleteVertexArrays(1, &vao_id);}
+		template<class Archive>
+		void serialize(Archive& ar){
+			ar(COMPONENT_SERIALIZE);
+			ar(name);
+		}
 	};
-	std::vector<std::shared_ptr<VAO>> vaos;
+	
 	
     void vbo_bind(){glBindBuffer(GL_ARRAY_BUFFER, vbo_id);}
     
@@ -69,6 +74,7 @@ class Mesh : public File, public IDraw {
 	template<class Archive>
 	void serialize(Archive& ar){
 		ar(FILE_SERIALIZE);
+		ar(cereal::base_class<Parent>(this));
 		ar(CEREAL_NVP(import_flags));
 		load();
 	}
@@ -84,5 +90,6 @@ class Mesh : public File, public IDraw {
 	~Mesh(){glDeleteBuffers(1, &vbo_id);}
 };
 CEREAL_REGISTER_TYPE(Mesh)
+CEREAL_REGISTER_TYPE_WITH_NAME(Mesh::VAO, "VAO")
 
 #endif // mesh_h

@@ -54,7 +54,7 @@ void Texture::imgui_draw(){
 	ImGui::Text("Size %d x %d", width, height);
 	ImGui::SameLine();
 	auto max_rect = ImGui::GetItemRectMax();
-	ImGui::Image((void*)t_id, ImVec2(max_rect.x, (int)((float) height / width * max_rect.x)));
+	ImGui::Image((void*)(intptr_t)t_id, ImVec2(max_rect.x, (int)((float) height / width * max_rect.x)));
 	
 	// I'll do this later
 	// ImGui::Combo()

@@ -40,7 +40,7 @@ void files(bool* p_open) {
 
 void assets(bool* p_open) {
     ImGui::Begin("Assets", p_open);
-	if(ImGui::Button("Reload"))assets::reload_project();
+	if(ImGui::Button("Reload",ImVec2(-1,0)))assets::reload_project();
     // Filter code
 	
 	// static std::shared_ptr<File> new_file;
@@ -51,7 +51,7 @@ void assets(bool* p_open) {
 		static std::shared_ptr<File> new_file;
 		std::shared_ptr<File> c;
 		auto push = [&](const char* type_id_name) -> void {
-			assets::add(c, type_id_name); new_file=c; ImGui::OpenPopup("modal_name");
+			new_file=c; ImGui::OpenPopup("modal_name");
 		};
 		if (c = helper::file_add_button<Program>()){push(typeid(Program).name());}
 		// else if 
@@ -59,10 +59,11 @@ void assets(bool* p_open) {
 		if (ImGui::BeginPopupModal("modal_name")){
 			static std::string name;
 			ImGui::InputText("Filename", &name);
-			if(ImGui::Button("Ok")){
+			if(ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter), false)){
 				new_file->filename_set(name);
-				new_file->next_id();
 				new_file->create_supposed_ext();
+				assets::add(new_file);
+				new_file.reset();
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();
@@ -89,11 +90,15 @@ void assets(bool* p_open) {
             }
 			if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover | ImGuiDragDropFlags_SourceAllowNullID))
 			{
-				// auto file_p = &f;
-				ImGui::SetDragDropPayload("DND_FILE", &f->file_id, sizeof(f->file_id));    // Set payload to carry the index of our item (could be anything)
+				auto refs = f->my_ref(); // Get the refs to the current referentiable
+				unsigned int data[11];
+				data[0]=refs.size()>10?0:refs.size();
+				int c=0;for(auto&ref:refs)data[++c]=ref;
+				
+				ImGui::SetDragDropPayload("DND_REF", &data[0], sizeof(data));
 				
 				auto hash_path = f->hash_path();
-				ImGui::Text(hash_path.c_str());
+				ImGui::Text(refs.size()>10?"Refs size too big?":hash_path.c_str());
 				ImGui::EndDragDropSource();
 			}	
         }

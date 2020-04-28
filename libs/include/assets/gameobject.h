@@ -7,7 +7,7 @@
 #include "cereal/archives/json.hpp"
 #include <vector>
 #include <map>
-// #include <glm/vec3.hpp>
+#include "transform.h"
 
 #include "type_name.h"
 
@@ -19,22 +19,30 @@
 
 class CLASSNAME_NORMAL;
 
-// #define PREFAB_VAR_SERIALIZE(type, name)\
-// 	if(#name == "components"){\
-// 		ar(cereal::make_nvp("n_comps", components.size()));\
-// 		for(auto&c:components){\
-// 			if(c->is_ref()){\
-// 				ar()\
-// 			}else ar(c);\
-// 		}\
-// 	}else ar(name);
+#define PREFAB_VAR_SERIALIZE(type, name)\
+	if(!strcmp(#name,"components")){\
+		int csize,oldsize;csize=oldsize=components.size();\
+		ar(csize);\
+		for(int i=0;i<csize-oldsize;++i)components.push_back(std::shared_ptr<Component>());\
+		for(int i=0;i<csize;++i){\
+			auto is_ref = components[i]?components[i]->parent != (Referentiable*)this:true;\
+			ar(is_ref);\
+			if(is_ref){\
+				std::vector<unsigned int> ref;\
+				if(components[i]) ref = components[i]->my_ref();\
+				ar(ref);\
+				components[i] = assets::get_file<Component>(ref);\
+			}else ar(components[i]);\
+		}\
+	}else ar(name);
 
 #include "prefab.h"
 // ? ###########################################################################
 
 #include "map_helper.h"
 
-class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw{
+#include "cereal/types/unordered_map.hpp"
+class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw, public Parent{
     
     public:
         bool enabled=true;
@@ -46,81 +54,54 @@ class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw{
 		IDRAW_IMGUI_NAME override{return filename().c_str();}
 		IDRAW_IMGUI_DRAW override;
 		
+		std::unique_ptr<Transform> trans=std::make_unique<Transform>();
+		
 		std::unordered_multimap<std::string, std::shared_ptr<Component>> type_component_ht;
 		
 		// ? add ************
-		void add(const std::shared_ptr<Component>& comp, const char* type_info_name){
-			auto t_name = helper::demangle(type_info_name);
-			if(get_comps(t_name).size()>=comp->max_num()){
-				printf(ANSI_COLOR_YELLOW "Max num %d for %s" ANSI_COLOR_RESET "\n", comp->max_num(), t_name.c_str());
-				return;
-			}
-			components.push_back(comp);
-			type_component_ht.insert(std::make_pair(t_name, comp));
-		}
+		void add(const std::shared_ptr<Component>& comp);
+		void del(const std::shared_ptr<Component>& comp);
 		
 		MAP_GET_ELEMENT(Component, comp, type_component_ht)
-		
 		MAP_GET_ELEMENTS(Component, comps, type_component_ht)
-		// // ? get_comp
-		// std::shared_ptr<Component> get_comp(const std::string& t_name){
-		// 	auto it = type_component_ht.find(t_name);
-		// 	if(it == type_component_ht.end())return std::shared_ptr<Component>();
-		// 	else return it->second;
-		// }
-		// template<class T>
-		// std::shared_ptr<T> get_comp(){
-		// 	return std::dynamic_pointer_cast<T>(get_comp(helper::demangle(typeid(T).name())));
-		// }
-		// // ? get_comps
-		// std::vector<std::shared_ptr<Component>> get_comps(const std::string t_name){
-		// 	// #warning "t_name calls for erroneous/nonexistent types"
-		// 	auto eq_range = type_component_ht.equal_range(t_name);
-		// 	std::vector<std::shared_ptr<Component>> v;
-		// 	for(auto it = eq_range.first; it!=eq_range.second;++it)
-		// 		v.push_back(it->second);
-		// 	return v;
-		// }
-		// template<class T>
-		// std::vector<std::shared_ptr<T>> get_comps(){
-		// 	std::string t_name = helper::demangle(typeid(T).name());
-		// 	auto o = get_comps(t_name);
-		// 	std::vector<std::shared_ptr<T>> v;v.reserve(o.size());
-		// 	for(auto&a:o)
-		// 		v.push_back(std::dynamic_pointer_cast<T>(a));
-		// 	return std::move(v);
-		// }
+
 		// ? ##########################
 		
 		template<class Archive>
 		void serialize(Archive & ar) {
 			ar(CEREAL_NVP(enabled));
+			ar(CEREAL_NVP(trans));
+			ar(cereal::virtual_base_class<Parent>(this));
 			// ? Base Classes
 			ar(FILE_SERIALIZE);
 			
 			// ? Serializing ref
-			std::string d_name = ref?std::static_pointer_cast<GameObject>(ref)->data_path():"";
-			ar(cereal::make_nvp("ref",d_name));
-			// If ref null and d_name not empty, means we loading, then fill ref
-			if(!ref && !d_name.empty())ref = assets::get_file<GameObject>(d_name);
+			// std::string d_name = ref?std::static_pointer_cast<GameObject>(ref)->data_path():"";
+			// ar(cereal::make_nvp("ref",d_name));
+			// // If ref null and d_name not empty, means we loading, then fill ref
+			// if(!ref && !d_name.empty())ref = assets::get_file<GameObject>(d_name);
 			
-			// Print error if we have a ref_name serialized 
-			// but can't find the actual reference
-			if(!ref && !d_name.empty()) 
-				printf(ANSI_COLOR_RED "%s ref not found in %s" ANSI_COLOR_RESET "\n", d_name.c_str(), filename().c_str()); 
+			// // Print error if we have a ref_name serialized 
+			// // but can't find the actual reference
+			// if(!ref && !d_name.empty()) 
+			// 	printf(ANSI_COLOR_RED "%s ref not found in %s" ANSI_COLOR_RESET "\n", d_name.c_str(), filename().c_str()); 
 			
 			ar(PREFAB_SERIALIZE);
 			
+			if(!type_component_ht.size())
+			for(auto&c:components)
+				if(c)type_component_ht.insert(std::make_pair(helper::demangle(typeid(*c).name()), c));
+			
 			// Setting refs for loading
-			if(ref){
-				auto other_go = std::dynamic_pointer_cast<GameObject>(ref);
-				if(other_go)
-				for(auto&tc:type_component_ht){
-					auto other_comp = other_go->get_comp(tc.first);
-					if(other_comp)tc.second->set_ref(other_comp);
-				}
-				else printf(ANSI_COLOR_RED "OtherGO not set error" ANSI_COLOR_RESET "\n");
-			}
+			// if(ref){
+			// 	auto other_go = std::dynamic_pointer_cast<GameObject>(ref);
+			// 	if(other_go)
+			// 	for(auto&tc:type_component_ht){
+			// 		auto other_comp = other_go->get_comp(tc.first);
+			// 		if(other_comp)tc.second->set_ref(other_comp);
+			// 	}
+			// 	else printf(ANSI_COLOR_RED "OtherGO not set error" ANSI_COLOR_RESET "\n");
+			// }
 		}
 };
 

@@ -21,10 +21,10 @@ public:
     unsigned int s_id=0;
 	// GLenum type_force=0;
     GLenum type=0;
-    int status;
+    int status=0;
     char log[200];
 	
-	bool loaded = false;
+	// bool loaded = false;
 	static bool supported(const std::string& ext);
 	/**
 	 * Will load code and recompile
@@ -35,7 +35,7 @@ public:
     Shader(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS){
 		if(!rpath.empty()){
 			load();
-			if(!loaded)std::printf("Shader %s loading failed\n", data_path().c_str());
+			if(!status)std::printf("Shader %s loading failed\n", data_path().c_str());
 		}
 	}
 	~Shader(){glDeleteShader(s_id);}
@@ -43,14 +43,14 @@ public:
 	IDRAW_IMGUI_NAME override {return filename();}
 	IDRAW_IMGUI_DRAW override ;
 	
-	FILE_SUPPOSED_EXT override {return "";}
+	// FILE_SUPPOSED_EXT override {return ".meta";}
 	
 	template<class Archive>
 	void serialize(Archive& ar){
 		ar(FILE_SERIALIZE);
 		// ar(CEREAL_NVP(type_force));
 		// Only load if compile failed
-		if(!status)load();
+		load();
 	}
 };
 CEREAL_REGISTER_TYPE(Shader)
@@ -145,7 +145,7 @@ public:
 	};
 
     // std::vector<std::shared_ptr<Shader>> _shaders;
-	std::unordered_set<std::string> shaders;
+	std::vector<std::vector<unsigned int>> shaders;
 	std::vector<std::unique_ptr<Attribute>> attributes;
 	std::vector<std::shared_ptr<Texture>> textures;
 
@@ -183,7 +183,7 @@ public:
 		
 		bool s_empty = shaders.empty();
 		std::cout << "Saving Shaders:" << std::endl;
-		for(auto&s:shaders)std::cout << "  " << s << std::endl;
+		for(auto&s:shaders)std::cout << "  " << s[0] << std::endl;
 		ar(CEREAL_NVP(shaders));
 		if(s_empty)add_shaders();
 		

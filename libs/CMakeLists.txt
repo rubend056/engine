@@ -45,6 +45,7 @@ add_library(my_libs
 	src/helper/type_name.cpp
 	src/helper/inotify_imp.cpp
 	src/helper/file.cpp
+	src/helper/referentiable.cpp
 
 	src/menus/inspector.cpp
 	src/menus/files.cpp
@@ -62,3 +63,21 @@ add_library(my_libs
 	src/rendering/program.cpp
 )
 target_link_libraries(my_libs imgui)
+target_precompile_headers(my_libs PUBLIC 
+	include/helper/file.h
+	include/helper/cereal_glm.h
+	include/helper/referentiable.h
+	include/helper/component.h
+	include/helper/map_helper.h
+	include/helper/inotify_imp.h
+	include/groups/debug.h
+	include/groups/gl.h
+	include/groups/helper.h
+	include/groups/my_filesystem.h
+	include/groups/my_imgui.h
+	include/groups/type_name.h
+	include/assets/assets.h
+	include/assets/gameobject.h
+	include/assets/scene.h
+	src/assets/_assets.h
+)

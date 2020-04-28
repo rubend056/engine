@@ -13,13 +13,13 @@
 static bool
         show_glEnable = false,
         // show_open = false,
-        show_metrics_window = true,
+        show_metrics_window = false,
         show_stats = false,
         show_inspector = true,
 		show_scene = true,
 		// show_textures = true,
 		// show_programs = true,
-        show_files = true,
+        show_files = false,
 		show_assets = true;
 
 void menus::imgui_engine_init(){
@@ -105,8 +105,8 @@ void menus::imgui_engine_update() {
 			// Open Scene menu
             if (ImGui::MenuItem("Open Scene")) {
 				open_scene_popup_modal = true;
-				#warning "Scene class used here"
-				scenes = assets::get_files("Scene");
+				
+				scenes = assets::get_files_type<File,Scene>();
             }
 			// ############
 			
@@ -176,7 +176,7 @@ void menus::imgui_engine_update() {
 			if(ImGui::Button("Ok")){
 				auto scene = std::make_shared<Scene>(scene_name);
 				scene->create_supposed_ext();
-				assets::add(scene, typeid(Scene).name());
+				assets::add(scene);
 				engine::load_scene(scene);
 				ImGui::CloseCurrentPopup();
 			}
