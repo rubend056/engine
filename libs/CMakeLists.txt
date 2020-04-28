@@ -54,7 +54,7 @@ add_library(my_libs
 	src/menus/menus.cpp
 	src/menus/menus_gl.cpp
 	
-	src/components/camera.cpp
+	# src/components/camera.cpp
 	src/components/transform.cpp
 	src/components/source.cpp
 	
@@ -64,20 +64,7 @@ add_library(my_libs
 )
 target_link_libraries(my_libs imgui)
 target_precompile_headers(my_libs PUBLIC 
-	include/helper/file.h
-	include/helper/cereal_glm.h
-	include/helper/referentiable.h
-	include/helper/component.h
-	include/helper/map_helper.h
-	include/helper/inotify_imp.h
-	include/groups/debug.h
-	include/groups/gl.h
-	include/groups/helper.h
-	include/groups/my_filesystem.h
-	include/groups/my_imgui.h
-	include/groups/type_name.h
+	apps/engine/engine_globals.h
 	include/assets/assets.h
-	include/assets/gameobject.h
-	include/assets/scene.h
 	src/assets/_assets.h
 )

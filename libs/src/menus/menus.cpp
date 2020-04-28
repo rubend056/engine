@@ -129,6 +129,7 @@ void menus::imgui_engine_update() {
         }
         if (ImGui::BeginMenu("View")) {
 			if(ImGui::BeginMenu("Assets")){
+				ImGui::MenuItem("Assets", NULL, &show_assets);
 				ImGui::MenuItem("Files", NULL, &show_files);
 				ImGui::EndMenu();
 			}

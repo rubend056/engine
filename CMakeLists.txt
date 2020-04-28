@@ -15,7 +15,7 @@ message("-- CMAKE_SYSTEM_NAME:      	${CMAKE_SYSTEM_NAME}")
 message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
-SET(GLAD_OPENGL_CORE_VERSION "30" CACHE STRING "OPENGL_VERSION: either 30 or 45")
+SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
 message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
 
 find_package(SDL2 REQUIRED)
@@ -102,9 +102,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 	add_executable(tests
 		libs/apps/catch/main_test.cpp
-		libs/apps/catch/file_test.cpp
-		libs/apps/catch/scene_test.cpp
-		libs/apps/catch/gameobject_test.cpp
 	)
 	
 	if(LSB_RELEASE_ID MATCHES "Arch")

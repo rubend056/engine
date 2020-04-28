@@ -1,6 +1,6 @@
 #include "program.h"
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 #include "debug.h"
 #include "assets.h"
@@ -124,12 +124,12 @@ void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib){
 	switch (attrib->type)
 	{
 	case GL_FLOAT: glUniform1fv(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC2: glUniform2fv(attrib->location, 2, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC3: glUniform3fv(attrib->location, 3, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC4: glUniform4fv(attrib->location, 4, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT2: glUniformMatrix2fv(attrib->location, 4, false, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT3: glUniformMatrix2fv(attrib->location, 9, false, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT4: glUniformMatrix2fv(attrib->location, 16, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC2: glUniform2fv(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC3: glUniform3fv(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC4: glUniform4fv(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT2: glUniformMatrix2fv(attrib->location, 1, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT3: glUniformMatrix2fv(attrib->location, 1, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT4: glUniformMatrix2fv(attrib->location, 1, false, ((float*)attrib->val)); break;
 	case GL_SAMPLER_2D:  break;
 	default:
 		throw std::range_error("Type not defined");
@@ -218,6 +218,7 @@ void Program::link(){
 			av->name_length = a.name_length;
 			av->size = a.size;
 			av->type = a.type;
+			av->location = a.location;
 			strcpy(av->name, a.name);
 			new_attributes.push_back(std::move(av));
 		}
@@ -234,6 +235,7 @@ void Program::link(){
 			av->name_length = a.name_length;
 			av->size = a.size;
 			av->type = a.type;
+			av->location = a.location;
 			strcpy(av->name, a.name);
 			new_attributes.push_back(std::move(av));
 		}
