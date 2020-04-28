@@ -13,5 +13,5 @@ cd ../..
 
 # Build 
 cd build
-make -j${THREADS}
+make -j${THREADS} engine
 cd ..
