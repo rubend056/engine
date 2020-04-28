@@ -58,4 +58,12 @@ Now compiles for Ubuntu 18.04 as well as Archlinux and is configurable to use Op
 <p align="center">
 <img class="image" width="90%" src="images/day33.png">
 
+<p align="center"><b>Day 49</b></p>
+<p align="center">
+A huge range of improvement from serailizing to getting the textures finally working. As well as dynamic project reloading:
+
+|Textures | Color Edit|
+:----:|:---------:
+|![](images/day49_0.png) | ![](images/day49_1.png) |
+
 <br>

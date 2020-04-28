@@ -158,9 +158,13 @@ namespace assets{
 						p/= event->filename;
 						p = engine::get_relative_to_project(p);
 						
-						auto shader = assets::get_file_path<Shader>(p);
-						if(shader)shader->load();
+						
+						if(auto f = assets::get_file_path(p)){
+							if(auto shader = std::dynamic_pointer_cast<Shader>(f))shader->load();
+							else if(auto mesh = std::dynamic_pointer_cast<Mesh>(f))mesh->load();
+						}
 					}else if(event->event == inotify::CREATE || event->event == inotify::DELETE){
+						std::printf(ANSI_COLOR_YELLOW "Create or delete triggered" ANSI_COLOR_RESET "\n");
 						reload = true;
 					}
 				}

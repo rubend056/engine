@@ -285,7 +285,8 @@ void Program::imgui_draw(){
 			attach_shader(shader->s_id);link();
 		}
 	ImGui::PopID();
-	
+	if(ImGui::Button("Relink", ImVec2(-1,0)))link();
+	ImGui::TextColored(link_status?ImVec4(0.f,1.f,0.f,1.f):ImVec4(1.f,0.f,0.f,1.f), link_status?"Ok":"Failed");
 	ImGui::Separator();
 	#define _SEPARATION 3
 	
@@ -357,20 +358,32 @@ void Program::imgui_draw(){
 		if(!a->uniform)continue;
 		ImGui::PushID(a->i);
 		ImGui::TextDisabled("%d",a->i);ImGui::SameLine(0,_SEPARATION);
-		if(a->type == GL_FLOAT_VEC4)
-			{ImGui::ColorPicker4("##Picker",(float*)a->val);ImGui::SameLine(0,_SEPARATION);}
-		ImGui::TextDisabled(a->name);
-		if(a->type == GL_FLOAT_VEC3){
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat3("##Picker",(float*)a->val);
-		}else if (a->type == GL_SAMPLER_2D){
-			auto val = (int*)a->val;
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::InputInt("##Picker", val, 1, 1);
-			if(*val < 0)*val=0;
+		#define PICKER_NAME "##Picker"
+		bool is_color = std::string(a->name).find("col") != std::string::npos && (a->type == GL_FLOAT_VEC3 || a->type == GL_FLOAT_VEC4);
+		
+		if(is_color){
+			if(a->type == GL_FLOAT_VEC3)
+				ImGui::ColorEdit3(PICKER_NAME,(float*)a->val,ImGuiColorEditFlags_NoInputs);
+			else 
+				ImGui::ColorEdit4(PICKER_NAME,(float*)a->val,ImGuiColorEditFlags_NoInputs);
+			ImGui::SameLine(0,_SEPARATION);	
 		}
+		ImGui::TextDisabled(a->name);
+		if(!is_color){
+			if(a->type == GL_FLOAT_VEC3 || a->type == GL_FLOAT_VEC4){
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(-1);
+				if(a->type == GL_FLOAT_VEC3)ImGui::DragFloat3(PICKER_NAME,(float*)a->val);
+				else if(a->type == GL_FLOAT_VEC4)ImGui::DragFloat4(PICKER_NAME,(float*)a->val);
+			}else if (a->type == GL_SAMPLER_2D){
+				auto val = (int*)a->val;
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(-1);
+				ImGui::InputInt(PICKER_NAME, val, 1, 1);
+				if(*val < 0)*val=0;
+			}
+		}
+		
 		ImGui::PopID();
 	}
 	
