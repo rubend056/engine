@@ -134,18 +134,20 @@ class Program : public File, public Component {
 private:
 	void add_shaders();
 	void add_textures(const std::vector<std::string>& t_names);
+	
+	//! THIS WILL BE DELETED
+	std::vector<std::vector<unsigned int>> shaders;
+	
 public:
     unsigned int p_id;
 	// 1 means OK, 0 means Failed
-    int link_status = 1;
+    int link_status = 0;
     uint32_t attribs_enabled (){
 		uint32_t t=0;
 		for(auto&a:attributes)if(!a->uniform)t|=_BV32(a->location);
 		return t;
 	};
-
-    // std::vector<std::shared_ptr<Shader>> _shaders;
-	std::vector<std::vector<unsigned int>> shaders;
+	
 	std::vector<std::unique_ptr<Attribute>> attributes;
 	std::vector<std::shared_ptr<Texture>> textures;
 
@@ -155,6 +157,7 @@ public:
 	 */
     void attach_shader(GLuint s_id);
     void detach_shader(GLuint s_id);
+	std::vector<unsigned int> get_shaders();
     void clear_shaders();
     void link();
 	

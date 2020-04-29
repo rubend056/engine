@@ -160,7 +160,14 @@ namespace assets{
 						
 						
 						if(auto f = assets::get_file_path(p)){
-							if(auto shader = std::dynamic_pointer_cast<Shader>(f))shader->load();
+							if(auto shader = std::dynamic_pointer_cast<Shader>(f)){
+								shader->load();
+								auto programs = assets::get_files_type<Program>();
+								for(auto&p:programs){
+									auto _shaders = p->get_shaders();
+									if(std::find(_shaders.begin(), _shaders.end(), shader->s_id) != _shaders.end())p->link();
+								}
+							}
 							else if(auto mesh = std::dynamic_pointer_cast<Mesh>(f))mesh->load();
 						}
 					}else if(event->event == inotify::CREATE || event->event == inotify::DELETE){
