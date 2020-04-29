@@ -15,13 +15,18 @@ using namespace std;
 bool Shader::supported(const std::string& ext){
 	return ext.compare(".glsl") == 0 || ext.compare(".vert") == 0 || ext.compare(".frag") == 0;
 }
+// Only create a new shader when shader type changes
+// 
 void Shader::load(){
 	auto d_path = engine::get_absolute_from_project(data_path());
 	auto filename = d_path.filename().string();
 	auto ext = d_path.extension().string();
 	
 	if (!supported(ext))return;
-        
+    
+	int old_type = type;
+	// Figure out shader type
+	
 	if (ext.compare(FRAGMENT_EXT) == 0)
 		type = GL_FRAGMENT_SHADER;
 	else if (ext.compare(VERTEX_EXT) == 0)
@@ -36,17 +41,19 @@ void Shader::load(){
 #endif
 	else if (filename.find("vertex") != string::npos)
 		type = GL_VERTEX_SHADER;
-
-	if (type == 0) 
-		printf("Coudn't find type for shader %s, please update filename\n", filename.c_str());
+	
+	
+	if (type == 0) {
+		printf(ANSI_COLOR_RED "Coudn't find type for shader %s, please update filename" ANSI_COLOR_RESET "\n", filename.c_str());
+		return;
+	}
 	
 	printf("Importing %s as type %d shader\n", filename.c_str(), type);
 	std::ifstream sfile(d_path);
 	auto data = string((istreambuf_iterator<char>(sfile)), istreambuf_iterator<char>());
 	
 	auto src = data.c_str();
-	if(s_id)glDeleteShader(s_id);
-	s_id = glCreateShader(type);
+	if(!s_id || old_type != type)s_id = glCreateShader(type);
 	glShaderSource(s_id, 1, &src, NULL);
 	glCompileShader(s_id);
 	glGetShaderiv(s_id, GL_COMPILE_STATUS, &status);
@@ -97,6 +104,18 @@ void Program::add_shaders(){
 }
 void Program::add_textures(const std::vector<std::string>& t_names){
 	for(auto&t_name:t_names)textures.push_back(assets::get_load_file<Texture>(t_name));
+}
+std::vector<unsigned int> Program::get_shaders(){
+	std::vector<unsigned int> v;
+	
+	const GLsizei _SHADERS_SIZE=20;
+	GLuint _shaders[_SHADERS_SIZE];
+	GLsizei _shaders_count;
+	glGetAttachedShaders(p_id, _SHADERS_SIZE, &_shaders_count, _shaders);
+	v.reserve(_shaders_count);
+	for(int i=0;i<_shaders_count;++i)v.push_back(_shaders[i]);
+	
+	return v;
 }
 
 
@@ -168,13 +187,10 @@ void Program::use(){
 void Program::link(){
 	// if(!_shaders_count)return; 
 	// glBindFragDataLocation(p_id, 0, "outColor"); 
-	const GLsizei _SHADERS_SIZE=20;
-	GLuint _shaders[_SHADERS_SIZE];
-	GLsizei _shaders_count;
-	glGetAttachedShaders(p_id, _SHADERS_SIZE, &_shaders_count, _shaders);
+	auto _shaders = get_shaders();
 	shaders.clear();
-	for(GLsizei i=0;i<_shaders_count;++i){
-		function<bool(Shader*)> f = [&](Shader* s){return s->s_id == _shaders[i];};
+	for(auto&s_id:_shaders){
+		function<bool(Shader*)> f = [&](Shader* s){return s->s_id == s_id;};
 		auto s = assets::get_file(f);
 		if(s)shaders.push_back(s->my_ref());
 	}
