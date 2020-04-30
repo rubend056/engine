@@ -18,9 +18,9 @@ message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 # SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
 # message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
 
-find_package(SDL2 REQUIRED)
-message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
-message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
+# find_package(SDL2 REQUIRED)
+# message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
+# message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
 find_package(ASSIMP REQUIRED)
 message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
 message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
@@ -35,6 +35,13 @@ SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
 
 add_subdirectory(extern/glad)
 add_subdirectory(extern/soil)
+add_subdirectory(extern/sdl2-src)
+find_library(SDL2 SDL2)
+
+include_directories(extern/glad/${GLAD_OPENGL_CORE_VERSION})
+add_subdirectory(extern/imgui)
+
+
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	find_program(LSB_RELEASE_EXEC lsb_release)
@@ -67,17 +74,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 
 	include_directories(
-		${SDL2_INCLUDE_DIRS}
+		# ${SDL2_INCLUDE_DIRS}
 		${ASSIMP_INCLUDE_DIRS}
 		${CMAKE_BINARY_DIR}
 		extern/assimp/include
-		# extern/sdl2/include/SDL2
+		extern/sdl2-src/include
 		extern/soil/include
 		
 		extern
 		extern/imgui
 		extern/imgui/examples
-		extern/glad/${GLAD_OPENGL_CORE_VERSION}
 		
 		libs/apps/engine
 		libs/include
@@ -89,12 +95,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		libs/include/rendering
 	)
 	
-
-	add_subdirectory(extern/imgui)
 	add_subdirectory(libs)
 
-
-	add_library(engine_lib
+	
+	add_library(engine_lib SHARED
 		libs/apps/engine/engine.cpp
 	)
 
@@ -106,11 +110,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		libs/apps/catch/main_test.cpp
 	)
 	
-	if(LSB_RELEASE_ID MATCHES "Arch")
-		set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
-		string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
-		# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
-	endif()
+	# if(LSB_RELEASE_ID MATCHES "Arch")
+	# 	set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
+	# 	string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
+	# 	# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
+	# endif()
 	
 	
 	set(LIBRARIES 
@@ -120,7 +124,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 		#Core libraries for engine
 		soil
-		${SDL2_LIBRARIES}
+		
+		SDL2main
+		# ${SDL2_LIBRARIES}
 		
 		# libSDL2d.a
 		# libSDL2maind.a

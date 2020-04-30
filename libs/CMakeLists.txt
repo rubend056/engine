@@ -36,7 +36,9 @@
 # )
 # target_link_libraries(rendering menus imgui)
 
-add_library(my_libs	
+# find_library(SDL2 SDL2)
+
+add_library(my_libs
     src/assets/assets.cpp
     src/assets/assets_import.cpp
 	src/assets/gameobject.cpp
