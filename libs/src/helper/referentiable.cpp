@@ -55,7 +55,7 @@ void Referentiable::orphan(const std::shared_ptr<Referentiable>& obj){
 // }
 
 std::shared_ptr<Referentiable> Parent::foster(const std::shared_ptr<Referentiable>& child){
-	if(!child || (child && child.get() == this))return std::shared_ptr<Referentiable>();
+	if(!child || (child && (child.get() == this || child->parent == this)))return std::shared_ptr<Referentiable>();
 	Referentiable::orphan(child);
 	children.push_back(child);
 	child->parent = this;

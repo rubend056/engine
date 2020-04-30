@@ -16,8 +16,8 @@ To Build
 - LINUX
   - Run `./config.sh` to install dependencies
   - Run `./build.sh` to compile the engine
-  - Run `./copytestgame.sh` to duplicate the test project folder
-  - Run `./launch.sh` to launch the engine
+  - Run (pptionally) `./copytestgame.sh` to duplicate the test game project folder
+  - Run `./build/engine game0` (or `./build/engine game1` if you chose to copy the base game) to launch the engine
 	
 - WINDOWS
   - Not available yet

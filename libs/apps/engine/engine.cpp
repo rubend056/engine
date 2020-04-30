@@ -14,6 +14,8 @@
 
 using namespace std;
 
+
+
 fs::path relativePath( const fs::path &path, const fs::path &relative_to ){
     // create absolute paths
     fs::path p = fs::absolute(path);
@@ -53,10 +55,16 @@ fs::path relativePath( const fs::path &path, const fs::path &relative_to ){
 }
 
 namespace engine{
-    bool run = true;
+    
+	bool run = true;
+	double deltaTime=0;
+	double time=0;
+	
     std::shared_ptr<Scene> scene;
     // std::vector<std::shared_ptr<GameObject>> selected;
     fs::path project_path;
+	
+	
 	fs::path get_absolute_from_project(const fs::path &asset_path){
 		// cout << "Asset path: " << fs::absolute(asset_path) << endl;
 		// cout << "Project path: " << project_path << endl;

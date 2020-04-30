@@ -11,6 +11,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 
+
 int main( int argc, char* args[] )
 {
 	
@@ -85,10 +86,17 @@ int main( int argc, char* args[] )
 	//?#########################
     
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+	
+	// For delta time
+	Uint64 NOW = SDL_GetPerformanceCounter();
+	Uint64 LAST = 0;
+	// #### Delta time
+	
     engine::init();
     while (engine::run)
     {
         
+		
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -108,15 +116,19 @@ int main( int argc, char* args[] )
         
         GLenum err;
         while((err = glGetError()) != GL_NO_ERROR)
-        {
-			
-            printf("OpenGL error %d\n", err);
-        }
+        {printf("OpenGL error %d\n", err);}
         
+		// Time
+		LAST = NOW;
+		NOW = SDL_GetPerformanceCounter();
+		engine::deltaTime = (double)((NOW - LAST)*1000 / (double)SDL_GetPerformanceFrequency() );
+		engine::time += engine::deltaTime;
+		// #### Delta time
+		
         engine::update();
         
 		ImGui::Render();
-        glViewport(0, 0, (int)io.DisplaySize.x/2, (int)io.DisplaySize.y/2);
+        glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         glClear(GL_COLOR_BUFFER_BIT);
 		
         engine::render();

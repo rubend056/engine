@@ -1,2 +1,2 @@
 #!/bin/bash
-./build/engine ./game1
+./build/engine ./game0

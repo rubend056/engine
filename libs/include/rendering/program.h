@@ -104,6 +104,18 @@ public:
 		// }
 	}
 };
+
+#define TYPE_EXPANSION(func)\
+	func(GL_FLOAT		,float			,glUniform1fv)\
+	func(GL_DOUBLE		,double			,glUniform1dv)\
+	func(GL_FLOAT_VEC2	,glm::vec2		,glUniform2fv)\
+	func(GL_FLOAT_VEC3	,glm::vec3		,glUniform3fv)\
+	func(GL_FLOAT_VEC4	,glm::vec4		,glUniform4fv)\
+	func(GL_FLOAT_MAT2	,glm::mat2		,glUniformMatrix2fv)\
+	func(GL_FLOAT_MAT3	,glm::mat3		,glUniformMatrix2fv)\
+	func(GL_FLOAT_MAT4	,glm::mat4		,glUniformMatrix2fv)\
+	func(GL_SAMPLER_2D	,unsigned int	,)
+
 template <typename T>
 struct AttributeVar:public Attribute{
 	std::unique_ptr<T> _val = std::unique_ptr<T>(new T(0));
@@ -119,14 +131,10 @@ struct AttributeVar:public Attribute{
 		val = _val.get();
 	}
 };
-CEREAL_REGISTER_TYPE(AttributeVar<unsigned int>)
-CEREAL_REGISTER_TYPE(AttributeVar<float>)
-CEREAL_REGISTER_TYPE(AttributeVar<glm::vec2>)
-CEREAL_REGISTER_TYPE(AttributeVar<glm::vec3>)
-CEREAL_REGISTER_TYPE(AttributeVar<glm::vec4>)
-CEREAL_REGISTER_TYPE(AttributeVar<glm::mat2>)
-CEREAL_REGISTER_TYPE(AttributeVar<glm::mat3>)
-CEREAL_REGISTER_TYPE(AttributeVar<glm::mat4>)
+#define CRT(gl_type, type, uniformfunc)\
+	CEREAL_REGISTER_TYPE(AttributeVar<type>)
+// #define CRT(gl_type, type, uniformfunc) CRT_(gl_type, type, uniformfunc)
+TYPE_EXPANSION(CRT)
 
 #include "texture.h"
 

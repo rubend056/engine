@@ -43,7 +43,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/build/engine",
-			"args": ["../game1"],
+			"args": ["../game0"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/build",
 			"environment": [],
