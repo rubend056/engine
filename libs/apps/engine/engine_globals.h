@@ -15,6 +15,8 @@
 namespace engine{
 	// Controls whether the engine should stop
     extern bool run;
+	extern double deltaTime;
+	extern double time;
 	
 	// All the gameobjects in the scene
     extern std::shared_ptr<Scene> scene;

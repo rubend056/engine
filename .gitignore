@@ -1,7 +1,13 @@
 /build
 /game1
-*imgui.ini*
+/imgui.ini
+*.ini
 *.zip
 *.a
 *.o
 /source*
+
+/game0/**/*.meta
+/game0/**/*.json
+/game0/**/*.prgm
+/game0/**/*.scene

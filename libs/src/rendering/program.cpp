@@ -119,18 +119,23 @@ std::vector<unsigned int> Program::get_shaders(){
 }
 
 
+
 std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void*_last_val=nullptr){
 	// Return if we're erasing and pointer is null, if there is no type defined, or if we're creating but pointer is not null
+	#define ATTRIB_CREATE_FUNC(gl_type, type, uniformfunc)\
+		case gl_type: return std::unique_ptr<Attribute>(new AttributeVar<type>    (_last_val)); break;
 	switch (_type)
 	{
-	case GL_FLOAT: 		return std::unique_ptr<Attribute>(new AttributeVar<float>    (_last_val)); break;
-	case GL_FLOAT_VEC2: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec2>(_last_val)); break;
-	case GL_FLOAT_VEC3: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec3>(_last_val)); break;
-	case GL_FLOAT_VEC4: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec4>(_last_val)); break;
-	case GL_FLOAT_MAT2: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat2>(_last_val)); break;
-	case GL_FLOAT_MAT3: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat3>(_last_val)); break;
-	case GL_FLOAT_MAT4: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat4>(_last_val)); break;
-	case GL_SAMPLER_2D: return std::unique_ptr<Attribute>(new AttributeVar<unsigned int>   (_last_val)); break;
+	TYPE_EXPANSION(ATTRIB_CREATE_FUNC)
+	// case GL_FLOAT: 		return std::unique_ptr<Attribute>(new AttributeVar<float>    (_last_val)); break;
+	// case GL_DOUBLE: 	return std::unique_ptr<Attribute>(new AttributeVar<double>    (_last_val)); break;
+	// case GL_FLOAT_VEC2: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec2>(_last_val)); break;
+	// case GL_FLOAT_VEC3: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec3>(_last_val)); break;
+	// case GL_FLOAT_VEC4: return std::unique_ptr<Attribute>(new AttributeVar<glm::vec4>(_last_val)); break;
+	// case GL_FLOAT_MAT2: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat2>(_last_val)); break;
+	// case GL_FLOAT_MAT3: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat3>(_last_val)); break;
+	// case GL_FLOAT_MAT4: return std::unique_ptr<Attribute>(new AttributeVar<glm::mat4>(_last_val)); break;
+	// case GL_SAMPLER_2D: return std::unique_ptr<Attribute>(new AttributeVar<unsigned int>   (_last_val)); break;
 	default:
 		throw std::range_error("Type not defined");
 		break;
@@ -139,22 +144,26 @@ std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void*_last_val=nullpt
 }
 void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib){
 	if(!attrib->uniform)return; // Return if it's not a uniform
-	#define TOM(type, offset) (*((type*)attrib->val+offset))
+	// #define TOM(type, offset) (*((type*)attrib->val+offset))
+	// #define SET_UNIFORM_FUNC(gl_type, type, uniformfunc)\
+	// 	case gl_type: 		uniformfunc(attrib->location, 1, ((float*)attrib->val)); break;
 	switch (attrib->type)
 	{
-	case GL_FLOAT: glUniform1fv(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC2: glUniform2fv(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC3: glUniform3fv(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC4: glUniform4fv(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT2: glUniformMatrix2fv(attrib->location, 1, false, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT3: glUniformMatrix2fv(attrib->location, 1, false, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT4: glUniformMatrix2fv(attrib->location, 1, false, ((float*)attrib->val)); break;
+		// TYPE_EXPANSION()
+	case GL_FLOAT: 		glUniform1fv		(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_DOUBLE: 	glUniform1dv		(attrib->location, 1, ((double*)attrib->val)); break;
+	case GL_FLOAT_VEC2: glUniform2fv		(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC3: glUniform3fv		(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_VEC4: glUniform4fv		(attrib->location, 1, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT2: glUniformMatrix2fv	(attrib->location, 1, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT3: glUniformMatrix3fv	(attrib->location, 1, false, ((float*)attrib->val)); break;
+	case GL_FLOAT_MAT4: glUniformMatrix4fv	(attrib->location, 1, false, ((float*)attrib->val)); break;
 	case GL_SAMPLER_2D:  break;
 	default:
 		throw std::range_error("Type not defined");
 		break;
 	}
-	#undef TOM
+	// #undef TOM
 }
 
 void print_link_status(int link_status, const char* filename){
@@ -168,7 +177,9 @@ void Program::use(){
 		glUseProgram(p_id);
 		// Set the uniforms
 		for(auto&a:attributes){
-			attrib_set_uniform(a);
+			if(strcmp(a->name, "time") == 0) glUniform1d(a->location, engine::time);
+			else if(strcmp(a->name, "dtime") == 0) glUniform1d(a->location, engine::deltaTime);
+			else attrib_set_uniform(a);
 		}
 		// Binding all textures to their appropriate texture unit
 		static uint16_t gl_texture[] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2};
