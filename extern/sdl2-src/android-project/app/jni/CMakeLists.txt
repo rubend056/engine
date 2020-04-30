@@ -7,8 +7,18 @@ project(GAME)
 # android_ndk_import_module_cpufeatures()
 
 
+
+
 # SDL sources are in a subfolder named "SDL"
 add_subdirectory(SDL)
+add_subdirectory(glad)
+
+include_directories(
+	imgui
+	imgui/examples
+)
+add_subdirectory(imgui)
+
 
 # Compilation of companion libraries
 #add_subdirectory(SDL_image)
