@@ -1,0 +1,10 @@
+
+SET(GLAD_OPENGL_CORE_VERSION "33" CACHE STRING "OPENGL_VERSION: either 30,33,40 or 45")
+message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
+
+include_directories(
+    ${GLAD_OPENGL_CORE_VERSION}
+)
+add_library(glad 
+    ${GLAD_OPENGL_CORE_VERSION}/glad.c
+)
