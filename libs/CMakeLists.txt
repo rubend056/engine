@@ -63,8 +63,10 @@ add_library(my_libs
 	src/rendering/program.cpp
 )
 target_link_libraries(my_libs imgui)
-target_precompile_headers(my_libs PUBLIC 
-	apps/engine/engine_globals.h
-	include/assets/assets.h
-	src/assets/_assets.h
-)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
+	target_precompile_headers(my_libs PUBLIC 
+		apps/engine/engine_globals.h
+		include/assets/assets.h
+		src/assets/_assets.h
+	)
+endif()

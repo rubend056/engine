@@ -15,8 +15,8 @@ message("-- CMAKE_SYSTEM_NAME:      	${CMAKE_SYSTEM_NAME}")
 message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
-SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
-message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
+# SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
+# message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
 
 find_package(SDL2 REQUIRED)
 message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
@@ -33,6 +33,8 @@ message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
 # add_compile_definitions(DEBUG_GUI)	
 
+add_subdirectory(extern/glad)
+add_subdirectory(extern/soil)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	find_program(LSB_RELEASE_EXEC lsb_release)
@@ -45,8 +47,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	link_directories(
 		# extern/assimp/lib
 		# extern/sdl2/lib
-		extern/soil/lib
-		extern/glad/${GLAD_OPENGL_CORE_VERSION}
+		# extern/soil/lib
+		# extern/glad/${GLAD_OPENGL_CORE_VERSION}
 	)
 
 	SET(CMAKE_BUILD_TYPE Debug)
@@ -69,7 +71,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		${ASSIMP_INCLUDE_DIRS}
 		${CMAKE_BINARY_DIR}
 		extern/assimp/include
-		extern/sdl2/include/SDL2
+		# extern/sdl2/include/SDL2
 		extern/soil/include
 		
 		extern
@@ -117,12 +119,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		imgui
 
 		#Core libraries for engine
-		libSOIL.a
+		soil
 		${SDL2_LIBRARIES}
 		
 		# libSDL2d.a
 		# libSDL2maind.a
-		libglad.a
+		glad
 
 		# assimp
 		# libIrrXML.a

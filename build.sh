@@ -6,9 +6,9 @@ echo "Make using $THREADS parallel jobs"
 set -e
 
 # Build Glad
-cd extern/glad
-./build.sh
-cd ../..
+# cd extern/glad
+# ./build.sh
+# cd ../..
 
 
 # Build 
