@@ -36,7 +36,9 @@
 # )
 # target_link_libraries(rendering menus imgui)
 
-add_library(my_libs	
+find_library(imgui imgui)
+
+add_library(my_libs	SHARED
     src/assets/assets.cpp
     src/assets/assets_import.cpp
 	src/assets/gameobject.cpp

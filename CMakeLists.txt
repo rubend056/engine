@@ -31,6 +31,8 @@ message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 # DEBUG DEFINES
 # Uncoment this to debug
 SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
+add_subdirectory(extern/glad)
+add_subdirectory(extern/box2d)
 # add_compile_definitions(DEBUG_GUI)	
 
 
@@ -111,6 +113,34 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	endif()
 	
 	
+	
+	target_link_libraries(tests
+		imgui
+
+		#Core libraries for engine
+		libSOIL.a
+		${SDL2_LIBRARIES}
+		
+		# libSDL2d.a
+		# libSDL2maind.a
+		# libglad.a
+		glad
+
+		# assimp
+		# libIrrXML.a
+		# libzlibstatic.a
+		${ASSIMP_LIBRARIES}
+		
+		box2d
+		
+		#Very low level
+		inotifytools
+		GL
+		dl
+		pthread
+		stdc++fs
+	)
+	
 	set(LIBRARIES 
 		my_libs
 		engine_lib
@@ -122,13 +152,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		
 		# libSDL2d.a
 		# libSDL2maind.a
-		libglad.a
+		# libglad.a
+		glad
 
 		# assimp
 		# libIrrXML.a
 		# libzlibstatic.a
 		${ASSIMP_LIBRARIES}
-
+		
+		box2d
+		
 		#Very low level
 		inotifytools
 		GL
@@ -141,9 +174,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	target_link_libraries(engine 
 		${LIBRARIES}
 	)
-	target_link_libraries(tests
-		${LIBRARIES}
-	)
+	
 	
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	

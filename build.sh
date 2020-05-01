@@ -6,12 +6,12 @@ echo "Make using $THREADS parallel jobs"
 set -e
 
 # Build Glad
-cd extern/glad
-./build.sh
-cd ../..
+# cd extern/glad
+# ./build.sh
+# cd ../..
 
 
 # Build 
 cd build
-make -j${THREADS} engine
+make -j${THREADS} tests
 cd ..
