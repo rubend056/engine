@@ -13,5 +13,5 @@ set -e
 
 # Build 
 cd build
-make -j${THREADS} tests
+make -j${THREADS} engine
 cd ..

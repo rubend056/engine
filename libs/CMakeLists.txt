@@ -37,8 +37,10 @@
 # target_link_libraries(rendering menus imgui)
 
 find_library(imgui imgui)
+find_library(soil soil)
 
-add_library(my_libs	SHARED
+add_library(my_libs
+	src/engine/engine.cpp
 
     src/assets/assets.cpp
     src/assets/assets_import.cpp
@@ -60,14 +62,14 @@ add_library(my_libs	SHARED
 	# src/components/camera.cpp
 	src/components/transform.cpp
 	src/components/source.cpp
+	src/components/audio.c
 	
 	src/rendering/mesh.cpp
 	src/rendering/texture.cpp
 	src/rendering/program.cpp
 )
-target_link_libraries(my_libs imgui)
+target_link_libraries(my_libs imgui soil box2d SDL2 assimp)
 target_include_directories(my_libs PUBLIC
-	apps/engine
 	include
 	include/assets
 	include/components
@@ -77,10 +79,10 @@ target_include_directories(my_libs PUBLIC
 	include/rendering
 )
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
-	target_precompile_headers(my_libs PUBLIC 
-		apps/engine/engine_globals.h
-		include/assets/assets.h
-		src/assets/_assets.h
-	)
-endif()
+# if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
+# 	target_precompile_headers(my_libs PUBLIC 
+# 		include/engine_globals.h
+# 		include/assets/assets.h
+# 		src/assets/_assets.h
+# 	)
+# endif()

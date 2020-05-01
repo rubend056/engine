@@ -33,11 +33,17 @@ message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
 # add_compile_definitions(DEBUG_GUI)	
 
+# set(CMAKE_POSITION_INDEPENDENT_CODE on)
+
+set(BUILD_SHARED_LIBS on)
+
 add_subdirectory(extern/box2d)
+set_property(TARGET box2d PROPERTY POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/soil)
 add_subdirectory(extern/sdl2-src)
-find_library(SDL2 SDL2)
+# set_property(TARGET SDL2 PROPERTY POSITION_INDEPENDENT_CODE ON)
+# find_library(SDL2 SDL2)
 
 include_directories(extern/glad/${GLAD_OPENGL_CORE_VERSION})
 add_subdirectory(extern/imgui)
@@ -89,17 +95,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	
 	add_subdirectory(libs)
 
-	
-	add_library(engine_lib SHARED
-		libs/apps/engine/engine.cpp
-	)
-
 	add_executable(engine 
-		libs/apps/engine/main.cpp
+		src/main.cpp
 	)
-
+	target_include_directories(engine PRIVATE libs/src/engine)
 	add_executable(tests
-		libs/apps/catch/main_test.cpp
+		src/main_test.cpp
 	)
 	
 	# if(LSB_RELEASE_ID MATCHES "Arch")
@@ -108,9 +109,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	# 	# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
 	# endif()
 	
-	add_custom_target(SDL2_make SDL2)
-	
-	target_link_libraries(tests
+	set(LIBRARIES
+		my_libs
 		imgui
 
 		#Core libraries for engine
@@ -140,38 +140,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		stdc++fs
 	)
 	
-	set(LIBRARIES 
-		my_libs
-		engine_lib
-		imgui
-
-		#Core libraries for engine
-		soil
-		
-		SDL2main
-		# ${SDL2_LIBRARIES}
-		
-		# libSDL2d.a
-		# libSDL2maind.a
-		glad
-
-		# assimp
-		# libIrrXML.a
-		# libzlibstatic.a
-		${ASSIMP_LIBRARIES}
-		
-		box2d
-		
-		#Very low level
-		inotifytools
-		GL
-		dl
-		pthread
-		stdc++fs
-	)
-	
 
 	target_link_libraries(engine 
+		${LIBRARIES}
+	)
+	target_link_libraries(tests
 		${LIBRARIES}
 	)
 	

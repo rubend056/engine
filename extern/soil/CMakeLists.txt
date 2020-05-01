@@ -9,4 +9,4 @@ add_library(soil
 target_include_directories(soil PRIVATE
 	source/src
 )
-target_include_directories(soil PUBLIC source/src/SOIL.h)
+target_include_directories(soil PUBLIC include)
