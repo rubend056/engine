@@ -15,12 +15,12 @@ message("-- CMAKE_SYSTEM_NAME:      	${CMAKE_SYSTEM_NAME}")
 message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
-SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
-message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
+# SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
+# message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
 
-find_package(SDL2 REQUIRED)
-message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
-message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
+# find_package(SDL2 REQUIRED)
+# message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
+# message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
 find_package(ASSIMP REQUIRED)
 message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
 message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
@@ -31,9 +31,17 @@ message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 # DEBUG DEFINES
 # Uncoment this to debug
 SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
-add_subdirectory(extern/glad)
-add_subdirectory(extern/box2d)
 # add_compile_definitions(DEBUG_GUI)	
+
+add_subdirectory(extern/box2d)
+add_subdirectory(extern/glad)
+add_subdirectory(extern/soil)
+add_subdirectory(extern/sdl2-src)
+find_library(SDL2 SDL2)
+
+include_directories(extern/glad/${GLAD_OPENGL_CORE_VERSION})
+add_subdirectory(extern/imgui)
+
 
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -47,8 +55,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	link_directories(
 		# extern/assimp/lib
 		# extern/sdl2/lib
-		extern/soil/lib
-		extern/glad/${GLAD_OPENGL_CORE_VERSION}
+		# extern/soil/lib
+		# extern/glad/${GLAD_OPENGL_CORE_VERSION}
 	)
 
 	SET(CMAKE_BUILD_TYPE Debug)
@@ -67,34 +75,22 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 
 	include_directories(
-		${SDL2_INCLUDE_DIRS}
+		# ${SDL2_INCLUDE_DIRS}
 		${ASSIMP_INCLUDE_DIRS}
 		${CMAKE_BINARY_DIR}
-		extern/assimp/include
-		extern/sdl2/include/SDL2
-		extern/soil/include
+		# extern/assimp/include
+		# extern/sdl2-src/include
+		# extern/soil/include
 		
 		extern
-		extern/imgui
-		extern/imgui/examples
-		extern/glad/${GLAD_OPENGL_CORE_VERSION}
-		
-		libs/apps/engine
-		libs/include
-		libs/include/assets
-		libs/include/components
-		libs/include/groups
-		libs/include/helper
-		libs/include/menus
-		libs/include/rendering
+		# extern/imgui
+		# extern/imgui/examples
 	)
 	
-
-	add_subdirectory(extern/imgui)
 	add_subdirectory(libs)
 
-
-	add_library(engine_lib
+	
+	add_library(engine_lib SHARED
 		libs/apps/engine/engine.cpp
 	)
 
@@ -106,20 +102,23 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		libs/apps/catch/main_test.cpp
 	)
 	
-	if(LSB_RELEASE_ID MATCHES "Arch")
-		set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
-		string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
-		# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
-	endif()
+	# if(LSB_RELEASE_ID MATCHES "Arch")
+	# 	set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
+	# 	string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
+	# 	# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
+	# endif()
 	
-	
+	add_custom_target(SDL2_make SDL2)
 	
 	target_link_libraries(tests
 		imgui
 
 		#Core libraries for engine
-		libSOIL.a
-		${SDL2_LIBRARIES}
+		# libSOIL.a
+		soil
+		
+		SDL2
+		# ${SDL2_LIBRARIES}
 		
 		# libSDL2d.a
 		# libSDL2maind.a
@@ -147,12 +146,13 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		imgui
 
 		#Core libraries for engine
-		libSOIL.a
-		${SDL2_LIBRARIES}
+		soil
+		
+		SDL2main
+		# ${SDL2_LIBRARIES}
 		
 		# libSDL2d.a
 		# libSDL2maind.a
-		# libglad.a
 		glad
 
 		# assimp

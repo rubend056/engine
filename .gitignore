@@ -5,8 +5,15 @@
 *.zip
 *.a
 *.o
+
+#Android Project
+**/android-project/.gradle
+**/android-project/**/build
+**/android-project/**/.externalNativeBuild
+
 /source*
 
+#Test Game
 /game0/**/*.meta
 /game0/**/*.json
 /game0/**/*.prgm

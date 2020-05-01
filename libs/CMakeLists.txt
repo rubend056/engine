@@ -39,6 +39,7 @@
 find_library(imgui imgui)
 
 add_library(my_libs	SHARED
+
     src/assets/assets.cpp
     src/assets/assets_import.cpp
 	src/assets/gameobject.cpp
@@ -65,8 +66,21 @@ add_library(my_libs	SHARED
 	src/rendering/program.cpp
 )
 target_link_libraries(my_libs imgui)
-target_precompile_headers(my_libs PUBLIC 
-	apps/engine/engine_globals.h
-	include/assets/assets.h
-	src/assets/_assets.h
+target_include_directories(my_libs PUBLIC
+	apps/engine
+	include
+	include/assets
+	include/components
+	include/groups
+	include/helper
+	include/menus
+	include/rendering
 )
+
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
+	target_precompile_headers(my_libs PUBLIC 
+		apps/engine/engine_globals.h
+		include/assets/assets.h
+		src/assets/_assets.h
+	)
+endif()

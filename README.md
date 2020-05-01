@@ -11,7 +11,7 @@ One of the things I aim to overcome is my utter lack to plan ahead and set goals
 
 <br>
 
-To Build
+Engine Compiling
 --------
 - LINUX
   - Run `./config.sh` to install dependencies
@@ -23,6 +23,22 @@ To Build
   - Not available yet
 
 - MAC
+  - Not available yet
+
+Game Compiling
+---------
+- Linux (x86_64)
+  - Not yet
+
+- Android (armv7, etc...)
+  - Download NDK and Android SDK 16 and modify `extern/sdl2-src/android-project/local.properties` to point to them. (This is 4Gb last time I downloaded it all)
+  - Make sure you have the Java SDK installed for your machine. (optionally, if gradlew asks for it, point the enviroment vairable to the right folder).
+  - Run Gradlew -> `extern/sdl2-src/android-project/gradlew` with the, (I belive) `installDebug` argument. This will install the game to your phone
+
+- Windows
+  - Not available yet
+  
+- Mac
   - Not available yet
 
 Progress
