@@ -8,6 +8,7 @@
 *.o
 
 #Android Project
+local.properties
 **/android-project/.gradle
 **/android-project/**/build
 **/android-project/**/.externalNativeBuild

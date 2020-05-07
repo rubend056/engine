@@ -85,7 +85,9 @@ std::shared_ptr<File> File::load_file(const fs::path rel_path) {
 		return f;
 	auto full_path = engine::get_absolute_from_project(rel_path);
 	std::ifstream file(full_path);
-	cereal::JSONInputArchive ar(file);
-	ar(f);
+	if(file.is_open()){
+		cereal::JSONInputArchive ar(file);
+		ar(f);
+	}
 	return f;
 }

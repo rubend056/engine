@@ -142,6 +142,7 @@ namespace engine
     void update(){
 		menus::imgui_engine_update();
 		assets::update();
+		
     }
 	// void for_gameobjects(const std::shared_ptr<GameObject>&go, 
 	// 		const std::function<void(const std::shared_ptr<GameObject>&go)>&f){

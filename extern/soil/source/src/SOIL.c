@@ -26,8 +26,18 @@
 	#include <Carbon/Carbon.h>
 	#define APIENTRY
 #else
-	#include <GL/gl.h>
-	#include <GL/glx.h>
+	// #define XSTR(x) STR(x)
+	// #define STR(x) #x
+	// #pragma message "The value of SOIL_ANDROID: " XSTR(SOIL_ANDROID)
+	#ifdef ANDROID
+		#pragma message "SOIL ANDROID DEFINED"
+		#include <GLES/gl.h>
+		#include <GLES/glext.h>
+	#else
+		#pragma message "SOIL ANDROID NOT DEFINED"
+		#include <GL/gl.h>
+		#include <GL/glx.h>
+	#endif
 #endif
 
 #include "SOIL.h"

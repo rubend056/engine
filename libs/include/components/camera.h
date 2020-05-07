@@ -18,6 +18,7 @@ public:
 	template<class Archive>
 	void serialize(Archive& ar){
 		ar(COMPONENT_SERIALIZE);
+		ar(cam_ortho, cam_fov, cam_ratio, cam_near, cam_far, cam_ortho_ratio);
 	}
 };
 CEREAL_REGISTER_TYPE(Camera)

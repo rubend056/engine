@@ -88,7 +88,9 @@
 		"cfenv": "cpp",
 		"*.inc": "cpp",
 		"version": "cpp",
-		"*.h.in": "c-make"
+		"*.h.in": "c-make",
+		"gl.h": "c",
+		"glx.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled",
 	"files.exclude": {

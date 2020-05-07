@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 # message("CMAKE_CXX_FLAGS_MINSIZEREL is ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
+include(BuildType.cmake)
+
 project(engine)
 
 message("-- CMAKE_SYSTEM_INFO_FILE: 	${CMAKE_SYSTEM_INFO_FILE}")
@@ -15,38 +17,31 @@ message("-- CMAKE_SYSTEM_NAME:      	${CMAKE_SYSTEM_NAME}")
 message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
-# SET(GLAD_OPENGL_CORE_VERSION "45" CACHE STRING "OPENGL_VERSION: either 30 or 45")
-# message("-- GLAD_OPENGL_CORE_VERSION:	${GLAD_OPENGL_CORE_VERSION}")
 
 # find_package(SDL2 REQUIRED)
 # message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
 # message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
-find_package(ASSIMP REQUIRED)
-message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
-message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 
-# if (NOT CMAKE_VERSION VERSION_LESS 3.12.4) # Means greater than or equal
-# endif
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Android")
+	find_package(ASSIMP REQUIRED)
+	message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
+	message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
+
+	set(BUILD_SHARED_LIBS on)
+	# set(CMAKE_POSITION_INDEPENDENT_CODE on)
+
+	add_subdirectory(extern/soil)
+endif()
 
 # DEBUG DEFINES
-# Uncoment this to debug
 SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
-# add_compile_definitions(DEBUG_GUI)	
 
-# set(CMAKE_POSITION_INDEPENDENT_CODE on)
-
-set(BUILD_SHARED_LIBS on)
 
 add_subdirectory(extern/box2d)
-set_property(TARGET box2d PROPERTY POSITION_INDEPENDENT_CODE ON)
+# set_property(TARGET box2d PROPERTY POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(extern/glad)
-add_subdirectory(extern/soil)
 add_subdirectory(extern/sdl2-src)
 add_subdirectory(extern/sdl2-mixer)
-# set_property(TARGET SDL2 PROPERTY POSITION_INDEPENDENT_CODE ON)
-# find_library(SDL2 SDL2)
-
-include_directories(extern/glad/${GLAD_OPENGL_CORE_VERSION})
 add_subdirectory(extern/imgui)
 
 
@@ -66,7 +61,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		# extern/glad/${GLAD_OPENGL_CORE_VERSION}
 	)
 
-	SET(CMAKE_BUILD_TYPE Debug)
+	
 
 
 
@@ -104,12 +99,13 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_executable(tests
 		src/main_test.cpp
 	)
+	target_include_directories(tests PRIVATE extern)
 	
 	# if(LSB_RELEASE_ID MATCHES "Arch")
 	# 	set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
 	# 	string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
 	# 	# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
-	# endif()z
+	# endif()
 	
 	set(LIBRARIES
 		my_libs
@@ -152,9 +148,34 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	)
 	
 	
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-	
-	
+elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
+	# armeabi-v7a requires cpufeatures library
+	# include(AndroidNdkModules)
+	# android_ndk_import_module_cpufeatures()
+
+	# message("-- CMAKE_SYSTEM_INFO_FILE: 	${CMAKE_SYSTEM_INFO_FILE}")
+	# message("-- CMAKE_SYSTEM_NAME:      	${CMAKE_SYSTEM_NAME}")
+	# message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
+	# message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
+
+
+	# SDL sources are in a subfolder named "SDL"
+	# add_subdirectory(box2d)
+	# add_subdirectory(glad)
+	# add_subdirectory(soil)
+	# add_subdirectory(sdl2-src)
+	# add_subdirectory(sdl2-mixer)
+	# add_subdirectory(imgui)
+
+
+
+	# Compilation of companion libraries
+	#add_subdirectory(SDL_image)
+	#add_subdirectory(SDL_mixer)
+	#add_subdirectory(SDL_ttf)
+
+	# Your game and its CMakeLists.txt are in a subfolder named "src"
+	add_subdirectory(src)
 endif()
 
 
