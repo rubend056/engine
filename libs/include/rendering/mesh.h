@@ -1,7 +1,11 @@
 #ifndef mesh_h
 #define mesh_h
 
-#include "rendering_common.h"
+#define _BV32(x) ((uint32_t)1 << x)
+#include "gl.h"
+#include "file.h"
+#include "idraw.h"
+
 #include "assimp/postprocess.h"
 
 #include "component.h"
@@ -68,7 +72,7 @@ class Mesh : public File, public Parent, public IDraw {
     
 	bool loaded=false;
 	static bool supported(const std::string& ext);
-	void load();
+	void load() override;
 	
 	// friend class cereal::access;
 	template<class Archive>

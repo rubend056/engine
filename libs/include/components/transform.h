@@ -2,6 +2,8 @@
 #define transform_h
 
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "component.h"
 
 #include "helper/cereal_glm.h"
@@ -21,7 +23,12 @@ class CLASSNAME_NORMAL;
 
 class CLASSNAME_NORMAL: public Component, public PREFAB_NAME{
 public:
-	
+	glm::mat4 get_matrix_trans();
+	glm::quat get_rot_quat();
+	glm::mat4 get_rot_mat();
+	glm::mat4 get_pos_mat();
+	glm::mat4 get_sca_mat();
+	Transform(){sca = glm::vec3(1);}
 	IDRAW_IMGUI_DRAW override;
 	IDRAW_IMGUI_NAME override {return "Transform";if(pos == rot);}
 	COMPONENT_MAX_NUM override {return 1;}

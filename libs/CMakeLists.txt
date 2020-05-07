@@ -43,13 +43,14 @@ add_library(my_libs
 	src/engine/engine.cpp
 
     src/assets/assets.cpp
-    src/assets/assets_import.cpp
+    # src/assets/assets_import.cpp
 	src/assets/gameobject.cpp
 	src/assets/scene.cpp
 	
 	src/helper/type_name.cpp
 	src/helper/inotify_imp.cpp
 	src/helper/file.cpp
+	src/helper/component.cpp
 	src/helper/referentiable.cpp
 
 	src/menus/inspector.cpp
@@ -59,7 +60,7 @@ add_library(my_libs
 	src/menus/menus.cpp
 	src/menus/menus_gl.cpp
 	
-	# src/components/camera.cpp
+	src/components/camera.cpp
 	src/components/transform.cpp
 	src/components/source.cpp
 	src/components/audio.c
@@ -69,6 +70,9 @@ add_library(my_libs
 	src/rendering/program.cpp
 )
 target_link_libraries(my_libs imgui soil box2d SDL2 assimp)
+target_include_directories(my_libs PRIVATE
+	# src/rendering
+)
 target_include_directories(my_libs PUBLIC
 	include
 	include/assets
@@ -80,7 +84,7 @@ target_include_directories(my_libs PUBLIC
 )
 
 # if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.16)
-# 	target_precompile_headers(my_libs PUBLIC 
+# 	target_precompile_headers(my_libs PRIVATE 
 # 		include/engine_globals.h
 # 		include/assets/assets.h
 # 		src/assets/_assets.h

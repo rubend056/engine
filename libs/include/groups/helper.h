@@ -6,24 +6,29 @@
 #include <typeinfo>
 #include <vector>
 
-#include <stdexcept>
+// #include <stdexcept>
 #include <string>
 
+#include "component.h"
 #include "type_name.h"
 
-#define FOR_IT(it_name,v_name) auto it_name=v_name.begin();it_name!=v_name.end();++it_name
+#define FOR_IT(it_name, v_name)    \
+	auto it_name = v_name.begin(); \
+	it_name != v_name.end();       \
+	++it_name
 
 namespace helper {
 
 template <typename T, typename B>
 std::shared_ptr<T> find_type_in_vector(std::vector<std::shared_ptr<B>>& vector) {
 	static_assert(std::is_base_of<B, T>::value, "T not derived from B");
-	
-	auto it = std::find_if(vector.begin(), vector.end(), [](std::shared_ptr<B>& v) -> bool { 
-		return typeid(v) == typeid(T); 
+
+	auto it = std::find_if(vector.begin(), vector.end(), [](std::shared_ptr<B>& v) -> bool {
+		return typeid(v) == typeid(T);
 	});
-	
-	if (it < vector.end()) return std::dynamic_pointer_cast<T>();
+
+	if (it < vector.end())
+		return std::dynamic_pointer_cast<T>();
 	return std::shared_ptr<T>();
 }
 
@@ -38,7 +43,6 @@ std::string string_format(const std::string& format, Args... args) {
 	snprintf(buf.get(), size, format.c_str(), args...);
 	return std::string(buf.get(), buf.get() + size - 1);  // We don't want the '\0' inside
 }
-
 
 // Buttons to return new instance of T, a component or file
 template <class T>
@@ -58,6 +62,16 @@ std::shared_ptr<T> file_add_button() {
 		return std::shared_ptr<T>();
 }
 
+template <class T, class J>
+std::vector<std::shared_ptr<T>> dynamic_pointer_cast(
+	const std::vector<std::shared_ptr<J>>& other) {
+	std::vector<std::shared_ptr<T>> v;
+	v.reserve(other.size());
+	for (auto& a : other)
+		if (auto d = std::dynamic_pointer_cast<T>(a))
+			v.push_back(d);
+	return v;
+}
 
 }  // namespace helper
 

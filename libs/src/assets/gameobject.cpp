@@ -5,8 +5,24 @@
 
 GameObject::GameObject(const fs::path& rpath):File(FILE_CONSTRUCT_VARS){}
 
-void GameObject::add(const std::shared_ptr<Component>& comp){
-	if(!comp)return;
+std::shared_ptr<Referentiable> GameObject::foster(const std::shared_ptr<Referentiable>& child){
+	if(auto go = std::dynamic_pointer_cast<GameObject>(child))Parent::foster(child);
+	else if(auto comp = std::dynamic_pointer_cast<Component>(child)){
+		comp->parent = this;
+	}else throw(std::string("Not go or comp"));
+	return child;
+}
+
+void GameObject::add(const std::shared_ptr<Component>& _comp){
+	if(!_comp)return;
+	auto comp = _comp;
+	if(!comp->is_ref()){
+		// If component has a parent, clone it
+		if(comp->parent)comp = comp->clone();
+		// Foster component/ assume ownership
+		foster(comp);
+	}
+	
 	auto t_name = helper::demangle(typeid(*comp).name());
 	if(comp->max_num() >0 && get_comps(t_name).size()>=comp->max_num()){
 		printf(ANSI_COLOR_YELLOW "Max num %d for %s" ANSI_COLOR_RESET "\n", comp->max_num(), t_name.c_str());
@@ -15,6 +31,7 @@ void GameObject::add(const std::shared_ptr<Component>& comp){
 	components.push_back(comp);
 	type_component_ht.insert(std::make_pair(t_name, comp));
 }
+
 void GameObject::del(const std::shared_ptr<Component>& comp){
 	if(!comp)return;
 	components.erase( std::find(components.begin(), components.end(), comp));
@@ -71,7 +88,10 @@ void GameObject::imgui_draw(){
 			comp = assets::get_file<Component>(refs);
 		}
 		
-		if(comp){add(comp->is_ref()?comp:comp->clone());}
+		if(comp){
+			// if(!comp->is_ref())comp = std::dynamic_pointer_cast<Component>(foster(comp->clone()));
+			add(comp);
+		}
 		ImGui::EndDragDropTarget();
 	}
 	//? ############ Component DRAG N DROP
@@ -82,7 +102,8 @@ void GameObject::imgui_draw(){
 		// filter.Draw("##filter0", 100);
 		// std::shared_ptr<Component> c; const char* type_id_name;
 		// auto component_button = [&]() -> void {add(c); ImGui::CloseCurrentPopup();};
-		// if(ImGui::Button("Transform"))add(std::make_shared<Transform>());
+		if(ImGui::Button("Transform"))add(std::make_shared<Transform>());
+		if(ImGui::Button("Camera"))add(std::make_shared<Camera>());
 		// if (c = component_button<Program>()){type_id_name = typeid(Program).name(); push();}
 
 		ImGui::EndPopup();

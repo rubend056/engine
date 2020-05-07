@@ -1,7 +1,7 @@
 #ifndef _assets_h
 #define _assets_h
 
-#include "engine_globals.h"
+// #include "engine_globals.h"
 #include "assets.h"
 
 #include "rendering.h"
@@ -9,9 +9,9 @@
 
 #include "inotify_imp.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+// #include <assimp/Importer.hpp>
+// #include <assimp/scene.h>
+// #include <assimp/postprocess.h>
 
 #include <thread>
 #include <iostream>

@@ -4,6 +4,8 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 
+#include "helper.h"
+
 // ? MESH ******************************************************************
 static Assimp::Importer importer;
 

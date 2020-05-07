@@ -8,6 +8,9 @@
 
 #include "cereal/cereal.hpp"
 
+class Referentiable;
+typedef Referentiable* parent_type;
+
 // ? REFERENTIABLE ###################
 class Referentiable{
 private:
@@ -22,7 +25,7 @@ public:
 	virtual ~Referentiable()=default;
 	
 	// Parent referentiable to get the reference vector recursively
-	Referentiable* parent=nullptr; // Backward link
+	parent_type parent=nullptr; // Backward link
 private:
 	// Recursive internal function to fill the vector of id's
 	void _my_ref(std::vector<unsigned int>& v);
@@ -36,7 +39,7 @@ public:
 	void serialize(Archive& ar){
 		unsigned int sid=_id;
 		ar(cereal::make_nvp("id", sid));
-		if(sid)gen(sid);
+		if(sid && sid!=_id)gen(sid);
 	}
 };
 // ?################### REFERENTIABLE
@@ -47,7 +50,7 @@ public:
 	std::vector<std::shared_ptr<Referentiable>> children;
 	
 	// Foster a child, add a child to our children, removing it from other parents
-	std::shared_ptr<Referentiable> foster(const std::shared_ptr<Referentiable>& child);
+	virtual std::shared_ptr<Referentiable> foster(const std::shared_ptr<Referentiable>& child);
 	
 	template<class Archive>
 	void serialize(Archive& ar){

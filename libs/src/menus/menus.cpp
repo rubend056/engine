@@ -1,11 +1,12 @@
+#include "cereal/archives/json.hpp"
 #include "_menus.h"
+
+#include "engine_globals.h"
+#include "engine_scene.h"
+#include "assets.h"
 
 #include "gl.h"
 #include "my_imgui.h"
-#include "cereal/archives/json.hpp"
-#include "engine_globals.h"
-#include "assets.h"
-
 #include <fstream>
 
 #define ENGINE_INI engine::get_absolute_from_project("cache_menus.json")
@@ -61,7 +62,8 @@ std::shared_ptr<File> menus::add_popup(const std::vector<std::shared_ptr<File>>&
 				return v;
 			}
 		}
-		if(modal && ImGui::Button("Cancel"))ImGui::CloseCurrentPopup();
+		if(modal && (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))))
+			ImGui::CloseCurrentPopup();
 		ImGui::EndPopup();
 	}
 	return std::shared_ptr<File>();
@@ -163,7 +165,10 @@ void menus::imgui_engine_update() {
 		ImGui::SetNextWindowSize(ImVec2(200,0));
 		if (ImGui::BeginPopupModal("save_as_popup_modal", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
 			ImGui::Text("Save as modal");
-			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) ImGui::CloseCurrentPopup();
+			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) 
+				ImGui::CloseCurrentPopup();
+			if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
+				ImGui::CloseCurrentPopup();
 			ImGui::EndPopup();
 		}
 	}
@@ -174,6 +179,10 @@ void menus::imgui_engine_update() {
 		if(ImGui::BeginPopupModal("new_scene_popup", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
 			static std::string scene_name;
 			ImGui::InputText(".scene", &scene_name);
+			
+			if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
+				ImGui::CloseCurrentPopup();
+			
 			if(ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))){
 				auto scene = std::make_shared<Scene>(scene_name);
 				scene->create_supposed_ext();

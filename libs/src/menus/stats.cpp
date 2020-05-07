@@ -1,6 +1,7 @@
-#include "engine_globals.h"
+
 #include "_menus.h"
 #include "engine_globals.h"
+#include "engine_scene.h"
 
 void menus::stats(bool* p_open){
     ImGui::Begin("Stats", p_open);

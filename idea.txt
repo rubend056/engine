@@ -41,6 +41,9 @@
 	-Normals
 	-UV's
 
+So the axes are gonna be like Blender's. 
+
+
 -Draw on Inspector(as component)/Themselves(window)
 
 IDraw(Interface, handles drawing) // ANY CLASS THAT SHOWS SOMETHING ON THE GUI

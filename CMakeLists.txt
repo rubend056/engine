@@ -42,6 +42,7 @@ set_property(TARGET box2d PROPERTY POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/soil)
 add_subdirectory(extern/sdl2-src)
+add_subdirectory(extern/sdl2-mixer)
 # set_property(TARGET SDL2 PROPERTY POSITION_INDEPENDENT_CODE ON)
 # find_library(SDL2 SDL2)
 
@@ -69,7 +70,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 
 
-	SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}    -gdwarf-2 -fdata-sections -ffunction-sections")
+	SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}  -gdwarf-2 -fdata-sections -ffunction-sections")
+	# SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}  -ftime-report")
 	SET(GCC_COVERAGE_LINK_FLAGS    "${GCC_COVERAGE_LINK_FLAGS}       -Wl,--gc-sections")
 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
@@ -88,7 +90,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		# extern/sdl2-src/include
 		# extern/soil/include
 		
-		extern
+		# extern
 		# extern/imgui
 		# extern/imgui/examples
 	)
@@ -107,7 +109,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	# 	set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
 	# 	string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
 	# 	# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
-	# endif()
+	# endif()z
 	
 	set(LIBRARIES
 		my_libs
@@ -118,6 +120,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		soil
 		
 		SDL2
+		SDL2_mixer
 		# ${SDL2_LIBRARIES}
 		
 		# libSDL2d.a

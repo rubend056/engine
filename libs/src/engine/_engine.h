@@ -2,8 +2,6 @@
 #define engine_h
 
 #include "engine_globals.h"
-
-
 #include "gl.h"
 
 #include <vector>

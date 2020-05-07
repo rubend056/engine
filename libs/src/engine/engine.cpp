@@ -1,19 +1,22 @@
+// Cereal
+#include "cereal/archives/json.hpp"
+
+// Ours
 #include "_engine.h"
+#include "engine_scene.h"
 
 #include "menus.h"
 #include "assets.h"
-#include "helper.h"
+// #include "helper.h"
 #include "components.h"
 #include "mesh.h"
 
 #include "gl.h"
 
-#include <SDL.h>
-
-#include <algorithm>
+// #include <SDL.h>
+// #include <algorithm>
 
 using namespace std;
-
 
 
 fs::path relativePath( const fs::path &path, const fs::path &relative_to ){
@@ -103,6 +106,7 @@ namespace engine{
 	}
 }
 
+#include "source.h"
 
 ImVec4 clear_color = ImVec4(0.f, 0.f, 0.f, 1.00f);
 namespace engine
@@ -139,17 +143,31 @@ namespace engine
 		menus::imgui_engine_update();
 		assets::update();
     }
+	// void for_gameobjects(const std::shared_ptr<GameObject>&go, 
+	// 		const std::function<void(const std::shared_ptr<GameObject>&go)>&f){
+	// 	for(auto&child:go->children){}
+	// }
     void render(){
 		
         // Rendering
-        
 		if(engine::scene){
 			auto objects = helper::dynamic_pointer_cast<GameObject>(engine::scene->children);
+			
+			std::vector<std::shared_ptr<Camera>> cameras;
+			for(auto&go:objects){
+				auto _cameras=go->get_comps<Camera>(); 
+				cameras.insert(cameras.end(), _cameras.begin(), _cameras.end());
+			}
+			
+			// auto _object = objects;
+			// new_obj:
 			for(auto&go:objects){
 				auto progs = go->get_comps<Program>();
 				if(!progs.size())continue;
 				auto vaos = go->get_comps<Mesh::VAO>();
 				if(!vaos.size())continue;
+				
+				auto go_trans_matrix = go->trans->get_matrix_trans();
 				
 				for(auto&prog:progs){
 					if(!prog->link_status)continue;
@@ -159,7 +177,12 @@ namespace engine
 						dynamic_cast<Mesh*>(vao->parent)->vbo_bind();
 						vao->vao_bind();
 						vao->vao_attrib_enable(0xff);
-						vao->gl_draw();
+						for(auto&cam:cameras){
+							auto cam_tmat = cam->get_parent_go()->trans->get_pos_mat();
+							auto pmat = cam->get_matrix();
+							prog->set_pmat(pmat * go_trans_matrix);
+							vao->gl_draw();
+						}
 					}
 				}
 			}

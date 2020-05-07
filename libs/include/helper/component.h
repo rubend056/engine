@@ -3,7 +3,7 @@
 
 // #include "file.h"
 
-#include "cereal/archives/json.hpp"
+#include "cereal/cereal.hpp"
 #include "idraw.h"
 #include "referentiable.h"
 
@@ -15,10 +15,16 @@
 
 #define COMPONENT_SERIALIZE cereal::make_nvp("component", cereal::base_class<Component>(this))
 
+class GameObject;
+
 class Component : public IDraw, public virtual Referentiable{
+	private:
+		parent_type last_parent=nullptr;
+		GameObject* last_go=nullptr;
 	protected:
-		// std::shared_ptr<Component> c_ref; // Link to our prefab inst 
+		// std::shared_ptr<Component> c_ref; // Link to our prefab inst
     public:
+		GameObject* get_parent_go();
         bool enabled = true;
 		
 		// Override this to set the ref for the prefab
@@ -31,7 +37,7 @@ class Component : public IDraw, public virtual Referentiable{
 		virtual IDRAW_IMGUI_DRAW override {ImGui::Text ("imgui_draw is not set here");}
 		
 		virtual ~Component(){}
-		virtual std::shared_ptr<Component> clone(){throw("Trying to clone unclonable");};
+		virtual std::shared_ptr<Component> clone(){throw(std::string("Trying to clone unclonable"));};
 		
 		template<class Archive>
 		void serialize(Archive& ar){

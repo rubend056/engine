@@ -1,6 +1,7 @@
 #ifndef map_helper_h
 #define map_helper_h
 
+#include "helper.h"
 
 // ? (Hash name HAS to be <string, shared_ptr<T>>)
 #define MAP_GET_ELEMENT(type, func_name, hash_name)\
@@ -38,15 +39,6 @@ std::vector<std::shared_ptr<T>> get_##func_name (){\
 	return v;\
 }
 
-namespace helper{
-	template<class T, class J>
-	std::vector<std::shared_ptr<T>> dynamic_pointer_cast(
-		const std::vector<std::shared_ptr<J>>& other){
-		std::vector<std::shared_ptr<T>> v;v.reserve(other.size());
-		for(auto&a:other)
-			if(auto d = std::dynamic_pointer_cast<T>(a))v.push_back(d);
-		return v;
-	}
-}
+
 
 #endif

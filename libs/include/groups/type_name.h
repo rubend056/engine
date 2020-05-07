@@ -7,11 +7,11 @@
 namespace helper{
 	std::string demangle(const char* name);
 
-	template <class T>
-	std::string type_name(const T& t=0) {
-		if(t) return demangle(typeid(t).name());
-		else return demangle(typeid(T).name());
-	}
+	// template <class T>
+	// std::string type_name(const T& t=0) {
+	// 	if(t) return demangle(typeid(t).name());
+	// 	else return demangle(typeid(T).name());
+	// }
 }
 
 

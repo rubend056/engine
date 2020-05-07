@@ -3,6 +3,7 @@
 /imgui.ini
 *.ini
 *.zip
+*.tar*
 *.a
 *.o
 

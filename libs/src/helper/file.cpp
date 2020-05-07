@@ -29,6 +29,7 @@
 // };
 // CEREAL_REGISTER_TYPE(Test)
 
+#include "cereal/archives/json.hpp"
 #include "file.h"
 #include "my_imgui.h"
 

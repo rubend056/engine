@@ -1,15 +1,14 @@
 #include <typeinfo>
 
-#include "assets.h"
+// Ours
 #include "engine_globals.h"
+#include "engine_scene.h"
 #include "helper.h"
 #include "type_name.h"
+
 #include "_menus.h"
-#include "rendering.h"
 
 using namespace std;
-
-
 
 namespace menus {
 #define MAX_WIN_NAME 100

@@ -118,12 +118,18 @@ std::vector<unsigned int> Program::get_shaders(){
 	return v;
 }
 
-
+static const char* default_uniforms[]={
+	"itime",
+	"idtime",
+	"ipmat"
+};
 
 std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void*_last_val=nullptr){
 	// Return if we're erasing and pointer is null, if there is no type defined, or if we're creating but pointer is not null
 	#define ATTRIB_CREATE_FUNC(gl_type, type, uniformfunc)\
 		case gl_type: return std::unique_ptr<Attribute>(new AttributeVar<type>    (_last_val)); break;
+	
+	
 	switch (_type)
 	{
 	TYPE_EXPANSION(ATTRIB_CREATE_FUNC)
@@ -142,22 +148,23 @@ std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void*_last_val=nullpt
 	}
 	return nullptr;
 }
-void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib){
-	if(!attrib->uniform)return; // Return if it's not a uniform
+void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib,const void* other_val=nullptr){
+	if(!attrib->uniform || (!attrib->val && !other_val))return; // Return if it's not a uniform, or val null
 	// #define TOM(type, offset) (*((type*)attrib->val+offset))
 	// #define SET_UNIFORM_FUNC(gl_type, type, uniformfunc)\
 	// 	case gl_type: 		uniformfunc(attrib->location, 1, ((float*)attrib->val)); break;
+	auto _val = other_val?other_val:attrib->val;
 	switch (attrib->type)
 	{
 		// TYPE_EXPANSION()
-	case GL_FLOAT: 		glUniform1fv		(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_DOUBLE: 	glUniform1dv		(attrib->location, 1, ((double*)attrib->val)); break;
-	case GL_FLOAT_VEC2: glUniform2fv		(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC3: glUniform3fv		(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_VEC4: glUniform4fv		(attrib->location, 1, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT2: glUniformMatrix2fv	(attrib->location, 1, false, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT3: glUniformMatrix3fv	(attrib->location, 1, false, ((float*)attrib->val)); break;
-	case GL_FLOAT_MAT4: glUniformMatrix4fv	(attrib->location, 1, false, ((float*)attrib->val)); break;
+	case GL_FLOAT: 		glUniform1fv		(attrib->location, 1, ((float*)_val)); break;
+	case GL_DOUBLE: 	glUniform1dv		(attrib->location, 1, ((double*)_val)); break;
+	case GL_FLOAT_VEC2: glUniform2fv		(attrib->location, 1, ((float*)_val)); break;
+	case GL_FLOAT_VEC3: glUniform3fv		(attrib->location, 1, ((float*)_val)); break;
+	case GL_FLOAT_VEC4: glUniform4fv		(attrib->location, 1, ((float*)_val)); break;
+	case GL_FLOAT_MAT2: glUniformMatrix2fv	(attrib->location, 1, false, ((float*)_val)); break;
+	case GL_FLOAT_MAT3: glUniformMatrix3fv	(attrib->location, 1, false, ((float*)_val)); break;
+	case GL_FLOAT_MAT4: glUniformMatrix4fv	(attrib->location, 1, false, ((float*)_val)); break;
 	case GL_SAMPLER_2D:  break;
 	default:
 		throw std::range_error("Type not defined");
@@ -177,8 +184,8 @@ void Program::use(){
 		glUseProgram(p_id);
 		// Set the uniforms
 		for(auto&a:attributes){
-			if(strcmp(a->name, "time") == 0) glUniform1d(a->location, engine::time);
-			else if(strcmp(a->name, "dtime") == 0) glUniform1d(a->location, engine::deltaTime);
+			if(strcmp(a->name, "itime") == 0) glUniform1d(a->location, engine::time);
+			else if(strcmp(a->name, "idtime") == 0) glUniform1d(a->location, engine::deltaTime);
 			else attrib_set_uniform(a);
 		}
 		// Binding all textures to their appropriate texture unit
@@ -192,7 +199,16 @@ void Program::use(){
 		}
 	}else {printf("Can't use "); print_link_status(link_status, filename().c_str());}
 }
-
+void Program::set_pmat(const glm::mat4& mat){
+	auto it = std::find_if(attributes.begin(), attributes.end(), 
+		[](const std::unique_ptr<Attribute>& a){
+			return strcmp(a->name, "ipmat")==0;
+		}
+	);
+	if(it != attributes.end()){
+		attrib_set_uniform(*it, &mat); 
+	}
+}
 
 
 void Program::link(){
@@ -233,39 +249,71 @@ void Program::link(){
 			else return (*b)->val;
 		};
 		
-		// Getting attributes
-		glGetProgramiv(p_id, GL_ACTIVE_ATTRIBUTES, &count);
-		for(int i=0;i<count;++i){
-			Attribute a;a.i=i;a.uniform=false;
-			glGetActiveAttrib(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
-			a.location = glGetAttribLocation(p_id, a.name);
-			std::unique_ptr<Attribute> av = attrib_create_val(a.type,merge_attrib(a));
-			av->i = a.i;
-			av->uniform = a.uniform;
-			av->name_length = a.name_length;
-			av->size = a.size;
-			av->type = a.type;
-			av->location = a.location;
-			strcpy(av->name, a.name);
-			new_attributes.push_back(std::move(av));
+		// Will loop through attribs first, then uniforms
+		for(int is_attrib=1;is_attrib>=0;--is_attrib){
+			is_attrib?
+				glGetProgramiv(p_id, GL_ACTIVE_ATTRIBUTES, &count):
+				glGetProgramiv(p_id, GL_ACTIVE_UNIFORMS, &count);
+			for(int i=0;i<count;++i){
+				Attribute a;a.i=i;a.uniform=!is_attrib;
+				is_attrib?
+					glGetActiveAttrib(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name):
+					glGetActiveUniform(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
+				is_attrib?
+					a.location = glGetAttribLocation(p_id, a.name):
+					a.location = glGetUniformLocation(p_id, a.name);
+				
+				bool is_imp=false;
+				for(int e=0;e<sizeof(default_uniforms)/sizeof(default_uniforms[0]);++e)
+					{if(strcmp(default_uniforms[e], a.name)==0){is_imp=true;break;}}
+					
+				std::unique_ptr<Attribute> av = 
+					(!a.uniform || is_imp)?
+					std::make_unique<Attribute>():
+					attrib_create_val(a.type,merge_attrib(a));
+				av->i = a.i;
+				av->uniform = a.uniform;
+				av->name_length = a.name_length;
+				av->size = a.size;
+				av->type = a.type;
+				av->location = a.location;
+				strcpy(av->name, a.name);
+				new_attributes.push_back(std::move(av));
+			}
 		}
+		// // Getting attributes
+		// glGetProgramiv(p_id, GL_ACTIVE_ATTRIBUTES, &count);
+		// for(int i=0;i<count;++i){
+		// 	Attribute a;a.i=i;a.uniform=false;
+		// 	glGetActiveAttrib(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
+		// 	a.location = glGetAttribLocation(p_id, a.name);
+		// 	std::unique_ptr<Attribute> av = attrib_create_val(a.type,merge_attrib(a));
+		// 	av->i = a.i;
+		// 	av->uniform = a.uniform;
+		// 	av->name_length = a.name_length;
+		// 	av->size = a.size;
+		// 	av->type = a.type;
+		// 	av->location = a.location;
+		// 	strcpy(av->name, a.name);
+		// 	new_attributes.push_back(std::move(av));
+		// }
 		
-		// Getting uniforms
-		glGetProgramiv(p_id, GL_ACTIVE_UNIFORMS, &count);
-		for(int i=0;i<count;++i){
-			Attribute a;a.i=i;a.uniform=true;
-			glGetActiveUniform(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
-			a.location = glGetUniformLocation(p_id, a.name);
-			std::unique_ptr<Attribute> av = attrib_create_val(a.type,merge_attrib(a));
-			av->i = a.i;
-			av->uniform = a.uniform;
-			av->name_length = a.name_length;
-			av->size = a.size;
-			av->type = a.type;
-			av->location = a.location;
-			strcpy(av->name, a.name);
-			new_attributes.push_back(std::move(av));
-		}
+		// // Getting uniforms
+		// glGetProgramiv(p_id, GL_ACTIVE_UNIFORMS, &count);
+		// for(int i=0;i<count;++i){
+		// 	Attribute a;a.i=i;a.uniform=true;
+		// 	glGetActiveUniform(p_id, i, a.max_name, &a.name_length, &a.size, &a.type, a.name);
+		// 	a.location = glGetUniformLocation(p_id, a.name);
+		// 	std::unique_ptr<Attribute> av = attrib_create_val(a.type,merge_attrib(a));
+		// 	av->i = a.i;
+		// 	av->uniform = a.uniform;
+		// 	av->name_length = a.name_length;
+		// 	av->size = a.size;
+		// 	av->type = a.type;
+		// 	av->location = a.location;
+		// 	strcpy(av->name, a.name);
+		// 	new_attributes.push_back(std::move(av));
+		// }
 		
 		attributes = std::move(new_attributes);
 	}
@@ -388,7 +436,7 @@ void Program::imgui_draw(){
 		#define PICKER_NAME "##Picker"
 		bool is_color = std::string(a->name).find("col") != std::string::npos && (a->type == GL_FLOAT_VEC3 || a->type == GL_FLOAT_VEC4);
 		
-		if(is_color){
+		if(is_color && a->val){
 			if(a->type == GL_FLOAT_VEC3)
 				ImGui::ColorEdit3(PICKER_NAME,(float*)a->val,ImGuiColorEditFlags_NoInputs);
 			else 
@@ -396,7 +444,7 @@ void Program::imgui_draw(){
 			ImGui::SameLine(0,_SEPARATION);	
 		}
 		ImGui::TextDisabled(a->name);
-		if(!is_color){
+		if(!is_color && a->val){
 			if(a->type == GL_FLOAT_VEC3 || a->type == GL_FLOAT_VEC4){
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(-1);

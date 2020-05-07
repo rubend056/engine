@@ -1,8 +1,12 @@
 #ifndef texture_h
 #define texture_h
 
-#include "rendering_common.h"
+#define _BV32(x) ((uint32_t)1 << x)
+#include "gl.h"
+#include "file.h"
+#include "idraw.h"
 
+#include "cereal/types/polymorphic.hpp"
 
 class Texture : public File, public IDraw {
    public:
@@ -13,13 +17,9 @@ class Texture : public File, public IDraw {
 	
 	bool loaded = false;
 	static bool supported(const std::string& ext);
-	void load();
+	void load() override;
 	
-    Texture(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS) {
-		// create_supposed_ext();
-		glGenTextures(1, &t_id);
-		if(!rpath.empty())load();
-	}
+    Texture(FILE_CONSTRUCT_PARAM);
 	~Texture(){glDeleteTextures(1, &t_id);}
 	
 	IDRAW_IMGUI_NAME override {return filename();}

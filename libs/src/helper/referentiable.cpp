@@ -17,6 +17,7 @@ void Referentiable::gen(unsigned int wanted_id){
 	int max_it=10;
 	// Generate random id until that id doesn't exist in set
 	while((used_ids.find(_id) != used_ids.end() || !_id) && max_it > 0)
+		// 		(exists_in_set || zero) && can_keep_going
 		{_id=rand()+1;--max_it;}
 	
 	// Return if there were any errors

@@ -3,8 +3,16 @@
 #include "engine_globals.h"
 
 #include "SOIL.h"
+#include "gl.h"
 
 // ? TEXTURE ******************************************************************
+
+Texture::Texture(const fs::path& rpath):File(FILE_CONSTRUCT_VARS){
+	// create_supposed_ext();
+	glGenTextures(1, &t_id);
+	if(!rpath.empty())load();
+}
+
 bool Texture::supported(const std::string& ext){
 	return (ext.compare(".bmp") == 0 ||
 			ext.compare(".tga") == 0 ||

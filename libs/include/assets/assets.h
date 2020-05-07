@@ -5,16 +5,14 @@
 // #include "rendering.h"
 #include "file.h"
 #include "my_filesystem.h"
-
-// Ext
+#include "map_helper.h"
 #include "type_name.h"
 
+// Ext
 #include <string>
-
 #include <vector>
 #include <unordered_map>
-// #include <unordered_set>
-#include "map_helper.h"
+
 
 namespace assets{
 	extern std::vector<fs::directory_entry> entries;

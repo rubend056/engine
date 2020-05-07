@@ -1,20 +1,23 @@
 #ifndef program_h
 #define program_h
 
-#include "rendering_common.h"
-#include "component.h"
-
-#define FRAGMENT_EXT ".frag"
-#define VERTEX_EXT ".vert"
-#define PROGRAM_EXT ".prgm"
-
+// Ours
+#include "gl.h"
+#include "file.h"
+#include "idraw.h"
 
 #include "cereal/cereal.hpp"
+#include "cereal/types/polymorphic.hpp"
 #include "cereal/types/vector.hpp"
 #include "cereal/types/unordered_set.hpp"
 #include "cereal_glm.h"
 
 // #include "helper.h"
+
+#define FRAGMENT_EXT ".frag"
+#define VERTEX_EXT ".vert"
+#define PROGRAM_EXT ".prgm"
+
 
 class Shader : public File, public IDraw {
 public:
@@ -29,7 +32,7 @@ public:
 	/**
 	 * Will load code and recompile
 	 */
-	void load();
+	void load() override;
     
 	// Careful if shader isn't loaded correctly, shader will not be created
     Shader(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS){
@@ -136,6 +139,8 @@ struct AttributeVar:public Attribute{
 // #define CRT(gl_type, type, uniformfunc) CRT_(gl_type, type, uniformfunc)
 TYPE_EXPANSION(CRT)
 
+#define _BV32(x) ((uint32_t)1 << x)
+#include "component.h"
 #include "texture.h"
 
 class Program : public File, public Component {
@@ -152,7 +157,7 @@ public:
     int link_status = 0;
     uint32_t attribs_enabled (){
 		uint32_t t=0;
-		for(auto&a:attributes)if(!a->uniform)t|=_BV32(a->location);
+		for(auto&a:attributes)if(!a->uniform)t|= _BV32(a->location);
 		return t;
 	};
 	
@@ -173,6 +178,7 @@ public:
 	 * glUseProgram
 	 */
     void use();
+	void set_pmat(const glm::mat4& mat);
 	
 	bool loaded = false;
 	static bool supported(const std::string& ext);

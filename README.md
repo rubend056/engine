@@ -66,9 +66,9 @@ Now compiles for Ubuntu 18.04 as well as Archlinux and is configurable to use Op
 :----:|:---------:
 |![](images/day25_1.png) | ![](images/day25_0.png) |
 
-<p align="center"><b>Day 30</b></p>
+<!-- <p align="center"><b>Day 30</b></p>
 <p align="center">
-<img class="image" width="90%" src="images/day30.gif">
+<img class="image" width="90%" src="images/day30.gif"> -->
 
 <p align="center"><b>Day 33</b></p>
 <p align="center">

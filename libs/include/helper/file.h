@@ -11,7 +11,6 @@
 #include "debug.h"
 #include "my_filesystem.h"
 
-#include "cereal/archives/json.hpp"
 #include "cereal/types/polymorphic.hpp"
 
 // ? IF YOU ENCOUTER (CLASS DOESN"T HAVE ANY SERIALIZATION FUNCTION) 
@@ -82,6 +81,7 @@ public:
 		if(!_rel_path.empty()){}
 	}
 	virtual ~File(){}
+	virtual void load(){};
 	
 	// Draw imgui filename edit text
 	void imgui_draw_filename_edit();
