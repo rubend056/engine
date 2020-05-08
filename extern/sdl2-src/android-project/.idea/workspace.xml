@@ -5,21 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b713f3a3-5d64-4316-919f-efefe1e506dd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../../.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/jni/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/jni/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/jni/SDL" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/jni/glad" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/jni/imgui" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/jni/src/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/jni/src/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../soil/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../soil/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../soil/source/src/SOIL.c" beforeDir="false" afterPath="$PROJECT_DIR$/../../soil/source/src/SOIL.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../game0/plane.obj" beforeDir="false" afterPath="$PROJECT_DIR$/../../../game0/plane.obj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../libs/include/components/camera.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../../libs/include/components/camera.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../libs/src/engine/engine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../../libs/src/engine/engine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../libs/src/helper/file.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../../libs/src/helper/file.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../src/main_test.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/main_test.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../game0/square.obj" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -76,7 +62,7 @@
         <entry file="file://$PROJECT_DIR$/app/.externalNativeBuild/cmake/debug/arm64-v8a/cmake_build_output.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="144">
-              <caret line="429" column="29" lean-forward="true" selection-start-line="429" selection-start-column="29" selection-end-line="429" selection-end-column="29" />
+              <caret line="428" column="29" selection-start-line="428" selection-start-column="29" selection-end-line="428" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -90,23 +76,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/jni/src/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="165">
               <caret line="11" selection-start-line="11" selection-end-line="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../soil/source/src/SOIL.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="138">
-              <caret line="90" selection-start-line="90" selection-end-line="90" />
-              <folding>
-                <element signature="e#752#839#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -174,6 +148,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.sdk.path" value="$USER_HOME$/Android/Sdk" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="not.eligible.for.single.variant.sync" value="true" />
@@ -268,7 +243,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1601" y="39" width="1598" height="860" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" sideWeight="0.498" visible="true" weight="0.23901808" />
       <window_info id="Structure" sideWeight="0.502" side_tool="true" weight="0.35658914" />
@@ -287,7 +261,7 @@
       <window_info anchor="bottom" id="Debug" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info anchor="bottom" id="Event Log" sideWeight="0.500646" side_tool="true" weight="0.3297587" />
-      <window_info active="true" anchor="bottom" id="Build" sideWeight="0.499354" visible="true" weight="0.47184986" />
+      <window_info anchor="bottom" id="Build" sideWeight="0.499354" weight="0.47184986" />
       <window_info anchor="right" id="Device File Explorer" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" />
       <window_info anchor="right" id="Gradle" />
@@ -335,13 +309,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/jni/src/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" selection-start-line="11" selection-end-line="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/jni/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -372,17 +339,24 @@
     <entry file="file://$PROJECT_DIR$/app/.externalNativeBuild/cmake/debug/arm64-v8a/cmake_build_output.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
-          <caret line="429" column="29" lean-forward="true" selection-start-line="429" selection-start-column="29" selection-end-line="429" selection-end-column="29" />
+          <caret line="428" column="29" selection-start-line="428" selection-start-column="29" selection-end-line="428" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../soil/source/src/SOIL.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="90" selection-start-line="90" selection-end-line="90" />
+        <state relative-caret-position="423">
+          <caret line="109" column="38" lean-forward="true" selection-start-line="109" selection-start-column="38" selection-end-line="109" selection-end-column="38" />
           <folding>
             <element signature="e#752#839#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/jni/src/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>

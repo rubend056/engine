@@ -41,7 +41,7 @@
 	-Normals
 	-UV's
 
-So the axes are gonna be like Blender's. 
+So the axes are gonna be like Unity's (x, y, then -z forward)
 
 
 -Draw on Inspector(as component)/Themselves(window)
