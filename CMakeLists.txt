@@ -104,7 +104,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		GL
 		dl
 		pthread
-		stdc++fs
+		
+		stdc++fs.a
 	)
 	
 	foreach(T IN LISTS TARGETS)
@@ -112,6 +113,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 			${LIBRARIES}
 		)
 	endforeach()
+	# link_libraries(${LIBRARIES})
 	
 	
 elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
