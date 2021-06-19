@@ -8,10 +8,12 @@ on:
 
 jobs:
   build:
-
     runs-on: [ubuntu-latest]
-
     steps:
+    - name: Setup OpenGL for Runner
+      uses: openrndr/setup-opengl@v1.1
+    - name: OpenGL Info
+      run: xvfb-run glxinfo
     - uses: actions/checkout@v2
     - name: Build
       run: make build

@@ -102,6 +102,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		#Very low level
 		inotifytools
 		GL
+		
 		dl
 		pthread
 		
