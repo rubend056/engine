@@ -1,11 +1,14 @@
 /build
+/lib
 /game1
-/imgui.ini
+/*.ini
+/engine
 *.ini
 *.zip
 *.tar*
 *.a
 *.o
+
 
 #Android Project
 local.properties
@@ -16,7 +19,10 @@ local.properties
 /source*
 
 #Test Game
-/game0/**/*.meta
-/game0/**/*.json
-/game0/**/*.prgm
-/game0/**/*.scene
+**/game0/**/*.ini
+**/game0/**/*.meta
+**/game0/**/*.json
+**/game0/**/*.prgm
+**/game0/**/*.scene
+
+/*.done

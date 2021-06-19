@@ -46,17 +46,17 @@ Progress
 
 <p align="center"><b>Day 1</b></p>
 <p align="center">
-<img class="image" width="90%" style="width: 90%;" alt="A simple screen" src="images/day1.png">
+<img class="image" width="90%" style="width: 90%;" alt="A simple screen" src=".images/day1.png">
 
 <p align="center"><b>Day 3</b></p>
 <p align="center">
-<img class="image" width="90%" alt="File Editor, and file events with inotify" src="images/day3.png">
+<img class="image" width="90%" alt="File Editor, and file events with inotify" src=".images/day3.png">
 
 <p align="center"><b>Day 10</b></p>
 <p align="center">
 Trying to get the textures working:<br>
 <p align="center">
-<img class="image" width="90%" alt="Still trying to get the textures working" src="images/day10.png">
+<img class="image" width="90%" alt="Still trying to get the textures working" src=".images/day10.png">
 
 <p align="center"><b>Day 25</b></p>
 <p align="center">
@@ -64,15 +64,15 @@ Now compiles for Ubuntu 18.04 as well as Archlinux and is configurable to use Op
 
 |Main | New Scene|
 :----:|:---------:
-|![](images/day25_1.png) | ![](images/day25_0.png) |
+|![](.images/day25_1.png) | ![](.images/day25_0.png) |
 
 <!-- <p align="center"><b>Day 30</b></p>
 <p align="center">
-<img class="image" width="90%" src="images/day30.gif"> -->
+<img class="image" width="90%" src=".images/day30.gif"> -->
 
 <p align="center"><b>Day 33</b></p>
 <p align="center">
-<img class="image" width="90%" src="images/day33.png">
+<img class="image" width="90%" src=".images/day33.png">
 
 <p align="center"><b>Day 49</b></p>
 <p align="center">
@@ -80,6 +80,6 @@ A huge range of improvement from serailizing to getting the textures finally wor
 
 |Textures | Color Edit|
 :----:|:---------:
-|![](images/day49_0.png) | ![](images/day49_1.png) |
+|![](.images/day49_0.png) | ![](.images/day49_1.png) |
 
 <br>

@@ -1,4 +1,4 @@
-name: Ubuntu18.04
+name: Build Master
 
 on:
   push:
@@ -13,10 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: deps
-      run: sudo apt update && ./deps.sh
-    - name: config
-      run: ./config.sh
-    - name: build
-      run: ./build.sh
+    - name: Build
+      run: make build
     

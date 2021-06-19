@@ -18,10 +18,6 @@ message("-- CMAKE_SYSTEM_PROCESSOR: 	${CMAKE_SYSTEM_PROCESSOR}")
 message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
 
-# find_package(SDL2 REQUIRED)
-# message("-- SDL2_INCLUDE_DIRS 			${SDL2_INCLUDE_DIRS}")
-# message("-- SDL2_LIBRARIES 				${SDL2_LIBRARIES}")
-
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Android")
 	find_package(ASSIMP REQUIRED)
 	message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
@@ -38,11 +34,11 @@ SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
 
 
 add_subdirectory(extern/box2d)
-# set_property(TARGET box2d PROPERTY POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/sdl2-src)
 add_subdirectory(extern/sdl2-mixer)
 add_subdirectory(extern/imgui)
+
 
 
 
@@ -51,19 +47,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	execute_process(COMMAND ${LSB_RELEASE_EXEC} -is OUTPUT_VARIABLE LSB_RELEASE_ID OUTPUT_STRIP_TRAILING_WHITESPACE)
 	message("-- LSB_RELEASE_ID:		${LSB_RELEASE_ID}")
 
-	configure_file(libs/include/config.h.in config.h)
+	configure_file(src/libs/include/config.h.in config.h)
 
-	# list(INSERT CMAKE_MODULE_PATH 0 "extern/sdl2/lib/cmake extern/assimp/lib/cmake")
-	link_directories(
-		# extern/assimp/lib
-		# extern/sdl2/lib
-		# extern/soil/lib
-		# extern/glad/${GLAD_OPENGL_CORE_VERSION}
-	)
-
-	
-
-
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 	SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}  -gdwarf-2 -fdata-sections -ffunction-sections")
 	# SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}  -ftime-report")
@@ -71,62 +59,42 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
 
-	# set(Boost_USE_STATIC_LIBS ON)
-	# find_package(Boost REQUIRED COMPONENTS algorithm)
-
-
-
+	
 
 	include_directories(
-		# ${SDL2_INCLUDE_DIRS}
 		${ASSIMP_INCLUDE_DIRS}
 		${CMAKE_BINARY_DIR}
-		# extern/assimp/include
-		# extern/sdl2-src/include
-		# extern/soil/include
-		
-		# extern
-		# extern/imgui
-		# extern/imgui/examples
 	)
 	
-	add_subdirectory(libs)
+	
+	add_subdirectory(src/libs)
+	
+	SET(ENGINE_NAME engine)
+	SET(TEST_NAME engine_test)
+	SET(TARGETS ${ENGINE_NAME} ${TEST_NAME})
 
-	add_executable(engine 
+	# SET Executables
+	add_executable(${ENGINE_NAME} 
 		src/main.cpp
 	)
-	target_include_directories(engine PRIVATE libs/src/engine)
-	add_executable(tests
+	target_include_directories(${ENGINE_NAME} PRIVATE src/libs/src/engine)
+	add_executable(${TEST_NAME}
 		src/main_test.cpp
 	)
-	target_include_directories(tests PRIVATE extern)
-	
-	# if(LSB_RELEASE_ID MATCHES "Arch")
-	# 	set(SDL2_LIBRARIES "${SDL2_LIBRARIES} SDL2::SDL2")
-	# 	string(STRIP "${SDL2_LIBRARIES}" SDL2_LIBRARIES)
-	# 	# message("-- SDL2_LIBRARIES 		${SDL2_LIBRARIES}")
-	# endif()
+	target_include_directories(${TEST_NAME} PRIVATE extern)
 	
 	set(LIBRARIES
 		my_libs
 		imgui
 
 		#Core libraries for engine
-		# libSOIL.a
 		soil
 		
 		SDL2
 		SDL2_mixer
-		# ${SDL2_LIBRARIES}
 		
-		# libSDL2d.a
-		# libSDL2maind.a
-		# libglad.a
 		glad
 
-		# assimp
-		# libIrrXML.a
-		# libzlibstatic.a
 		${ASSIMP_LIBRARIES}
 		
 		box2d
@@ -139,13 +107,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		stdc++fs
 	)
 	
-
-	target_link_libraries(engine 
-		${LIBRARIES}
-	)
-	target_link_libraries(tests
-		${LIBRARIES}
-	)
+	foreach(T IN LISTS TARGETS)
+		target_link_libraries(${T} 
+			${LIBRARIES}
+		)
+	endforeach()
 	
 	
 elseif(CMAKE_SYSTEM_NAME MATCHES "Android")

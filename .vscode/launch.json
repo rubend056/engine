@@ -39,11 +39,11 @@
 			]
 		},
 		{
-			"name": "(gdb) Launch Engine",
+			"name": "(gdb) Launch Engine G0",
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/build/engine",
-			"args": ["../game0"],
+			"args": ["game0"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/build",
 			"environment": [],
