@@ -3,6 +3,7 @@
 #include "my_imgui.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
 void Transform::imgui_draw(){
