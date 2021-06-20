@@ -4,6 +4,8 @@
 
 [![Ubuntu 18.04 & 20.04](https://github.com/rubend056/engine/actions/workflows/ccpp.yml/badge.svg)](https://github.com/rubend056/engine/actions/workflows/ccpp.yml)
 
+</p>
+
 I've been meaning to make my own game engine for years now. Ever since using Unity3D I've always felt like I needed more control. This project is the answer to that:
 
 Summing up all my knowledge of C++ over the years. This engine will stitch up multiple libries like *SDL2, Assimp, Cereal, SOIL* as well as the OpenGL loader *Glad* to create a simple but powerful game creation platform that suits my purposes. It will be a colossal task and an equaly immense learning oportunity.
