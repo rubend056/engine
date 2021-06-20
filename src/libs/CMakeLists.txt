@@ -69,7 +69,7 @@ add_library(my_libs
 	src/rendering/texture.cpp
 	src/rendering/program.cpp
 )
-target_link_libraries(my_libs imgui soil box2d SDL2 assimp)
+target_link_libraries(my_libs imgui soil box2d SDL2 assimp stdc++fs)
 target_include_directories(my_libs PRIVATE
 	# src/rendering
 )

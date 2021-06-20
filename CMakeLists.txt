@@ -88,7 +88,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		imgui
 
 		#Core libraries for engine
-		soil
+		
+		soil 
 		
 		SDL2
 		SDL2_mixer
@@ -101,12 +102,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		
 		#Very low level
 		inotifytools
-		GL
+		
+		# Required by SOIL,engine,imgui
+		GL EGL
 		
 		dl
 		pthread
 		
-		stdc++fs.a
+		stdc++fs
 	)
 	
 	foreach(T IN LISTS TARGETS)

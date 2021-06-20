@@ -1,5 +1,6 @@
 {
 	"files.associations": {
+		"*.json": "jsonc",
 		"glad.h": "c",
 		"iostream": "cpp",
 		"*.tcc": "cpp",
@@ -90,7 +91,13 @@
 		"version": "cpp",
 		"*.h.in": "c-make",
 		"gl.h": "c",
-		"glx.h": "c"
+		"glx.h": "c",
+		"any": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"numbers": "cpp",
+		"semaphore": "cpp",
+		"stop_token": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled",
 	"files.exclude": {

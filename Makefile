@@ -1,4 +1,3 @@
-
 ROOT:=$(shell pwd)
 PROJECTS_DIR:=projects
 # THREADS:=$(shell nproc)
@@ -22,15 +21,21 @@ build: engine
 
 $(BUILD_DIR)$(D): deps$(D)
 	mkdir -p $(BUILD_DIR)
-	cmake -S . -B $(BUILD_DIR)
+	
+	cd build && cmake ..
+	# cmake -S . -B $(BUILD_DIR)
+	
 	touch $(BUILD_DIR)$(D)
 
 engine: $(BUILD_DIR)$(D)
 	echo "Building using ${THREADS} parallel jobs";
-	cmake --build $(BUILD_DIR) --target engine -- -j$(THREADS)
+	
+	cd build && make engine -j$(THREADS)
+	# cmake -B $(BUILD_DIR) --target engine -- -j$(THREADS)
 
 clean:
-	rm -rf $(BUILD_DIR) built $(wildcard *$(D)) lib 
+	rm -rf $(BUILD_DIR) built $(wildcard *$(D)) lib
+	rm -f engine engine_test CMakeCache.txt
 
 clean_game:
 	find game0 -iname "*.meta" -o -iname "*.scene" -o -iname "*.prgm" -o -iname "*.json" -delete

@@ -14,5 +14,5 @@ target_include_directories(soil PRIVATE
 	source/src
 )
 
-# target_link_libraries(soil GL EGL)
+target_link_libraries(soil GL EGL)
 target_include_directories(soil PUBLIC include)
