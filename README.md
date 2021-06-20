@@ -1,7 +1,8 @@
 <h1 align="center">Glorious C++ Engine</h1>
 
 <p align="center">
-[![Ubuntu 18.04 and 20.04](https://github.com/rubend056/engine/actions/workflows/ccpp.yml/badge.svg)](https://github.com/rubend056/engine/actions/workflows/ccpp.yml)
+
+[![Ubuntu 18.04 & 20.04](https://github.com/rubend056/engine/actions/workflows/ccpp.yml/badge.svg)](https://github.com/rubend056/engine/actions/workflows/ccpp.yml)
 
 I've been meaning to make my own game engine for years now. Ever since using Unity3D I've always felt like I needed more control. This project is the answer to that:
 
