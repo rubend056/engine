@@ -27,11 +27,11 @@ void main()
 	mat3 test_trans = mat3(
 		cos(tt) ,sin(tt),0,  
 		-sin(tt),cos(tt),0,  
-		0	   ,0	  ,1) * float(1 + sin(tt) * .1);
+		0	   ,0	  ,1) * float(1. + sin(tt) * .1);
 	vec4 out_pos = 
 			ipmat 
 			//* mat4(test_trans) 
 			* vec4(pos,1);
 	
-    gl_Position = ipmat * vec4(pos,1);
+    gl_Position = out_pos;
 }

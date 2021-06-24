@@ -5,7 +5,7 @@
 
 glm::mat4 Camera::get_matrix(){
 	if(auto p = get_parent_go()){
-		// This assumes the camera's default direction is downwards, into the -z axis
+		// This assumes the camera's default direction is forwards, into the -z axis
 		// View matrix
 		auto rmat = p->trans->get_rot_mat();
 		auto eye = p->trans->pos;

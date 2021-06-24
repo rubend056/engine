@@ -187,7 +187,6 @@ void menus::imgui_engine_update() {
 
 			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
 				auto scene = std::make_shared<Scene>(scene_name);
-				scene->create_supposed_ext();
 				assets::add(scene);
 				engine::load_scene(scene);
 				ImGui::CloseCurrentPopup();

@@ -68,6 +68,9 @@ add_library(my_libs
 	src/rendering/mesh.cpp
 	src/rendering/texture.cpp
 	src/rendering/program.cpp
+	src/rendering/shader.cpp
+	src/rendering/vao.cpp
+	src/rendering/attribute.cpp
 )
 target_link_libraries(my_libs imgui soil box2d SDL2 assimp stdc++fs)
 target_include_directories(my_libs PRIVATE

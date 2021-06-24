@@ -1,45 +1,47 @@
   LIBRARIES 
-	 |
-	 V
-	SDL
-	OpenGL
+     |
+     V
+    SDL
+   OpenGL
 
-	imgui
-	assimp
+   imgui
+   assimp
 
-	inotify
+   inotify
 
-	glad or GLEW
+   glad or GLEW
 
-	     -------engine---------------
-	     |				   |        |
-	  _imgui             assimp  inotify
-	  |    |
-	 SDL OpenGL 
+
+       -------engine---------
+       |				   |        |
+    _imgui       assimp  inotify
+    |    |
+   SDL OpenGL 
+
 
 ./engine <project folder>
 
 
 
-	Shader       Programs
-	in -> out  mesh/textures     
-				    | 
-				 	V
-				  shader
-					V
-				  shader
-					V
-				   ...
-				    V
-				pixel_color
-				
-				-attributes	(vec3,mat2) 		<- BUFFER_ARRAY
-				-uniforms 	(vec3,sampler2D) 	<- TEXTURE
+  Shader       Programs
+  in -> out  mesh/textures
+            | 
+            V
+      vertex shader
+            V
+     geometry shader
+            V
+           ...
+            V
+        pixel_color
+        
+        -attributes	(vec3,mat2) 		<- BUFFER_ARRAY
+        -uniforms 	(vec3,sampler2D) 	<- TEXTURE
 
-	Mesh          	Textures/Bump
-	-Verteices		-2D Image
-	-Normals
-	-UV's
+  Mesh          	Textures/Bump
+  -Verteices		-2D Image
+  -Normals
+  -UV's
 
 So the axes are gonna be like Unity's (x, y, then -z forward)
 
@@ -47,78 +49,78 @@ So the axes are gonna be like Unity's (x, y, then -z forward)
 -Draw on Inspector(as component)/Themselves(window)
 
 IDraw(Interface, handles drawing) // ANY CLASS THAT SHOWS SOMETHING ON THE GUI
-	virtual const char* imgui_name()=0
-	virtual void imgui_preview(){}
-	virtual void imgui_draw(){}
+  virtual const char* imgui_name()=0
+  virtual void imgui_preview(){}
+  virtual void imgui_draw(){}
 File(Serialize/Deserialize) // ANY CLASS REPRESENTED BY A FILE
-	serialize()
-Component:IDraw(Component interaction) // ANY CLASS THAT'S A COMPONENT
-	bool enabled
-	max_num()
+  serialize()
+Component:IDraw(Component interaction) // ANY CLASS THAT'S A COMPONENT (meaning that it will be inside a GameObject)
+  bool enabled
+  max_num()
 <Class>_Prefab (Prefab serialization and definitions)
-	
+  
 Mesh : File(load options),IDraw
-	vbo_id
-	VAO:Component{
-		vao_id
-		vao_bind()
-		vao_attrib_enable()
-		vao_attrib_diable()
-		
-		n_vertices
-		!positions (not present)
-		!normals (not present)
-		!tex_cords (not present)
-		
-		gl_draw()
-	} vaos;
-	vbo_bind()
-	load()
-	
+  vbo_id
+  VAO:Component{
+    vao_id
+    vao_bind()
+    vao_attrib_enable()
+    vao_attrib_diable()
+    
+    n_vertices
+    !positions (not present)
+    !normals (not present)
+    !tex_cords (not present)
+    
+    gl_draw()
+  } vaos;
+  vbo_bind()
+  load()
+  
 Texture: File(load options),IDraw
-	t_id
+  t_id
 Shader : File,IDraw
-	s_id
+  s_id
 Program : File,Component,IDraw
-	p_id
-	link_status
-	log
-	?Shader*/int // Hold pointer or just gpu id
-	?attachShader(id)/Shader*
-	?detachShader(id)/Shader*
-	clearShaders()
-	link()
-	use()
+  p_id
+  link_status
+  log
+  ?Shader*/int // Hold pointer or just gpu id
+  ?attachShader(id)/Shader*
+  ?detachShader(id)/Shader*
+  clearShaders()
+  link()
+  use()
 
 
 PREFABS
 GameObject <a> ref-> NULL
-	Component (Transform) ref-> NULL
-		p,r,s
-	Component (VAO) 		-> a.obj:a
-	Component (Program) 	-> a.prog
+  Component (Transform) ref-> NULL
+    p,r,s
+  Component (VAO) 		-> a.obj:a
+  Component (Program) 	-> a.prog
 
 Progam <p>
 
 Scene <s>
-	GameObject <b> ref-> <a> (When Gameobject instatiates, it links refs of components inside)
-		Component (Transform) ref-> <a>(Transform)
-			p,r,s
-		Component (VAO) 		-> a.obj:a
-		Component (Program) 	-> a.prog
+  GameObject <b> ref-> <a> (When Gameobject instatiates, it links refs of components inside)
+    Component (Transform) ref-> <a>(Transform)
+      p,r,s
+    Component (VAO) 		-> a.obj:a
+    Component (Program) 	-> a.prog
 
-		Component:IDraw
+    Component:IDraw
 #########
 
 PREFAB
-	 Prefab Linking
-	 	 MATTERS
-			|
-			V
-	-Initialize 	(ref -> load_cereal() -> file)  (file -> load_cereal)
-	-Modify file	(load() -> if(!is_ref) -> if(!is_ref))
-	
-	Destroy (ref and file get saved the same way)
+   Prefab Linking
+      MATTERS
+      |
+      V
+  -Initialize 	(ref -> load_cereal() -> file)  (file -> load_cereal)
+  -Modify file	(load() -> if(!is_ref) -> if(!is_ref))
+  
+  Destroy (ref and file get saved the same way)
 
 For each variable in components: `const get()` and `set(value)` methods
 
@@ -133,11 +135,11 @@ Load and upload meshes to OpenGL
 Now we have SHADERS and MESHES, we can create Programs
 Create Program, add shaders, 
 
-				
+        
 RIGHT NOW**************************************    STATUS
 Shader and Program initial classes  				DONE
 
-Watch for changes in project asset 
+Watch for changes in project assets           DONE
 folder and reimport/compile accordingly				DONE
 
 Implement vertex data for gl_helper 				Working..
@@ -146,35 +148,35 @@ Implement vertex data for gl_helper 				Working..
 
 LATER++++++++++++++++++++++++++++++++++++++++++
 
-Camera Object to Render (Perspective Matrix)
-	Transform
-	
+Camera Object to Render (Perspective Matrix)  DONE
+  Transform
+  
 
 //Cache (imported assets with same directory structure) *** Later
 Assets (any asset you want) 
-	What'll we do with these? Load into memory, that's what assimp does, no cooking yet
-	Import files by extension with Assimp into memory (save their paths, etc)
-	Some files you'll be able to change (txt, glsl, etc...)
+  What'll we do with these? Load into memory, that's what assimp does, no cooking yet
+  Import files by extension with Assimp into memory (save their paths, etc)
+  Some files you'll be able to change (txt, glsl, etc...)
 
-File Manager
-	Expandable File List of Project Folder
+File Manager                                 TBD
+  Expandable File List of Project Folder
 
-Shader Editor
-	Save Button + Edit Text
+Shader Editor                                DONE
+  Save Button + Edit Text
 
-Main View
-	Camera can (Select(LMouseClick), Pan(Alt+MMouse), Rotate(Alt+LMouse), Focus(F))
-	
-	Translate Arrows
-	Rotate Arrows
-	Scale Arrows
+Main View                                 WORKING...
+  Camera can (Select(LMouseClick), Pan(Alt+MMouse), Rotate(Alt+LMouse), Focus(F))
+  
+  Translate Arrows
+  Rotate Arrows
+  Scale Arrows
 
 Inspector
-	Shows Components of an Object
-	Components
-		Transform
-		Shaders
-	
+  Shows Components of an Object             DONE
+    Components
+      Transform
+      Shaders
+  
 
 
 

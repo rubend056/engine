@@ -97,7 +97,8 @@
 		"concepts": "cpp",
 		"numbers": "cpp",
 		"semaphore": "cpp",
-		"stop_token": "cpp"
+		"stop_token": "cpp",
+		"*.def": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled",
 	"files.exclude": {

@@ -3,27 +3,29 @@
         {
             "name": "Linux",
             "includePath": [
-				"${workspaceFolder}/build",
-				"${workspaceFolder}/extern/assimp/include",
+                "${workspaceFolder}/build",
+                "${workspaceFolder}/extern/assimp/include",
                 "${workspaceFolder}/extern/soil/include",
                 "${workspaceFolder}/extern/glad/33",
                 "${workspaceFolder}/extern/imgui",
                 "${workspaceFolder}/extern/imgui/examples",
-                "${workspaceFolder}/libs/include",
-                "${workspaceFolder}/libs/include/assets",
-                "${workspaceFolder}/libs/include/components",
-                "${workspaceFolder}/libs/include/groups",
-                "${workspaceFolder}/libs/include/helper",
-                "${workspaceFolder}/libs/include/menus",
-                "${workspaceFolder}/libs/include/rendering",
-                "${workspaceFolder}/libs/include"
+                "${workspaceFolder}/extern/sdl2-src/include",
+                
+                "${workspaceFolder}/src/libs/include",
+                "${workspaceFolder}/src/libs/include/assets",
+                "${workspaceFolder}/src/libs/include/cereal",
+                "${workspaceFolder}/src/libs/include/components",
+                "${workspaceFolder}/src/libs/include/rendering",
+                "${workspaceFolder}/src/libs/include/groups",
+                "${workspaceFolder}/src/libs/include/helper",
+                "${workspaceFolder}/src/libs/include/menus"
+                
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64",
-            "configurationProvider": "vector-of-bool.cmake-tools"
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

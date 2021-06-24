@@ -18,29 +18,8 @@
 #define CLASSNAME GAMEOBJECT
 #define CLASSNAME_NORMAL GameObject
 #define GAMEOBJECT_EXPANSION(FUNC) \
-	// FUNC(std::vector<std::shared_ptr<Component>>, components)
 
 class CLASSNAME_NORMAL;
-
-// #define PREFAB_VAR_SERIALIZE(type, name)\
-// 	if(!strcmp(#name,"components")){\
-// 		/*Serailizing the size of components*/\
-// 		int csize,oldsize;csize=oldsize=components.size();\
-// 		ar(csize);\
-// 		/*Equaling the size of components to the size of serialized*/\
-// 		for(int i=0;i<csize-oldsize;++i)components.push_back(std::shared_ptr<Component>());\
-// 		for(int i=0;i<csize;++i){\
-// 			/*Set is_ref to -> if component's parent doesn't equal 'this'*/\
-// 			auto is_ref = /*components[i]?components[i]->parent != (Referentiable*)this:*/true;\
-// 			ar(is_ref);\
-// 			if(is_ref){\
-// 				std::vector<unsigned int> ref;\
-// 				if(components[i]) ref = components[i]->my_ref();\
-// 				ar(ref);\
-// 				components[i] = assets::get_file<Component>(ref);\
-// 			}else ar(components[i]);\
-// 		}\
-// 	}else ar(name);
 
 #include "prefab.h"
 // ? ###########################################################################

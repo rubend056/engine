@@ -5,7 +5,7 @@
 #include "engine_scene.h"
 #include "helper.h"
 #include "type_name.h"
-
+#include "helper.h"
 #include "_menus.h"
 
 using namespace std;
@@ -65,7 +65,7 @@ void scene(bool* p_open){
 	
 	if (ImGui::Button("Add GameObject", ImVec2(-1,0))){
 		auto go = std::make_shared<GameObject>();
-		go->filename_set("GameObject");
+		go->set_filename("GameObject");
 		engine::scene->foster(go);
 	}
 		
@@ -73,7 +73,7 @@ void scene(bool* p_open){
 	ImGui::Separator();
 	
 	if(engine::scene){
-		auto objects = helper::dynamic_pointer_cast<GameObject>(engine::scene->children);
+		auto objects = helper::dynamic_pointer_cast_array<GameObject>(engine::scene->children);
 		for(auto&obj:objects){
 			ImGui::Text(obj->filename().c_str());
 			if(ImGui::IsItemClicked())

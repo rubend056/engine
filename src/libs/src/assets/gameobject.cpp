@@ -6,6 +6,7 @@
 GameObject::GameObject(const fs::path& rpath):File(FILE_CONSTRUCT_VARS){}
 
 std::shared_ptr<Referentiable> GameObject::foster(const std::shared_ptr<Referentiable>& child){
+	// If child is a gameobject, fosted the child
 	if(auto go = std::dynamic_pointer_cast<GameObject>(child))Parent::foster(child);
 	else if(auto comp = std::dynamic_pointer_cast<Component>(child)){
 		comp->parent = this;

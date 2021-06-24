@@ -1,3 +1,14 @@
+/**
+ * @file engine.cpp
+ * @author RubenD (rubendariopm14@gmail.com)
+ * @brief Engine Editor initialization and loop
+ * @version 0.1
+ * 
+ * Loads assets from project/game folder
+ * Initializes OpenGL context and window
+ * Runs engine loop
+ */
+
 // Cereal
 #include "cereal/archives/json.hpp"
 
@@ -10,6 +21,7 @@
 #include "components.h"
 #include "gl.h"
 #include "mesh.h"
+#include "vao.h"
 
 // #include <SDL.h>
 // #include <algorithm>
@@ -141,12 +153,13 @@ void update() {
 // 		const std::function<void(const std::shared_ptr<GameObject>&go)>&f){
 // 	for(auto&child:go->children){}
 // }
+// #include <stdio.h>
 void render() {
 	// Rendering
 	if (engine::scene) {
 		// Get all GameObjects in scene
-		auto gobjects = helper::dynamic_pointer_cast<GameObject>(engine::scene->children);
-		
+		auto gobjects = helper::dynamic_pointer_cast_array<GameObject>(engine::scene->children);
+
 		// Get all cameras in scene
 		std::vector<std::shared_ptr<Camera>> cameras;
 		for (auto &go : gobjects) {
@@ -156,21 +169,24 @@ void render() {
 
 		// For all GameObjects in scene
 		for (auto &go : gobjects) {
+			
 			// Get all Programs in GameObject
 			auto progs = go->get_comps<Program>();
 			if (!progs.size())
-				continue; // If there are no Programs, skip object
+				continue;  // If there are no Programs, skip object
+			
 			// Get all mesh VAO's in GameObject
-			auto vaos = go->get_comps<Mesh::VAO>();
+			auto vaos = go->get_comps<VAO>();
 			if (!vaos.size())
-				continue; // If there are no Mesh VAO's, skip object
-	
+				continue;  // If there are no Mesh VAO's, skip object
+
 			// Get GameObject's Transform Matrix
 			auto go_trans_matrix = go->trans->get_matrix_trans();
 
 			for (auto &prog : progs) {
 				if (!prog->link_status)
-					continue; // If link status of program false, skip program
+					continue;  // If link status of program false, skip program
+					
 				// 1. Use program
 				prog->use();
 				for (auto &vao : vaos) {
@@ -182,9 +198,13 @@ void render() {
 					vao->vao_bind();
 					vao->vao_attrib_enable(0xff);
 					for (auto &cam : cameras) {
-						auto cam_tmat = cam->get_parent_go()->trans->get_pos_mat();
+						// auto cam_tmat = cam->get_parent_go()->trans->get_pos_mat();
 						auto pmat = cam->get_matrix();
-						// 4. Set 
+						// cout << pmat << endl;
+						// 4. Set
+						// auto t = pmat * glm::vec4(1.f, 0.f, 0.f, 1.f);
+						// cout << t.x << t.y << t.z << endl;
+						// printf("%f %f %f\n", t.x, t.y, t.z);
 						prog->set_pmat(pmat * go_trans_matrix);
 						vao->gl_draw();
 					}

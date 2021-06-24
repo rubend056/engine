@@ -6,7 +6,6 @@
 #include <typeinfo>
 #include <vector>
 
-// #include <stdexcept>
 #include <string>
 
 #include "component.h"
@@ -63,7 +62,7 @@ std::shared_ptr<T> file_add_button() {
 }
 
 template <class T, class J>
-std::vector<std::shared_ptr<T>> dynamic_pointer_cast(
+std::vector<std::shared_ptr<T>> dynamic_pointer_cast_array(
 	const std::vector<std::shared_ptr<J>>& other) {
 	std::vector<std::shared_ptr<T>> v;
 	v.reserve(other.size());

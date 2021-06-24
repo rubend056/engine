@@ -79,7 +79,12 @@ class File : public virtual Referentiable {
 	 * @brief Replaces the filename to the one specified
 	 * @param _filename The new filename
 	 */
-	void filename_set(const std::string& _filename) { _rel_path.replace_filename(_filename); }
+	void set_filename(const std::string& _filename) { _rel_path.replace_filename(_filename); }
+	/**
+	 * @brief Replaces the path with the one specified
+	 * @param _filename The new filename
+	 */
+	void set_rel_path(const std::string& _path) { _rel_path = fs::path(_path); }
 	// const std::string stem();
 
 	// ? Constructors

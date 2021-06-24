@@ -45,25 +45,23 @@ void assets(bool* p_open) {
 	if (ImGui::Button("Add File", ImVec2(-1, 0)))
 		ImGui::OpenPopup("add_file_popup");
 	if (ImGui::BeginPopup("add_file_popup")) {
+		
 		static std::shared_ptr<File> new_file;
 		std::shared_ptr<File> c;
-		auto push = [&](const char* type_id_name) -> void {
-			new_file = c;
-			ImGui::OpenPopup("modal_name");
-		};
-		if (c = helper::file_add_button<Program>()) {
-			push(typeid(Program).name());
-		}
-		// else if
+		
+		static auto open_popup = []() -> void {ImGui::OpenPopup("modal_name");};
+		
+		if (new_file = helper::file_add_button<Program>()) {open_popup();}
 
 		if (ImGui::BeginPopupModal("modal_name")) {
-			static std::string name;
-			ImGui::InputText("Filename", &name);
+			static std::string path;
+			ImGui::InputText("Path/Filename", &path);
 			if (ImGui::Button("Ok") || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter), false)) {
-				new_file->filename_set(name);
-				new_file->create_supposed_ext();
+				
+				new_file->set_rel_path(path);
 				assets::add(new_file);
 				new_file.reset();
+				
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::EndPopup();

@@ -21,14 +21,29 @@ namespace assets{
 	extern std::unordered_map<std::string, std::shared_ptr<File>> rpath_asset_ht;
 	extern std::unordered_map<unsigned int, std::string> id_rpath_ht;
 	extern std::unordered_multimap<std::string, std::shared_ptr<File>> type_asset_ht;
-	// extern std::unordered_map<unsigned int, std::shared_ptr<File>> asset_asset_ht;
 	
-	// Add file to all the hash tables, you can get the typeid_name with 
+	/**
+	 * @brief Adds a file to everything
+	 * To assets, hash tables, files vector
+	 * Also adds supposed extension
+	 * @param file 
+	 */
 	void add(const std::shared_ptr<File>& file);
+	/**
+	 * @brief Clear all files, when reloading project
+	 * 
+	 */
 	void clear();
 	
 	// MAP_GET_ELEMENT(File, file_path, rpath_asset_ht)
-	// Get file by path, returns casted File to T
+	
+	/**
+	 * @brief Get file by path, returns casted File to T
+	 * 
+	 * @tparam T 
+	 * @param t_name 
+	 * @return std::shared_ptr<T> 
+	 */
 	template<class T=File>
 	std::shared_ptr<T> get_file_path (const std::string& t_name){
 		return std::dynamic_pointer_cast<T>(get_file_path<File>(t_name));
@@ -40,14 +55,23 @@ namespace assets{
 	// MAP_GET_ELEMENT(File, file_type, type_asset_ht)
 	// MAP_GET_ELEMENTS(File, files_type, type_asset_ht)
 	
-	// GET_ELEMENT
+	
+	
 	std::shared_ptr<File> get_file_type (const std::string& t_name);
-	template<class T>\
-	std::shared_ptr<T> get_file_type(){\
-		return std::dynamic_pointer_cast<T>(\
-			get_file_type(helper::demangle(typeid(T).name()))\
-		);\
+	/**
+	 * @brief Get the file based on type name
+	 * Type name is returned by helper::demangle(typeid(T).name())
+	 * Will not work on g++ compilers, please don't use this too much
+	 * @param t_name 
+	 * @return std::shared_ptr<File> 
+	 */
+	template<class T>
+	std::shared_ptr<T> get_file_type(){
+		return std::dynamic_pointer_cast<T>(
+			get_file_type(helper::demangle(typeid(T).name()))
+		);
 	}
+	
 	
 	// GET_ELEMENTS
 	/* t_name is string to search in map */
@@ -63,7 +87,13 @@ namespace assets{
 		return v;\
 	}
 	
-	
+	/**
+	 * @brief Gets or loads a file based on it's rel_path
+	 * 
+	 * @tparam T Type of object it will be casted to
+	 * @param rel_path The rel_path of file
+	 * @return std::shared_ptr<T> 
+	 */
 	template<class T=File>
 	std::shared_ptr<T> get_load_file(const fs::path& rel_path){
 		auto f = get_file_path(rel_path);
@@ -90,11 +120,27 @@ namespace assets{
 		return std::shared_ptr<T>();
 	}
 		
-	// Find file by id
-	
+	/**
+	 * @brief Gets a file based on a list/vector of refs 
+	 * 
+	 * @tparam T The type it will be casted to
+	 * @param refs 
+	 * @return std::shared_ptr<T> 
+	 */
 	template<class T=Referentiable>
 	std::shared_ptr<T> get_file(const std::vector<unsigned int>& refs){
 		return std::dynamic_pointer_cast<T>(get_file<Referentiable>(refs));
+	}
+	/**
+	 * @brief Gets a file based on a single ref
+	 * 
+	 * @tparam T The type it will be casted to
+	 * @param refs 
+	 * @return std::shared_ptr<T> 
+	 */
+	template<class T=Referentiable>
+	std::shared_ptr<T> get_file(const unsigned int ref){
+		return get_file<T>(std::vector<unsigned int>{ref});
 	}
 	template<>
 	std::shared_ptr<Referentiable> get_file(const std::vector<unsigned int>& refs);

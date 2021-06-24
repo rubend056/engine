@@ -14,7 +14,6 @@
 
 //? Assets IMPORT ****************************************************************
 namespace assets {
-//? RENDERING **************************
 std::vector<std::shared_ptr<File>> files;
 std::unordered_map<std::string, std::shared_ptr<File>> rpath_asset_ht;
 std::unordered_map<unsigned int, std::string> id_rpath_ht;
@@ -23,6 +22,8 @@ std::unordered_multimap<std::string, std::shared_ptr<File>> type_asset_ht;
 void add(const std::shared_ptr<File>& file) {
 	if (!file)
 		return;
+	
+	file->create_supposed_ext();
 	if (std::find(files.begin(), files.end(), file) == files.end())
 		files.push_back(file);
 	rpath_asset_ht.insert(std::make_pair(file->data_path(), file));
@@ -36,42 +37,7 @@ void clear() {
 	type_asset_ht.clear();
 }
 
-const float testvertices[]{
-	0.0f, 0.5f, 0.0f,
-	0.5f, -0.5f, 0.0f,
-	-0.5f, -0.5f, 0.0f};
-const float testtextcords[]{
-	0.5f, 1.0f,
-	1.0f, 0.0f,
-	0.0f, 0.0f};
-
-// void load_all(bool (*pred)(const std::string& ext)){
-
-// }
-
 void import_assets() {
-	// Assimp::Importer importer;
-
-	// TEST MESHES
-	// auto tmesh = std::shared_ptr<Mesh>(new Mesh(fs::path("tmesh")));
-	// tmesh->vbo_bind();
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(testvertices)+sizeof(testtextcords), nullptr, GL_STATIC_DRAW);
-
-	// auto vao = std::make_unique<Mesh::VAO>();
-	// vao->vao_bind();
-	// vao->n_vertices = 3;
-	// vao->positions = vao->tex_cords = true;
-
-	// unsigned int i=0;auto set_data = [&i](unsigned int size, void*data){glBufferSubData(GL_ARRAY_BUFFER, i, size, data);i+=size;};
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)i);
-	// set_data(sizeof(testvertices), (void*)testvertices);
-	// glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)i);
-	// set_data(sizeof(testtextcords), (void*)testtextcords);
-
-	// tmesh->loaded =true;
-	// tmesh->vaos.push_back(move(vao));
-	// assets::add(tmesh, typeid(Mesh).name());
-	// #################
 
 	// Loading all files, starting with meta files
 	for (int load_meta = 1; load_meta >= 0; --load_meta)
@@ -132,7 +98,6 @@ void import_assets() {
 			}
 
 			if (f) {
-				f->create_supposed_ext();
 				assets::add(f);
 			}
 		}
@@ -168,54 +133,51 @@ std::shared_ptr<File> get_file_path(const std::string& t_name) {
 		return it->second;
 }
 
+std::shared_ptr<Referentiable> get_file_parent(std::vector<unsigned int> refs, std::shared_ptr<Referentiable> r){
+	if(!r)return std::shared_ptr<Referentiable>();
+	if(!refs.size())return r;
+	
+	// Consume first id
+	int id = refs.front();
+	refs.erase(refs.begin());
+	
+	// Look in children of Parent
+	if(auto p = std::dynamic_pointer_cast<Parent>(r)){
+		auto it = std::find_if(p->children.begin(), p->children.end(),
+									[&](const std::shared_ptr<Referentiable>& r) {
+										return r ? r->get_id() == id : false;
+									});
+		if (it != p->children.end()){return get_file_parent(refs, *it);}
+	}
+	
+	// Look in components of Gameobject
+	if(auto go = std::dynamic_pointer_cast<GameObject>(r)){
+		auto it = std::find_if(go->components.begin(), go->components.end(),
+											[&](const std::shared_ptr<Component>& r) {
+												return r ? r->get_id() == id : false;
+											});
+		if (it != go->components.end()){return get_file_parent(refs, *it);}
+	}
+	
+	// If nothing found, return null
+	return std::shared_ptr<Referentiable>();
+}
 template <>
 std::shared_ptr<Referentiable> get_file(const std::vector<unsigned int>& refs) {
-	if (!refs.size())
-		return std::shared_ptr<Referentiable>();
-
-	int c = 0;
-	std::shared_ptr<Referentiable> target;
-	// If finding path was successful
-
-	auto path_it = id_rpath_ht.find(refs[c++]);
-	if (path_it != id_rpath_ht.end()) {
-		auto path = path_it->second;
-		// Get target object based on path
-		if (target = get_load_file(path)) {
-			// As long as refs has more references we keep going
-			while (c < refs.size()) {
-				// Convert taget to parent
-				auto parent = std::dynamic_pointer_cast<Parent>(target);
-				if (!parent)
-					break;	// Stop searching, refs is asking for more but you're not a parent?
-
-				int id = refs[c++];
-				// Find a child with the desired id
-				auto it_child = std::find_if(parent->children.begin(), parent->children.end(),
-											 [&](const std::shared_ptr<Referentiable>& r) {
-												 return r ? r->get_id() == id : false;
-											 });
-				// Set target to child if it was found
-				if (it_child != parent->children.end())
-					target = *it_child;
-				else if (auto go = std::dynamic_pointer_cast<GameObject>(target)) {
-					// Find a child with the desired id
-					auto it_component = std::find_if(go->components.begin(), go->components.end(),
-													 [&](const std::shared_ptr<Component>& r) {
-														 return r ? r->get_id() == id : false;
-													 });
-					if (it_component != go->components.end())
-						target = *it_component;
-					else
-						break;
-				} else
-					break;
-			}
-		}
+	std::vector<unsigned int> _refs = refs;
+	// Consume first id
+	int id = _refs.front();
+	_refs.erase(_refs.begin());
+	
+	// Find in our id to relative path map
+	auto it = id_rpath_ht.find(id);
+	if (it != id_rpath_ht.end()) {
+		auto path = it->second;
+		return get_file_parent(_refs, get_load_file(path));
 	}
 
-	// Only return target if we reached the end of the refs vector in the search
-	return c == refs.size() ? target : std::shared_ptr<Referentiable>();
+	// Return null if nothing found
+	return std::shared_ptr<Referentiable>();
 }
 
 //? ENTRIES **************************
@@ -310,6 +272,7 @@ void update() {
 
 					if (auto f = assets::get_file_path(p)) {
 						f->load();
+						// If udpated file is a shader, link all programs that currently have that shader
 						if (auto shader = std::dynamic_pointer_cast<Shader>(f)) {
 							auto programs = assets::get_files_type<Program>();
 							for (auto& p : programs) {

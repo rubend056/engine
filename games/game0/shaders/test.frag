@@ -10,6 +10,6 @@ uniform sampler2D tex;
 void main()
 {
 	outColor = 
-	// texture(tex, Tex_cord) * 
+	texture(tex, Tex_cord) * 
     vec4(color_uniform , 1);
 }

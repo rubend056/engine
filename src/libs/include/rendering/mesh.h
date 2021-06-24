@@ -1,99 +1,70 @@
+/**
+ * @file mesh.h
+ * @author RubenD (rubendariopm14@gmail.com)
+ * @brief Defines Mesh object
+ * @version 0.1
+ * 
+ * A mesh implementation in our engine.
+ * Contains:
+ * - Initializes a single VBO (Vertex Buffer Object)
+ * - Contains VAO's (Vertex Array Objects) (Basically different locations in VBO where object data (vertex, normals, texture coordinates) are stored)
+ * 
+ * As defined by Assimp a mesh can contain multiple objects which is why there are multiple VAO's inside a Mesh object
+ * 
+ * - A Vertex Buffer Object (VBO) is a memory buffer in the high speed memory of your video card designed to hold information about vertices.
+ * - A Vertex Array Object (VAO) is an object which contains one or more Vertex Buffer Objects and is designed to store the information for a complete rendered object.
+ * 
+ * 
+ */
+
 #ifndef mesh_h
 #define mesh_h
 
-#define _BV32(x) ((uint32_t)1 << x)
-#include "gl.h"
-#include "file.h"
-#include "idraw.h"
-
 #include "assimp/postprocess.h"
-
-#include "component.h"
+#include "file.h"
+#include "gl.h"
+#include "idraw.h"
 
 class Mesh : public File, public Parent, public IDraw {
    private:
-    // Can't modify this after constructor is called
-    unsigned int vbo_id;
-	
+	// The id of the Vertex Buffer Object (VBO) in GPU
+	unsigned int vbo_id;
+
    public:
-   	
-    unsigned int import_flags=aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_SortByPType;
-    // Can't modify the size after constructor is called
-    // glm::vec3 *positions = nullptr;
-    // glm::vec3 *normals = nullptr;
-    // glm::vec2 *tex_cords = nullptr;
-	
-	// Every VAO represents a different mesh
-	struct VAO: public Component{
-		std::string name;
-		unsigned int vao_id;
-		unsigned int n_vertices;
-		unsigned int draw_function=GL_TRIANGLES;
-		bool positions=false, normals=false, tex_cords=false;
-		void vao_bind(){glBindVertexArray(vao_id);}
-		
-		void vao_attrib_enable(uint32_t attribs) {
-			uint32_t enabled = (positions ? _BV32(0) : 0) |
-							(normals ? _BV32(1) : 0) |
-							(tex_cords ? _BV32(2) : 0);
-			for (int i = 0; i < 3; ++i)
-				if (attribs & enabled & _BV32(i))
-					glEnableVertexArrayAttrib(vao_id, i);
-		};
-		void vao_attrib_disable() {
-			for (int i = 0; i < 3; ++i)
-				glDisableVertexArrayAttrib(vao_id, i);
-		};
-		void gl_draw(){
-			// vao_bind();
-			glDrawArrays(draw_function, 0, n_vertices);
-		}
-		COMPONENT_MAX_NUM override{return 0;}
-		IDRAW_IMGUI_NAME override{return std::string("VAO ") + name;}
-		IDRAW_IMGUI_DRAW override{
-			ImGui::Text("ID: %d", vao_id);
-			ImGui::Text("Vertices: %d", n_vertices);
-			ImGui::Separator();
-			ImGui::Text("Positions: %s", positions?"true":"false");
-			ImGui::Text("Normals: %s", normals?"true":"false");
-			ImGui::Text("Tex_cords: %s", tex_cords?"true":"false");
-		}
-		VAO(){glGenVertexArrays(1, &vao_id);}
-		virtual ~VAO(){glDeleteVertexArrays(1, &vao_id);}
-		template<class Archive>
-		void serialize(Archive& ar){
-			ar(COMPONENT_SERIALIZE);
-			ar(name);
-		}
-	};
-	
-	
-    void vbo_bind(){glBindBuffer(GL_ARRAY_BUFFER, vbo_id);}
-    
-	bool loaded=false;
+	// assimp import flags
+	unsigned int import_flags = aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_SortByPType;
+	// Have we loaded the mesh?
+	bool loaded = false;
+
+	// CONSTRUCTORS
+	// Mesh(FILE_CONSTRUCT_PARAM);
+	// virtual ~Mesh();
+	Mesh(FILE_CONSTRUCT_PARAM) : File(FILE_CONSTRUCT_VARS) {
+		// create_supposed_ext();
+		glGenBuffers(1, &vbo_id);
+		if (!rpath.empty())
+			load();
+	}
+	virtual ~Mesh() { glDeleteBuffers(1, &vbo_id); }
+
+	// FUNCTIONS
+	void vbo_bind() { glBindBuffer(GL_ARRAY_BUFFER, vbo_id); }
 	static bool supported(const std::string& ext);
 	void load() override;
-	
-	// friend class cereal::access;
-	template<class Archive>
-	void serialize(Archive& ar){
+
+	// DRAW
+	IDRAW_IMGUI_NAME override { return filename().c_str(); }
+	IDRAW_IMGUI_DRAW override;
+
+	// SERIALIZATION
+	template <class Archive>
+	void serialize(Archive& ar) {
 		ar(FILE_SERIALIZE);
 		ar(cereal::base_class<Parent>(this));
 		ar(CEREAL_NVP(import_flags));
 		load();
 	}
-	
-	IDRAW_IMGUI_NAME override{return filename().c_str();}
-	IDRAW_IMGUI_DRAW override;
-	Mesh(FILE_CONSTRUCT_PARAM):File(FILE_CONSTRUCT_VARS){
-		// create_supposed_ext();
-		glGenBuffers(1, &vbo_id);
-		if(!rpath.empty())load();
-	}
-	// Mesh(){glGenBuffers(1, &vbo_id);}
-	~Mesh(){glDeleteBuffers(1, &vbo_id);}
 };
 CEREAL_REGISTER_TYPE(Mesh)
-CEREAL_REGISTER_TYPE_WITH_NAME(Mesh::VAO, "VAO")
 
-#endif // mesh_h
+#endif	// mesh_h
