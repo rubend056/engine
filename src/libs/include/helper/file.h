@@ -6,8 +6,10 @@
 #include <fstream>
 #include <set>
 #include <string>
+#include <map>
 
 #include "cereal/types/polymorphic.hpp"
+#include "cereal/types/map.hpp"
 #include "debug.h"
 #include "my_filesystem.h"
 
@@ -48,7 +50,7 @@ inline void load(Archive& ar, path& val) {
 // #define FILE_CONSTRUCT_PARAM0 const fs::path& rpath=""
 // #define FILE_CONSTRUCT_VARS0 rpath
 #define FILE_SUPPOSED_EXT const std::string supposed_ext()
-#define FILE_SERIALIZE cereal::make_nvp("file", cereal::base_class<File>(this))
+#define FILE_SERIALIZE cereal::make_nvp("File", cereal::base_class<File>(this))
 
 // ? FILE ********************
 /**
@@ -81,10 +83,10 @@ class File : public virtual Referentiable {
 	 */
 	void set_filename(const std::string& _filename) { _rel_path.replace_filename(_filename); }
 	/**
-	 * @brief Replaces the path with the one specified
-	 * @param _filename The new filename
+	 * @brief Replaces the relative path with the one specified
+	 * @param _filename The new relative path
 	 */
-	void set_rel_path(const std::string& _path) { _rel_path = fs::path(_path); }
+	void set_rel_path(const std::string& _path) { _rel_path = _path; }
 	// const std::string stem();
 
 	// ? Constructors
@@ -126,13 +128,13 @@ class File : public virtual Referentiable {
 	 * @brief Static function to save desired file
 	 * @param f The file to be saved
 	 */
-	static void save_file(const std::shared_ptr<File>& f);
+	static void save_file(const std::shared_ptr<File>& f, fs::path r_path=fs::path());
 	static std::shared_ptr<File> load_file(const fs::path rel_path);
 
 	// Serializes the file
 	template <class Archive>
 	void serialize(Archive& ar) {
-		ar(cereal::virtual_base_class<Referentiable>(this));
+		ar(REFERENTIABLE_SERIALIZE);
 
 		auto orel_path = _rel_path;
 		ar(cereal::make_nvp("rel_path", _rel_path));

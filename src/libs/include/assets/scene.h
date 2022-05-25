@@ -9,7 +9,7 @@
 #include "cereal/types/unordered_map.hpp"
 #include "map_helper.h"
 
-class Scene : public File, public Parent{
+class Scene : public File, public Parent, public IDraw{
 protected:
 	// std::unordered_map<std::string, std::shared_ptr<GameObject>> rpath_object_ht;
 public:
@@ -23,8 +23,10 @@ public:
 		
 	// MAP_GET_ELEMENT(GameObject, obj, rpath_object_ht)
 	// MAP_GET_ELEMENTS(GameObject, objs, rpath_object_ht)
-	
+	IDRAW_IMGUI_NAME override {return data_path().c_str();}
+	IDRAW_IMGUI_TYPE_NAME override{return "Scene";};
 	FILE_SUPPOSED_EXT override {return ".scene";}
+	
 	static bool supported(const std::string& ext);
 	// bool exists(const std::string& name_or_rpath);
 	
@@ -35,7 +37,7 @@ public:
 	
 	template<class Archive>
 	void serialize(Archive& ar){
-		ar(cereal::virtual_base_class<Parent>(this));
+		ar(PARENT_SERIALIZE);
 		ar(FILE_SERIALIZE);
 	}
 };

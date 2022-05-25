@@ -17,6 +17,7 @@
 
 #include <glm/glm.hpp>
 
+// GL_ATTRIBUTE_TYPE,  AtributeVar type, glUniform value type, glUniformFunction
 #define TYPE_EXPANSION(func)\
 	func(GL_FLOAT				,float				,float			,glUniform1fv)\
 	func(GL_DOUBLE			,double				,double			,glUniform1dv)\
@@ -26,7 +27,7 @@
 	func(GL_FLOAT_MAT2	,glm::mat2		,float			,glUniformMatrix2fv)\
 	func(GL_FLOAT_MAT3	,glm::mat3		,float			,glUniformMatrix2fv)\
 	func(GL_FLOAT_MAT4	,glm::mat4		,float			,glUniformMatrix2fv)\
-	// func(GL_SAMPLER_2D	,unsigned int	,float			,)
+	func(GL_SAMPLER_2D	,unsigned int	,			,)
 
 struct Attribute {
 	// static std::unique_ptr<Attribute> create_attrib_val(GLenum _type, void*_last_val=nullptr);

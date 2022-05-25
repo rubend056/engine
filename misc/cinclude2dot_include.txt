@@ -1,8 +1,0 @@
-src
-libs/include
-libs/include/assets
-libs/include/components
-libs/include/groups
-libs/include/helper
-libs/include/menus
-libs/include/rendering

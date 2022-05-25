@@ -1,3 +1,10 @@
+/**
+ * @file inspector.cpp
+ * @author RubenD (rubendariopm14@gmail.com)
+ * @brief Defines inspector menu
+ * @version 0.1
+ * 
+ */
 #include <typeinfo>
 
 // Ours
@@ -58,7 +65,8 @@ void inspector(bool* p_open) {
 void scene(bool* p_open){
 	if(!engine::scene)return;
 	
-	char d[engine::scene->filename().size()+1];sprintf(d,"Scene <%s>###scene", engine::scene->filename().c_str());
+	char d[engine::scene->filename().size()+1];
+	sprintf(d,"Scene <%s>###scene", engine::scene->filename().c_str());
 	ImGui::Begin(d, p_open);
 	
 	static_assert(std::is_base_of<IDraw, GameObject>::value, "GameObject not derived from IDraw");

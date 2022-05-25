@@ -22,6 +22,6 @@ class  class_name{
 	// DRAW
 	
 	// SERIALIZATION
-}
+};
 
 #endif //  class_name_h

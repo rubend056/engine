@@ -7,9 +7,11 @@
 #include <vector>
 
 #include "cereal/cereal.hpp"
+#define REFERENTIABLE_SERIALIZE cereal::make_nvp("Ref", cereal::virtual_base_class<Referentiable>(this))
 
 class Referentiable;
 typedef Referentiable* parent_type;
+typedef Referentiable Ref;
 
 // ? REFERENTIABLE ###################
 class Referentiable{
@@ -44,18 +46,25 @@ public:
 };
 // ?################### REFERENTIABLE
 
+#define PARENT_SERIALIZE cereal::make_nvp("Parent", cereal::base_class<Parent>(this))
+
 class Parent: public virtual Referentiable{
 public:
 	using Referentiable::Referentiable;
 	std::vector<std::shared_ptr<Referentiable>> children;
 	
-	// Foster a child, add a child to our children, removing it from other parents
+	/**
+	 * @brief Foster a child, push a child to our children, make child->parent = this
+	 * Effectively removing it from other parents before making it our own
+	 * @param child 
+	 * @return std::shared_ptr<Referentiable> 
+	 */
 	virtual std::shared_ptr<Referentiable> foster(const std::shared_ptr<Referentiable>& child);
 	
 	template<class Archive>
 	void serialize(Archive& ar){
 		ar(cereal::make_nvp("children", children));
-		ar(cereal::virtual_base_class<Referentiable>(this));
+		ar(REFERENTIABLE_SERIALIZE);
 	}
 	
 };

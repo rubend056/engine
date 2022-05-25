@@ -50,8 +50,10 @@ add_library(my_libs
 	src/helper/type_name.cpp
 	src/helper/inotify_imp.cpp
 	src/helper/file.cpp
+	src/helper/factory.cpp
 	src/helper/component.cpp
 	src/helper/referentiable.cpp
+	src/helper/imgui_helper.cpp
 
 	src/menus/inspector.cpp
 	src/menus/files.cpp

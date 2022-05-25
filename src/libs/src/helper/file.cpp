@@ -69,9 +69,9 @@ fs::path File::data_path() {
 	return p;
 }
 
-void File::save_file(const std::shared_ptr<File>& f) {
-	if(!f || f->filename().empty())return;
-	auto full_path = engine::get_absolute_from_project(f->_rel_path);
+void File::save_file(const std::shared_ptr<File>& f, fs::path r_path) {
+	if(!f || (f->filename().empty() && r_path.empty()))return;
+	auto full_path = engine::get_absolute_from_project(r_path.empty() ? f->_rel_path : r_path);
 	if (full_path.empty())
 		return;
 	std::cout << "Saving to: " << full_path << std::endl;

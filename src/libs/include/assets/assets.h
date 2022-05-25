@@ -1,3 +1,10 @@
+/**
+ * @file assets.h
+ * @author RubenD (rubendariopm14@gmail.com)
+ * @brief Defines the assets namespace
+ * @version 0.1
+ * 
+ */
 #ifndef Assets_h
 #define Assets_h
 
@@ -54,8 +61,6 @@ namespace assets{
 	
 	// MAP_GET_ELEMENT(File, file_type, type_asset_ht)
 	// MAP_GET_ELEMENTS(File, files_type, type_asset_ht)
-	
-	
 	
 	std::shared_ptr<File> get_file_type (const std::string& t_name);
 	/**

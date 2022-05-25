@@ -4,7 +4,7 @@
  * @brief Defines vao
  * @version 0.1
  * 
- * VAO holds all data of mesh in the GPU
+ * VAO holds all data of mesh that's in the GPU
  */
 #ifndef vao_h
 #define vao_h
@@ -40,6 +40,7 @@ struct VAO : public Component {
 	
 	// DRAW
 	IDRAW_IMGUI_NAME override { return std::string("VAO ") + name; }
+	IDRAW_IMGUI_TYPE_NAME override{return "VAO";};
 	IDRAW_IMGUI_DRAW override;
 	
 	// SERIALIZATION

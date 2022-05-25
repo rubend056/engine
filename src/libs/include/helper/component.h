@@ -13,7 +13,7 @@
 #define COMPONENT_IS_REF bool is_ref()
 #define COMPONENT_SET_REF void set_ref(const std::shared_ptr<Component>& val)
 
-#define COMPONENT_SERIALIZE cereal::make_nvp("component", cereal::base_class<Component>(this))
+#define COMPONENT_SERIALIZE cereal::make_nvp("Component", cereal::base_class<Component>(this))
 
 class GameObject;
 
@@ -34,6 +34,7 @@ class Component : public IDraw, public virtual Referentiable{
 		virtual COMPONENT_IS_REF{return true;}
         virtual COMPONENT_MAX_NUM {return 1;}
 		virtual IDRAW_IMGUI_NAME override {return "Component";}
+		virtual IDRAW_IMGUI_TYPE_NAME override{return "Component";};
 		virtual IDRAW_IMGUI_DRAW override {ImGui::Text ("imgui_draw is not set here");}
 		
 		virtual ~Component(){}
@@ -41,7 +42,7 @@ class Component : public IDraw, public virtual Referentiable{
 		
 		template<class Archive>
 		void serialize(Archive& ar){
-			ar(cereal::virtual_base_class<Referentiable>(this));
+			ar(REFERENTIABLE_SERIALIZE);
 			ar(CEREAL_NVP(enabled));
 		}
 };

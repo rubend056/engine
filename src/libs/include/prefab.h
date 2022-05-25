@@ -1,6 +1,6 @@
 #include <memory>
 
-#define PREFAB_SERIALIZE cereal::make_nvp("template", cereal::base_class<PREFAB_NAME>(this))
+#define PREFAB_SERIALIZE cereal::make_nvp("Prefab", cereal::base_class<PREFAB_NAME>(this))
 
 #define PREFAB_VAR_ENUM_NAME(name) name##_enum
 #define PREFAB_VAR_ENUM_DIRTY(type, name) PREFAB_VAR_ENUM_NAME(name),
@@ -31,7 +31,7 @@
 			PREFAB_VAR_DIRTY_NAME(name) = true;              \
 		}                                                    \
 	}
-#define PREFAB_VAR_CHECK(type, name) check_##name();
+// #define PREFAB_VAR_CHECK(type, name) check_##name();
 
 //? GET AND SET
 #define PREFAB_VAR_GET_DEF(type, name) \

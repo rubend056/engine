@@ -5,6 +5,7 @@
 
 #include "assets.h"
 #include "debug.h"
+#include "imgui_helper.h"
 #include "menus.h"
 
 using namespace std;
@@ -49,7 +50,7 @@ std::vector<unsigned int> Program::get_shaders() {
 	GLuint _shaders[MAX_SHADERS_SIZE];
 	GLsizei _shaders_count;
 	glGetAttachedShaders(p_id, MAX_SHADERS_SIZE, &_shaders_count, _shaders);
-	
+
 	v.reserve(_shaders_count);
 	for (int i = 0; i < _shaders_count; ++i) v.push_back(_shaders[i]);
 	return v;
@@ -69,7 +70,6 @@ std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void* _last_val = nul
 
 	switch (_type) {
 		TYPE_EXPANSION(ATTRIB_CREATE_FUNC)
-		ATTRIB_CREATE_FUNC(GL_SAMPLER_2D, uint,,)
 		default:
 			throw std::range_error("Type not defined");
 			break;
@@ -79,25 +79,43 @@ std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void* _last_val = nul
 void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib, const void* other_val = nullptr) {
 	if (!attrib->uniform || (!attrib->val && !other_val))
 		return;	 // Return if it's not a uniform, or val null
-		
+
 // #define TOM(type, offset) (*((type*)attrib->val+offset))
-#define SET_UNIFORM_FUNC(gl_type, type, gl_type_name, uniformfunc)      \
-	case gl_type:                                                       \
-		uniformfunc(attrib->location, 1, ((gl_type_name*)attrib->val)); \
-		break;
+// 	static const int gl_mat_types[] = {GL_FLOAT_MAT2, GL_FLOAT_MAT3, GL_FLOAT_MAT4};
+// #define SET_UNIFORM_FUNC(gl_type, type, gl_type_name, uniformfunc)      \
+// 	case gl_type:                                                       \
+// 		uniformfunc(attrib->location, 1, ((gl_type_name*)_val)); \
+// 		break;
 
 	auto _val = other_val ? other_val : attrib->val;
 	switch (attrib->type) {
 		// TYPE_EXPANSION(SET_UNIFORM_FUNC)
-		case GL_FLOAT: 		glUniform1fv		(attrib->location, 1, ((float*)_val)); break;
-		case GL_DOUBLE: 	glUniform1dv		(attrib->location, 1, ((double*)_val)); break;
-		case GL_FLOAT_VEC2: glUniform2fv		(attrib->location, 1, ((float*)_val)); break;
-		case GL_FLOAT_VEC3: glUniform3fv		(attrib->location, 1, ((float*)_val)); break;
-		case GL_FLOAT_VEC4: glUniform4fv		(attrib->location, 1, ((float*)_val)); break;
-		case GL_FLOAT_MAT2: glUniformMatrix2fv	(attrib->location, 1, false, ((float*)_val)); break;
-		case GL_FLOAT_MAT3: glUniformMatrix3fv	(attrib->location, 1, false, ((float*)_val)); break;
-		case GL_FLOAT_MAT4: glUniformMatrix4fv	(attrib->location, 1, false, ((float*)_val)); break;
-		case GL_SAMPLER_2D:  break;
+		case GL_FLOAT:
+			glUniform1fv(attrib->location, 1, ((float*)_val));
+			break;
+		case GL_DOUBLE:
+			glUniform1dv(attrib->location, 1, ((double*)_val));
+			break;
+		case GL_FLOAT_VEC2:
+			glUniform2fv(attrib->location, 1, ((float*)_val));
+			break;
+		case GL_FLOAT_VEC3:
+			glUniform3fv(attrib->location, 1, ((float*)_val));
+			break;
+		case GL_FLOAT_VEC4:
+			glUniform4fv(attrib->location, 1, ((float*)_val));
+			break;
+		case GL_FLOAT_MAT2:
+			glUniformMatrix2fv(attrib->location, 1, false, ((float*)_val));
+			break;
+		case GL_FLOAT_MAT3:
+			glUniformMatrix3fv(attrib->location, 1, false, ((float*)_val));
+			break;
+		case GL_FLOAT_MAT4:
+			glUniformMatrix4fv(attrib->location, 1, false, ((float*)_val));
+			break;
+		case GL_SAMPLER_2D:
+			break;
 		default:
 			throw std::range_error("Type not defined");
 			break;
@@ -224,37 +242,44 @@ void Program::imgui_draw() {
 
 	{
 		int _i = 0;
+		bool x_pressed = false;
 		for (auto& v : shaders) {
 			++_i;
 			auto shader = assets::get_file<Shader>(v);
+			
 			ImGui::PushID(_i);
-			ImGui::Text("%s", shader->filename().c_str());
-			ImGui::SameLine();
-			if (ImGui::SmallButton("X")) {
-				detach_shader(shader->s_id);
-				link();
-				ImGui::PopID();
-				break;
+			{
+				ImGui::Text("%s", shader->filename().c_str());
+				ImGui::SameLine();
+				x_pressed = ImGui::SmallButton("X");
 			}
 			ImGui::PopID();
+
+			if (x_pressed) {
+				detach_shader(shader->s_id);
+				link();
+				break;
+			}
 		}
 	}
 
 	ImGui::PopStyleVar();
 	ImGui::EndChild();
 
-	ImGui::PushID("add_shader");
-	if (ImGui::Button("Add Shader", ImVec2(-1, 0))) {
-		ImGui::OpenPopup("add_popup");
-	}
+	ImGui::PushID("add_shader");  // ID add_shader
+	{
+		if (ImGui::Button("Add Shader", ImVec2(-1, 0))) {
+			ImGui::OpenPopup("select_shader");
+		}
 
-	auto shader_files = assets::get_files_type<File, Shader>();
-	auto shader = std::dynamic_pointer_cast<Shader>(menus::add_popup(shader_files));
-	if (shader) {
-		attach_shader(shader->s_id);
-		link();
+		// auto shader_files = assets::get_files_type<File, Shader>();
+		if (auto shader = menus::select_asset<Shader>("select_shader")) {
+			attach_shader(shader->s_id);
+			link();
+		}
 	}
-	ImGui::PopID();
+	ImGui::PopID();	 // ID add_shader
+
 	if (ImGui::Button("Relink", ImVec2(-1, 0)))
 		link();
 	ImGui::TextColored(link_status ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f), link_status ? "Ok" : "Failed");
@@ -266,11 +291,11 @@ void Program::imgui_draw() {
 	for (auto& a : attributes) {
 		if (a->uniform)
 			continue;
-		ImGui::PushID(a->i);
+		ImGui::PushID(a->i);  // ID attr index
 		ImGui::TextDisabled("%d", a->i);
 		ImGui::SameLine(0, _SEPARATION);
 		ImGui::TextDisabled(a->name);
-		ImGui::PopID();
+		ImGui::PopID();	 // ID attr index
 	}
 
 	ImGui::Separator();
@@ -303,27 +328,29 @@ void Program::imgui_draw() {
 		ImGui::PopID();
 	}
 
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.1, .1, .1, .2));
-	if (ImGui::Button("Drag Textures Here", ImVec2(-1, 0)))
+	// ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.1, .1, .1, .2));
+	if (ImGui::Button("Add Texture", ImVec2(-1, 0)))
 		ImGui::OpenPopup("add_texture_popup");
 	//? IMAGE DRAG N DROP
-	if (ImGui::BeginDragDropTarget()) {
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_REF")) {
-			unsigned int data[11];
-			assert(payload->DataSize == sizeof(data));
-			memcpy(data, payload->Data, sizeof(data));
-			std::vector<unsigned int> refs;
-			for (int i = 0; i < data[0]; ++i) refs.push_back(data[i + 1]);
-			auto texture = assets::get_file<Texture>(refs);
-			if (texture)
+
+	static std::vector<uint> refs;
+	imgui_dnd_ref(refs, false);
+	if (refs.size()) {
+		if (auto texture = assets::get_file<Texture>(refs)) {
+			// Only add if it doesn't exist
+			if (std::find(textures.begin(), textures.end(), texture) == textures.end())
 				textures.push_back(texture);
 		}
-		ImGui::EndDragDropTarget();
 	}
-	//? ############ IMAGE DRAG N DROP
-	menus::add_popup(assets::get_files_type<File, Texture>(), false, "add_texture_popup");
 
-	ImGui::PopStyleColor();
+	//? ############ IMAGE DRAG N DROP
+	if (auto texture = menus::select_asset<Texture>("add_texture_popup")) {
+		// Only add if it doesn't exist
+		if (std::find(textures.begin(), textures.end(), texture) == textures.end())
+			textures.push_back(texture);
+	}
+
+	// ImGui::PopStyleColor();
 
 	ImGui::Separator();
 

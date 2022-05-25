@@ -1,3 +1,10 @@
+/**
+ * @file shader.h
+ * @author RubenD (rubendariopm14@gmail.com)
+ * @brief Defines a shader
+ * @version 0.1
+ * 
+ */
 #ifndef shader_h
 #define shader_h
 
@@ -37,6 +44,7 @@ public:
 	~Shader(){glDeleteShader(s_id);}
 	
 	IDRAW_IMGUI_NAME override {return filename();}
+	IDRAW_IMGUI_TYPE_NAME override{return "Shader";};
 	IDRAW_IMGUI_DRAW override ;
 	
 	// FILE_SUPPOSED_EXT override {return ".meta";}

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="70mm"
+   height="70mm"
+   viewBox="0 0 70 70"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="/home/rubend/cpp_p/engine/misc/icon.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="true"
+     inkscape:document-units="mm"
+     showgrid="false"
+     height="50mm"
+     showborder="true"
+     borderlayer="false"
+     inkscape:snap-others="false"
+     inkscape:snap-global="false"
+     inkscape:zoom="2.7233239"
+     inkscape:cx="134.57819"
+     inkscape:cy="138.80097"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <filter
+       id="selectable_hidder_filter"
+       width="1"
+       height="1"
+       x="0"
+       y="0"
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="LPE boolean visibility">
+      <feComposite
+         id="boolops_hidder_primitive"
+         result="composite1"
+         operator="arithmetic"
+         in2="SourceGraphic"
+         in="BackgroundImage"
+         k1="0"
+         k2="0"
+         k3="0"
+         k4="0" />
+    </filter>
+    <inkscape:path-effect
+       effect="bool_op"
+       id="path-effect5520"
+       is_visible="true"
+       lpeversion="1"
+       operand-path="#path629"
+       operation="diff"
+       swap-operands="false"
+       rmv-inner="false"
+       filltype-this="from-curve"
+       filter=""
+       filltype-operand="from-curve" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect5518"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter5596"
+       x="-0.2168573"
+       y="-0.22252978"
+       width="1.4337146"
+       height="1.4805098">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.5540389"
+         id="feGaussianBlur5598" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="color:#000000;opacity:1;mix-blend-mode:normal;fill:#0070ff;fill-opacity:0;stroke:#0082ff;stroke-width:4.61239543;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5596)"
+       d="M 44.398145,40.846426 H 6.9060334 L 25.652091,8.1466413 Z"
+       id="path629-6"
+       transform="matrix(1.3008425,0,0,1.3008425,1.702008,0.98430505)" />
+    <path
+       style="color:#000000;display:none;opacity:0.999;fill:#0070ff;fill-opacity:0;stroke:#0027ff;stroke-width:3.35116;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 49.552958,38.222755 H 12.060846 L 30.806904,5.5229707 Z"
+       id="path629-3" />
+    <path
+       style="color:#000000;opacity:1;fill:#0070ff;fill-opacity:0;stroke:#004dff;stroke-width:8.07085043;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:24.21255128,24.21255128;stroke-dashoffset:24.21255128;stroke-opacity:1;paint-order:normal"
+       d="M 59.865032,54.777792 H 9.4328357 L 34.648936,10.791955 Z"
+       id="path629"
+       inkscape:export-filename="/home/rubend/cpp_p/engine/misc/path629.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </g>
+</svg>

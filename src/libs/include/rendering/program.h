@@ -121,6 +121,7 @@ class Program : public File, public Component {
 	// DRAWING
 	IDRAW_IMGUI_DRAW override;
 	IDRAW_IMGUI_NAME override { return filename(); }
+	IDRAW_IMGUI_TYPE_NAME override{return "Program";};
 
 	// FILE
 	FILE_SUPPOSED_EXT override { return PROGRAM_EXT; }

@@ -100,7 +100,7 @@ void Mesh::load() {
 	}
 }
 
-
+// DRAWING
 void Mesh::imgui_draw() {
 	auto vaos = helper::dynamic_pointer_cast_array<VAO>(children);
 	ImGui::TextDisabled("VAO's");
@@ -109,10 +109,10 @@ void Mesh::imgui_draw() {
 		ImGui::BeginChild(vao->name.c_str(), ImVec2(-1, 0), true);
 
 		ImGui::Button("Drag Me", ImVec2(-1, 0));
-		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoDisableHover | ImGuiDragDropFlags_SourceAllowNullID)) {
-			
-			ImGui::EndDragDropSource();
-		}
+		
+		auto refs = vao->my_ref();
+		imgui_dnd_ref(refs, true, ImGuiDragDropFlags_SourceNoDisableHover | ImGuiDragDropFlags_SourceAllowNullID);
+		
 		vao->imgui_draw();
 		ImGui::EndChild();
 	}

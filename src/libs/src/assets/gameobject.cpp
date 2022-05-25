@@ -1,5 +1,6 @@
 #include "gameobject.h"
 
+#include "imgui_helper.h"
 #include "components.h"
 #include "mesh.h"
 
@@ -70,43 +71,19 @@ void GameObject::imgui_draw(){
 	//? ADD COMPONENT POPUP
 	if (ImGui::Button("Add Component", ImVec2(-1,0)))
 		ImGui::OpenPopup("add_component_popup");
-	//? Component DRAG N DROP
-	if (ImGui::BeginDragDropTarget())
-	{
-		std::shared_ptr<Component> comp;
-		// if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_FILE"))
-		// {
-		// 	IM_ASSERT(payload->DataSize == sizeof(int));
-		// 	auto f_id = *(int*)payload->Data;
-		// 	comp = assets::get_file<Component>([&](File*t){return t->get_id() == f_id;});
-		// }
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_REF"))
-		{
-			unsigned int data[11];
-			assert(payload->DataSize == sizeof(data));
-			memcpy(data, payload->Data, sizeof(data));
-			std::vector<unsigned int> refs;for(int i=0;i<data[0];++i)refs.push_back(data[i+1]);
-			comp = assets::get_file<Component>(refs);
-		}
-		
-		if(comp){
+	
+	
+	
+	static std::vector<uint> refs;
+	imgui_dnd_ref(refs, false);
+	if(refs.size()){
+		if(auto comp = assets::get_file<Component>(refs)){
 			// if(!comp->is_ref())comp = std::dynamic_pointer_cast<Component>(foster(comp->clone()));
 			add(comp);
 		}
-		ImGui::EndDragDropTarget();
 	}
-	//? ############ Component DRAG N DROP
 
-	if (ImGui::BeginPopup("add_component_popup")) {
-		// Filter code
-		// static ImGuiTextFilter filter;
-		// filter.Draw("##filter0", 100);
-		// std::shared_ptr<Component> c; const char* type_id_name;
-		// auto component_button = [&]() -> void {add(c); ImGui::CloseCurrentPopup();};
-		if(ImGui::Button("Transform"))add(std::make_shared<Transform>());
-		if(ImGui::Button("Camera"))add(std::make_shared<Camera>());
-		// if (c = component_button<Program>()){type_id_name = typeid(Program).name(); push();}
-
-		ImGui::EndPopup();
+	if (auto comp = menus::select_asset<Component>("add_component_popup", FactoryType_Camera, MenuSelectFlags_NewOnly)) {
+		add(comp);
 	}
 }

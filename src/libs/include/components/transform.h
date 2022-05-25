@@ -30,7 +30,8 @@ public:
 	glm::mat4 get_sca_mat();
 	Transform(){sca = glm::vec3(1);}
 	IDRAW_IMGUI_DRAW override;
-	IDRAW_IMGUI_NAME override {return "Transform";if(pos == rot);}
+	IDRAW_IMGUI_NAME override {return "Transform";}
+	IDRAW_IMGUI_TYPE_NAME override{return "Transform";};
 	COMPONENT_MAX_NUM override {return 1;}
 	
 	COMPONENT_IS_REF override {return false;}

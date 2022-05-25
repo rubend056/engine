@@ -19,10 +19,11 @@ std::unordered_map<std::string, std::shared_ptr<File>> rpath_asset_ht;
 std::unordered_map<unsigned int, std::string> id_rpath_ht;
 std::unordered_multimap<std::string, std::shared_ptr<File>> type_asset_ht;
 
-void add(const std::shared_ptr<File>& file) {
-	if (!file)
+void add(const std::shared_ptr<File>& _file) {
+	if (!_file)
 		return;
-	
+		
+	auto file = _file;
 	file->create_supposed_ext();
 	if (std::find(files.begin(), files.end(), file) == files.end())
 		files.push_back(file);
@@ -183,17 +184,21 @@ std::shared_ptr<Referentiable> get_file(const std::vector<unsigned int>& refs) {
 //? ENTRIES **************************
 // All entries, including project_path to the project
 vector<fs::directory_entry> entries;
-void list_dir(string d) {
-	for (const auto& entry : fs::directory_iterator(d)) {
-		assets::entries.push_back(entry);
-		if (ENTRY_IS_DIR(entry)) {
-			list_dir(entry.path().string());
+void list_dir(string d, int depth=0) {
+	// Push the first dir
+	if(!d.size())return;
+	auto entry = fs::directory_entry(d);
+	if(!entry.exists())return;
+	assets::entries.push_back(entry);
+	if(ENTRY_IS_DIR(entry)){
+		for (const auto& entry : fs::directory_iterator(d)) {
+			list_dir(entry.path().string(), depth+1);
 		}
 	}
+	
 }
 void reload_project() {
 	entries.clear();
-	entries.push_back(fs::directory_entry(engine::project_path));
 	list_dir(engine::project_path);
 
 	// Initialize inotify

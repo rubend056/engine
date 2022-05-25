@@ -54,14 +54,16 @@ class Mesh : public File, public Parent, public IDraw {
 
 	// DRAW
 	IDRAW_IMGUI_NAME override { return filename().c_str(); }
+	IDRAW_IMGUI_TYPE_NAME override { return "Mesh"; };
 	IDRAW_IMGUI_DRAW override;
 
 	// SERIALIZATION
 	template <class Archive>
 	void serialize(Archive& ar) {
-		ar(FILE_SERIALIZE);
-		ar(cereal::base_class<Parent>(this));
-		ar(CEREAL_NVP(import_flags));
+		ar(
+			FILE_SERIALIZE,
+			PARENT_SERIALIZE,
+			CEREAL_NVP(import_flags));
 		load();
 	}
 };

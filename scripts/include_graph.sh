@@ -1,7 +1,9 @@
 #!/bin/bash
-set -e
+set e
 
 P=`pwd`
+DOT_DIR="${P}/misc/graph"
+DEST_DIR="${DOT_DIR}"
 
-./cinclude2dot --include `cat ${P}/misc/cinclude2dot_include.txt | tr "\n" ","` --quotetypes quote --merge file --exclude cereal --src libs > source.dot
-dot -Tpdf source.dot -o source.pdf
+${DOT_DIR}/cinclude2dot --include `cat ${DOT_DIR}/cinclude2dot_include.txt | tr "\n" ","`  --quotetypes quote --merge file --exclude cereal --src src > ${DEST_DIR}/source.dot
+neato -Tpdf -x ${DEST_DIR}/source.dot -o ${DEST_DIR}/source.pdf

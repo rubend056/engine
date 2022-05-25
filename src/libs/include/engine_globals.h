@@ -6,6 +6,8 @@
 #include "my_filesystem.h"
 // #include <memory>
 
+#define ARRAY_SIZE(arr) (sizeof(arr)/sizeof((arr)[0]))
+#define ARRAY_END(arr) ((arr) + ARRAY_SIZE(arr))
 
 // Has initialization of everything as well as basic functions init, update, render, etc...
 namespace engine{
