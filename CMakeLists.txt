@@ -96,7 +96,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		#Core libraries for engine
 		
 		soil
-		fmt
 		
 		SDL2
 		# SDL2_mixer
