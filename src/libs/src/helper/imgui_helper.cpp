@@ -1,7 +1,5 @@
 #include "imgui_helper.h"
 
-#include "fmt/format-inl.h"
-
 // #include <iostream>
 
 #include "cereal/archives/binary.hpp"
