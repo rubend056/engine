@@ -11,25 +11,23 @@ class Texture : public File, public IDraw {
    public:
 	unsigned int t_id;
 
-	int type = 0;  // SOIL_LOAD_AUTO
+	int tex_type = 0;  // SOIL_LOAD_AUTO
 	int width, height;
 
 	bool loaded = false;
-	static bool supported(const std::string& ext);
+	static bool supported(std::string ext);
 	void load() override;
 
 	Texture(FILE_CONSTRUCT_PARAM);
 	~Texture() { glDeleteTextures(1, &t_id); }
 
 	IDRAW_IMGUI_NAME override { return filename(); }
-	IDRAW_IMGUI_TYPE_NAME override { return "Texture"; };
+	ITYPE override { return "Texture"; };
 	IDRAW_IMGUI_DRAW override;
 
 	template <class Archive>
 	void serialize(Archive& ar) {
-		ar(
-			FILE_SERIALIZE,
-			cereal::make_nvp("type", type));
+		ar(FILE_SERIALIZE, CEREAL_NVP(tex_type));
 		load();
 	}
 };

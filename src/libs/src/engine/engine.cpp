@@ -76,41 +76,59 @@ std::shared_ptr<Scene> scene;
 // std::vector<std::shared_ptr<GameObject>> selected;
 fs::path project_path;
 
+void check_project_path() {
+	if (project_path.empty() || project_path.is_relative())
+		throw "Project path is empty or relative";
+}
+fs::path &normalize_absolute(fs::path &p) {
+	check_project_path();
+	// Make sure asset path is always absolute
+	if (p.is_relative())
+		p = project_path / p;
+	return p;
+}
+bool is_within_project(const fs::path &full_path) {
+	return full_path.string().find(project_path.string()) == 0;
+}
+
+bool is_relative_to_project(const fs::path &asset_path) {
+	if (asset_path.is_relative())
+		return true;
+	auto p = asset_path;
+	normalize_absolute(p);
+	return is_within_project(p);
+}
 fs::path get_absolute_from_project(const fs::path &asset_path) {
-	// cout << "Asset path: " << fs::absolute(asset_path) << endl;
-	// cout << "Project path: " << project_path << endl;
-	// Make sure asset path is relative
-	assert(asset_path.is_relative());
-	// Make sure asset path is inside project
-	// assert(fs::absolute(asset_path).string().find(project_path.string()) != std::string::npos);
-	auto pp = project_path.string();
-	return fs::path(pp + "/" + asset_path.string());
+	check_project_path();
+	if (asset_path.is_relative())
+		return project_path / asset_path;
+	else
+		assert(is_relative_to_project(asset_path));
+	return asset_path;
 }
 fs::path get_relative_to_project(const fs::path &asset_path) {
-	// Make sure asset path is inside project
-	assert(fs::absolute(asset_path).string().find(project_path.string()) != std::string::npos);
-	// return asset_path.lexically_relative(project_path);
-	return relativePath(asset_path, project_path);
-}
-#define ENGINE_CACHE_PATH engine::get_absolute_from_project("cache.json")
-void save_scene() {
-	if (scene) {
-		std::ofstream f(ENGINE_CACHE_PATH);
-		cereal::JSONOutputArchive ar(f);
-
-		// Saving Scene
-		// File::save_file(scene);
-		ar(cereal::make_nvp("scene", scene->hash_path()));
-
-		// Saving Inspector File
-		// auto ins_paths = assets::data_path(std::dynamic_pointer_cast<File>(menus::inspector_o));
-		// ar(cereal::make_nvp("inspector", ins_paths));
+	check_project_path();
+	if (asset_path.is_absolute()) {
+		assert(is_within_project(asset_path));
+		return relativePath(asset_path, project_path);
 	}
+	return asset_path;
+}
+
+#define ENGINE_CACHE_PATH engine::get_absolute_from_project("cache.json")
+void save_engine_state() {
+	if (!scene)
+		return;
+
+	std::ofstream f(ENGINE_CACHE_PATH);
+	cereal::JSONOutputArchive ar(f);
+
+	// Saving Scene
+	ar(cereal::make_nvp("scene", scene->hash_path()));
 }
 void load_scene(const std::shared_ptr<Scene> &_scene) {
-	save_scene();
+	save_engine_state();
 	scene = _scene;
-	menus::inspector_o.clear();
 }
 }  // namespace engine
 
@@ -169,12 +187,11 @@ void render() {
 
 		// For all GameObjects in scene
 		for (auto &go : gobjects) {
-			
 			// Get all Programs in GameObject
 			auto progs = go->get_comps<Program>();
 			if (!progs.size())
 				continue;  // If there are no Programs, skip object
-			
+
 			// Get all mesh VAO's in GameObject
 			auto vaos = go->get_comps<VAO>();
 			if (!vaos.size())
@@ -186,7 +203,7 @@ void render() {
 			for (auto &prog : progs) {
 				if (!prog->link_status)
 					continue;  // If link status of program false, skip program
-					
+
 				// 1. Use program
 				prog->use();
 				for (auto &vao : vaos) {
@@ -197,15 +214,15 @@ void render() {
 					// 3. Bind VAO
 					vao->vao_bind();
 					vao->vao_attrib_enable(0xff);
+
 					for (auto &cam : cameras) {
-						// auto cam_tmat = cam->get_parent_go()->trans->get_pos_mat();
 						auto pmat = cam->get_matrix();
-						// cout << pmat << endl;
-						// 4. Set
-						// auto t = pmat * glm::vec4(1.f, 0.f, 0.f, 1.f);
-						// cout << t.x << t.y << t.z << endl;
-						// printf("%f %f %f\n", t.x, t.y, t.z);
 						prog->set_pmat(pmat * go_trans_matrix);
+						vao->gl_draw();
+					}
+					// Backup rendering in case there are no cameras
+					if (cameras.size() == 0) {
+						prog->set_pmat(glm::mat4(1));
 						vao->gl_draw();
 					}
 				}
@@ -216,7 +233,7 @@ void render() {
 
 void exit() {
 	menus::imgui_engine_exit();
-	save_scene();
+	save_engine_state();
 	assets::exit();
 }
 }  // namespace engine

@@ -23,7 +23,7 @@ void VAO::gl_draw() {
 	glDrawArrays(draw_function, 0, n_vertices);
 }
 
-void VAO::imgui_draw(){
+void VAO::imgui_draw() {
 	ImGui::Text("ID: %d", vao_id);
 	ImGui::Text("Vertices: %d", n_vertices);
 	ImGui::Separator();

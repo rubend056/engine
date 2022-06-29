@@ -28,7 +28,7 @@ void Program::clear_shaders() {
 	shaders.clear();
 }
 
-bool Program::supported(const std::string& ext) {
+bool Program::supported(std::string ext) {
 	return ext.compare(PROGRAM_EXT) == 0;
 }
 
@@ -76,43 +76,38 @@ std::unique_ptr<Attribute> attrib_create_val(GLenum _type, void* _last_val = nul
 	}
 	return nullptr;
 }
-void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib, const void* other_val = nullptr) {
-	if (!attrib->uniform || (!attrib->val && !other_val))
+/**
+ * Sets uniform if attibute is a uniform and 
+ */
+void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib, const void* val = nullptr) {
+	if (!attrib->uniform || !val)
 		return;	 // Return if it's not a uniform, or val null
 
-// #define TOM(type, offset) (*((type*)attrib->val+offset))
-// 	static const int gl_mat_types[] = {GL_FLOAT_MAT2, GL_FLOAT_MAT3, GL_FLOAT_MAT4};
-// #define SET_UNIFORM_FUNC(gl_type, type, gl_type_name, uniformfunc)      \
-// 	case gl_type:                                                       \
-// 		uniformfunc(attrib->location, 1, ((gl_type_name*)_val)); \
-// 		break;
-
-	auto _val = other_val ? other_val : attrib->val;
 	switch (attrib->type) {
 		// TYPE_EXPANSION(SET_UNIFORM_FUNC)
 		case GL_FLOAT:
-			glUniform1fv(attrib->location, 1, ((float*)_val));
+			glUniform1fv(attrib->location, 1, ((float*)val));
 			break;
 		case GL_DOUBLE:
-			glUniform1dv(attrib->location, 1, ((double*)_val));
+			glUniform1dv(attrib->location, 1, ((double*)val));
 			break;
 		case GL_FLOAT_VEC2:
-			glUniform2fv(attrib->location, 1, ((float*)_val));
+			glUniform2fv(attrib->location, 1, ((float*)val));
 			break;
 		case GL_FLOAT_VEC3:
-			glUniform3fv(attrib->location, 1, ((float*)_val));
+			glUniform3fv(attrib->location, 1, ((float*)val));
 			break;
 		case GL_FLOAT_VEC4:
-			glUniform4fv(attrib->location, 1, ((float*)_val));
+			glUniform4fv(attrib->location, 1, ((float*)val));
 			break;
 		case GL_FLOAT_MAT2:
-			glUniformMatrix2fv(attrib->location, 1, false, ((float*)_val));
+			glUniformMatrix2fv(attrib->location, 1, false, ((float*)val));
 			break;
 		case GL_FLOAT_MAT3:
-			glUniformMatrix3fv(attrib->location, 1, false, ((float*)_val));
+			glUniformMatrix3fv(attrib->location, 1, false, ((float*)val));
 			break;
 		case GL_FLOAT_MAT4:
-			glUniformMatrix4fv(attrib->location, 1, false, ((float*)_val));
+			glUniformMatrix4fv(attrib->location, 1, false, ((float*)val));
 			break;
 		case GL_SAMPLER_2D:
 			break;
@@ -122,67 +117,84 @@ void attrib_set_uniform(const std::unique_ptr<Attribute>& attrib, const void* ot
 	}
 	// #undef TOM
 }
+/**
+ * Sets uniform if name and type match
+ */
+void attrib_set_uniform(std::string name, int gl_type, const void* val) {
+}
 
-void print_link_status(int link_status, const char* filename) {
-	printf((link_status == GL_TRUE) ? ANSI_COLOR_GREEN : ANSI_COLOR_RED);
-	printf("Program %s link %s" ANSI_COLOR_RESET "\n", filename, (link_status) ? "OK" : "BAD");
+void print_link_status(int link_status, const char* filename, const char* debug_info = nullptr) {
+	printf(link_status == GL_TRUE ? ANSI_COLOR_GREEN : ANSI_COLOR_RED);
+	printf("Program %s link %s" ENDL, filename, link_status ? "OK" : "BAD");
+	if (debug_info)
+		printf(debug_info);
+	printf(ANSI_COLOR_RESET);
 }
 
 void Program::use() {
-	if (link_status == GL_TRUE) {
-		// Use the program
-		glUseProgram(p_id);
-		// Set the uniforms
-		for (auto& a : attributes) {
-			if (strcmp(a->name, "itime") == 0)
-				glUniform1d(a->location, engine::time);
-			else if (strcmp(a->name, "idtime") == 0)
-				glUniform1d(a->location, engine::deltaTime);
-			else
-				attrib_set_uniform(a);
-		}
-		// Binding all textures to their appropriate texture unit
-		static uint16_t gl_texture[] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2};
-		for (
-			auto it = textures.begin(); it < textures.end() &&
-										it - textures.begin() < sizeof(gl_texture) / sizeof(gl_texture[0]);
-			++it) {
-			glActiveTexture(gl_texture[it - textures.begin()]);
-			glBindTexture(GL_TEXTURE_2D, (*it)->t_id);
-		}
-	} else {
+	if (link_status != GL_TRUE) {
 		printf("Can't use ");
 		print_link_status(link_status, filename().c_str());
+		return;
+	}
+	// Use the program
+	glUseProgram(p_id);
+	// Set the uniforms
+	for (auto& a : attributes) {
+		if (strcmp(a->name, "itime") == 0)
+			glUniform1d(a->location, engine::time);
+		else if (strcmp(a->name, "idtime") == 0)
+			glUniform1d(a->location, engine::deltaTime);
+		else
+			attrib_set_uniform(a);
+	}
+	// Binding all textures to their appropriate texture unit
+	static uint16_t gl_texture[] = {GL_TEXTURE0, GL_TEXTURE1, GL_TEXTURE2};
+	for (
+		auto it = textures.begin(); it < textures.end() &&
+									(size_t)(it - textures.begin()) < sizeof(gl_texture) / sizeof(gl_texture[0]);
+		++it) {
+		glActiveTexture(gl_texture[it - textures.begin()]);
+		glBindTexture(GL_TEXTURE_2D, (*it)->t_id);
 	}
 }
 
 void Program::set_pmat(const glm::mat4& mat) {
 	// Find an attribute called ipmat
-	auto it = std::find_if(attributes.begin(), attributes.end(),
-						   [](const std::unique_ptr<Attribute>& a) {
-							   return strcmp(a->name, "ipmat") == 0;
-						   });
-	if (it != attributes.end()) {
-		attrib_set_uniform(*it, &mat);
+	for (auto& a : attributes) {
+		if (strcmp(a->name, "ipmat") != 0 && strcmp(a->name, "pmat") != 0)
+			continue;
+		attrib_set_uniform(a, &mat);
+		return;
 	}
 }
 
 void Program::link() {
-	// if(!_shaders_count)return;
-	// glBindFragDataLocation(p_id, 0, "outColor");
-	auto _shaders = get_shaders();
 	shaders.clear();
+	// Repopulate shaders
+	auto _shaders = get_shaders();
 	for (auto& s_id : _shaders) {
+		// NOLINT
 		function<bool(Shader*)> f = [&](Shader* s) { return s->s_id == s_id; };
 		auto s = assets::get_file(f);
 		if (s)
 			shaders.push_back(s->my_ref());
 	}
 
+	// Link
 	glLinkProgram(p_id);
+
+	// Get link status
 	glGetProgramiv(p_id, GL_LINK_STATUS, &link_status);
 
-	print_link_status(link_status, filename().c_str());
+	// Get Log
+	GLint maxLength = 0;
+	glGetProgramiv(p_id, GL_INFO_LOG_LENGTH, &maxLength);
+	GLchar infoLog[maxLength];
+	glGetProgramInfoLog(p_id, maxLength, &maxLength, infoLog);
+
+	// Print status and log
+	print_link_status(link_status, filename().c_str(), maxLength > 1 ? infoLog : nullptr);
 
 	if (link_status == GL_TRUE) {
 		std::vector<std::unique_ptr<Attribute>> new_attributes;
@@ -209,7 +221,7 @@ void Program::link() {
 
 				// Check if attribute is one of the known ones
 				bool is_imp = false;
-				for (int e = 0; e < sizeof(default_uniforms) / sizeof(default_uniforms[0]); ++e) {
+				for (size_t e = 0; e < sizeof(default_uniforms) / sizeof(default_uniforms[0]); ++e) {
 					if (strcmp(default_uniforms[e], a.name) == 0) {
 						is_imp = true;
 						break;
@@ -246,7 +258,7 @@ void Program::imgui_draw() {
 		for (auto& v : shaders) {
 			++_i;
 			auto shader = assets::get_file<Shader>(v);
-			
+
 			ImGui::PushID(_i);
 			{
 				ImGui::Text("%s", shader->filename().c_str());
@@ -302,11 +314,11 @@ void Program::imgui_draw() {
 
 	ImGui::TextDisabled("Textures");
 	for (auto it = textures.begin(); it < textures.end(); ++it) {
-		int index = it - textures.begin();
+		size_t index = it - textures.begin();
 		ImGui::PushID(index);
 		ImGui::Image((void*)(intptr_t)((*it)->t_id), ImVec2(50, 50));
 		ImGui::SameLine();
-		ImGui::Text("GL_TEXTURE%d", index);
+		ImGui::Text("GL_TEXTURE%zu", index);
 		ImGui::SameLine();
 		if (index && ImGui::SmallButton("Up")) {
 			auto temp = *it;   // Store this index

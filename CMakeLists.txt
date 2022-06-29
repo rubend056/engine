@@ -19,7 +19,10 @@ message("-- CMAKE_SYSTEM:           	${CMAKE_SYSTEM}")
 
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Android")
-	find_package(ASSIMP REQUIRED)
+	# find_package(ASSIMP REQUIRED)
+	set(ASSIMP_INCLUDE_DIRS extern/assimp/include)
+	link_directories(extern/assimp/lib)
+	set(ASSIMP_LIBRARIES libIrrXML.a libzlibstatic.a)
 	message("-- ASSIMP_INCLUDE_DIRS 		${ASSIMP_INCLUDE_DIRS}")
 	message("-- ASSIMP_LIBRARIES 			${ASSIMP_LIBRARIES}")
 
@@ -30,13 +33,16 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Android")
 endif()
 
 # DEBUG DEFINES
-SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS}   -DDEBUG_GUI")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall")
+
+# SET(GCC_COVERAGE_COMPILE_FLAGS "${GCC_COVERAGE_COMPILE_FLAGS} -DDEBUG_GUI -Wall")
 
 
 add_subdirectory(extern/box2d)
 add_subdirectory(extern/glad)
-add_subdirectory(extern/sdl2-src)
-add_subdirectory(extern/sdl2-mixer)
+add_subdirectory(extern/sdl)
+add_subdirectory(extern/sdl-mixer)
 add_subdirectory(extern/imgui)
 
 
@@ -89,7 +95,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 		#Core libraries for engine
 		
-		soil 
+		soil
+		fmt
 		
 		SDL2
 		SDL2_mixer
@@ -135,8 +142,8 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Android")
 	# add_subdirectory(box2d)
 	# add_subdirectory(glad)
 	# add_subdirectory(soil)
-	# add_subdirectory(sdl2-src)
-	# add_subdirectory(sdl2-mixer)
+	# add_subdirectory(sdl)
+	# add_subdirectory(sdl-mixer)
 	# add_subdirectory(imgui)
 
 

@@ -1,6 +1,6 @@
 <h1 align="center" style="border-bottom:0">
   <div style="display:flex; justify-content:center; margin-bottom:.5em">
-    <img src="misc/icon.png" alt="drawing" width="30" style="margin-right:10px;margin-left:10px"/>
+    <img src="misc/icons/logo.svg" alt="drawing" width="30" style="margin-right:10px;margin-left:10px"/>
     Triangle Engine
   </div>
   <div style="font-size:.6em;margin-bottom:10px">
@@ -10,12 +10,15 @@
     
 [Manifesto](misc/docs/manifesto.md)
 
+[Compilation](misc/docs/compiling.md)
+
   </div>
 </h1>
 
 <div align="center" style="text-align:center; margin:20px">
 
-[![Ubuntu 18.04 & 20.04](https://github.com/rubend056/engine/actions/workflows/ccpp.yml/badge.svg)](https://github.com/rubend056/engine/actions/workflows/ccpp.yml)
+[![Ubuntu](https://github.com/rubend056/engine/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/rubend056/engine/actions/workflows/ubuntu.yml)
+[![Tests](https://github.com/rubend056/engine/actions/workflows/tests.yml/badge.svg)](https://github.com/rubend056/engine/actions/workflows/tests.yml)
 
 </div>
 

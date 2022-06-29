@@ -4,12 +4,12 @@
 #include <cassert>
 #include <cstring>
 #include <fstream>
+#include <map>
 #include <set>
 #include <string>
-#include <map>
 
-#include "cereal/types/polymorphic.hpp"
 #include "cereal/types/map.hpp"
+#include "cereal/types/polymorphic.hpp"
 #include "debug.h"
 #include "my_filesystem.h"
 
@@ -128,7 +128,7 @@ class File : public virtual Referentiable {
 	 * @brief Static function to save desired file
 	 * @param f The file to be saved
 	 */
-	static void save_file(const std::shared_ptr<File>& f, fs::path r_path=fs::path());
+	static void save_file(const std::shared_ptr<File>& f, fs::path r_path = fs::path());
 	static std::shared_ptr<File> load_file(const fs::path rel_path);
 
 	// Serializes the file
@@ -140,7 +140,7 @@ class File : public virtual Referentiable {
 		ar(cereal::make_nvp("rel_path", _rel_path));
 
 		if (!orel_path.empty() && orel_path != _rel_path)
-			printf(ANSI_COLOR_YELLOW "Warning _rel_path changed: old(%s) new(%s)" ANSI_COLOR_RESET "\n",
+			printf(ANSI_COLOR_YELLOW "Warning _rel_path changed: old(%s) new(%s)" ANSI_COLOR_RESET ENDL,
 				   orel_path.c_str(), _rel_path.c_str());
 	}
 };

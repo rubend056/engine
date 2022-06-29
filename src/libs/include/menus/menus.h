@@ -27,6 +27,13 @@ typedef std::function<bool(const std::shared_ptr<Ref>&)> select_filter;
 
 namespace menus {
 
+struct FileText {
+	fs::path path;
+	std::string data;
+	bool open = true;
+};
+
+extern std::vector<FileText> text_files;
 extern std::set<std::shared_ptr<IDraw>> inspector_o;
 
 void imgui_engine_init();
@@ -35,14 +42,14 @@ void imgui_engine_exit();
 
 bool path_exists(const std::string& path);
 
-std::shared_ptr<Referentiable> select_asset(const char* name, select_filter select_filter = SELECT_FILTER_DEFAULT, FactoryType_ create_types = FactoryType_None, MenuSelectFlags flags = 0);
+std::shared_ptr<Referentiable> select_asset(const char* name, select_filter select_filter = SELECT_FILTER_DEFAULT, FACTORY_KEY_TYPE create_types = Factory_None, MenuSelectFlags flags = 0);
 
 template <typename T>
-std::shared_ptr<T> select_asset(const char* name, FactoryType_ create_types = FactoryType_None, MenuSelectFlags flags = 0) {
+std::shared_ptr<T> select_asset(const char* name, FACTORY_KEY_TYPE create_types = Factory_None, MenuSelectFlags flags = 0) {
 	return std::dynamic_pointer_cast<T>(
 		select_asset(
 			name,
-			[](const std::shared_ptr<Ref>& ref) -> bool { return (std::dynamic_pointer_cast<T>(ref) != 0); }, create_types,
+			[](const std::shared_ptr<Ref>& ref) -> bool { return !!std::dynamic_pointer_cast<T>(ref); }, create_types,
 			flags));
 }
 

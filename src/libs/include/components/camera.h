@@ -13,9 +13,10 @@ class Camera : public Component {
 
    public:
 	glm::mat4 get_matrix();
+	static glm::mat4 get_matrix_default();
 	IDRAW_IMGUI_DRAW override;
-	IDRAW_IMGUI_NAME override { return "Camera"; }
-	IDRAW_IMGUI_TYPE_NAME override{return "Camera";};
+	IDRAW_IMGUI_NAME override { return type(); }
+	ITYPE override { return "Camera"; };
 
 	COMPONENT_IS_REF override { return false; }
 

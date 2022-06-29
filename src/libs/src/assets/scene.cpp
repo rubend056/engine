@@ -1,7 +1,12 @@
 #include "scene.h"
 
-bool Scene::supported(const std::string& ext){
+#include "menus.h"
+
+bool Scene::supported(std::string ext) {
 	return ext.compare(".scene") == 0;
+}
+void Scene::serialize_inspector() {
+	cereal::make_nvp("inspector_o", menus::inspector_o);
 }
 
 // bool Scene::exists(const std::string& name_or_rpath){

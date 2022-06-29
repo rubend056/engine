@@ -11,8 +11,6 @@
 #include "cereal/archives/json.hpp"
 #include "cereal/types/polymorphic.hpp"
 
-
-
 struct File {
    public:
 	unsigned int file_id = 0;
@@ -57,8 +55,6 @@ class Test
 	}
 };
 // CEREAL_REGISTER_TYPE(Test)
-
-
 
 int main() {
 	auto j = std::shared_ptr<File2>(new Test);

@@ -1,37 +1,17 @@
-#version 130
+#version 460
 
-// The position attribute for this vertex in local space
-in vec3 pos;
-// The normal attribute for this vertex in local space
-in vec3 norm;
-// The texture coordinate for this vertex in local space
-in vec2 tex_cord;
-
-
-// Passing on the texture coordinate
-out vec2 Tex_cord;
-
-// The time in the game
+layout (location = 0) in vec3 pos;
+layout (location = 1) in vec3 tex_c;
+layout (location = 2) in vec3 nm;
 uniform double itime;
-// Transformation matrix, to convert vertex position in local space to screen coordinates
-// which is what this thing will output
-uniform mat4 ipmat; 
 
-const float PI = 3.1415926535897932384626433832795;
+out vec3 pos_v;
+out vec3 tex_c_v;
 
 void main()
 {
-	Tex_cord = tex_cord;
-	
-	float tt = float(itime) * PI * float(.0001);
-	mat3 test_trans = mat3(
-		cos(tt) ,sin(tt),0,  
-		-sin(tt),cos(tt),0,  
-		0	   ,0	  ,1) * float(1. + sin(tt) * .1);
-	vec4 out_pos = 
-			ipmat 
-			//* mat4(test_trans) 
-			* vec4(pos,1);
-	
-    gl_Position = out_pos;
+	vec3 p = pos * (1+.1*cos(float(itime)/400));
+	gl_Position = vec4(p, 1.0);
+	pos_v = p;
+	tex_c_v = tex_c;
 }

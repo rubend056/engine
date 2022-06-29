@@ -1,15 +1,16 @@
-#version 130
+#version 460
 
-in vec2 Tex_cord;
+in vec3 pos_v;
+in vec3 tex_c_v;
 
-out vec4 outColor;
+out vec4 col;
 
-uniform vec3 color_uniform;
 uniform sampler2D tex;
 
 void main()
 {
-	outColor = 
-	texture(tex, Tex_cord) * 
-    vec4(color_uniform , 1);
+	float v = (pos_v.x+pos_v.y)+1;
+	v = v/2;
+	col =
+	vec4(texture(tex, tex_c_v.xy).xyz, 1);
 }

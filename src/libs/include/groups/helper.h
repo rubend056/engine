@@ -3,10 +3,9 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <typeinfo>
 #include <vector>
-
-#include <string>
 
 #include "component.h"
 #include "type_name.h"

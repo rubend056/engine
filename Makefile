@@ -10,6 +10,8 @@ D:=.done
 
 start: engine
 	./engine games/game0
+test: engine_test
+	./engine_test
 
 deps: deps$(D)
 
@@ -34,6 +36,10 @@ engine: $(BUILD_DIR)$(D)
 	
 	cd build && make engine -j$(THREADS)
 	# cmake -B $(BUILD_DIR) --target engine -- -j$(THREADS)
+
+engine_test: $(BUILD_DIR)$(D)
+	echo "Building using ${THREADS} parallel jobs";
+	cd build && make engine_test -j$(THREADS)
 
 clean:
 	rm -rf $(BUILD_DIR) built $(wildcard *$(D)) lib

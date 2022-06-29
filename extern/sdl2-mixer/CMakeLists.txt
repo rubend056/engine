@@ -2,9 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 PROJECT(SDL2_mixer VERSION 2.0.4)
 
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-# find_library(SDL SDL)
-
 set(SRC_C_FILES
     dynamic_flac.c
     dynamic_fluidsynth.c

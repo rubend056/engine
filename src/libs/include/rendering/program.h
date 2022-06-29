@@ -6,6 +6,8 @@
  * 
  * Has opengl functions for creating/using OpenGL 'Shader Programs'
  * 
+ * 
+ * 
  */
 #ifndef program_h
 #define program_h
@@ -31,8 +33,6 @@
 
 class Program : public File, public Component {
    private:
-	
-
 	// Shader id's from File.id (this is the id generated for each file) in current program
 	// Not to be confused with OpenGL shader id
 	// Gets updated with 'link' function
@@ -47,8 +47,6 @@ class Program : public File, public Component {
 	 * @param t_ids 
 	 */
 	void add_textures(const std::vector<std::vector<uint>>&);
-
-	
 
    public:
 	// The program id
@@ -121,18 +119,18 @@ class Program : public File, public Component {
 	// DRAWING
 	IDRAW_IMGUI_DRAW override;
 	IDRAW_IMGUI_NAME override { return filename(); }
-	IDRAW_IMGUI_TYPE_NAME override{return "Program";};
+	ITYPE override { return "Program"; };
 
 	// FILE
 	FILE_SUPPOSED_EXT override { return PROGRAM_EXT; }
-	static bool supported(const std::string& ext);
+	static bool supported(std::string ext);
 
 	// SERIALIZING
 	template <class Archive>
 	void serialize(Archive& ar) {
 		ar(FILE_SERIALIZE);
 		ar(COMPONENT_SERIALIZE);
-		
+
 		// Saving/loading shaders
 		bool s_empty = shaders.empty();
 		std::cout << "Saving Shaders:" << std::endl;
@@ -142,7 +140,7 @@ class Program : public File, public Component {
 			add_shaders();
 
 		ar(CEREAL_NVP(attributes));
-	
+
 		// Saving/loading textures
 		std::vector<std::vector<uint>> t_ids;
 		for (auto& t : textures) t_ids.push_back(t->my_ref());

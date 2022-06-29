@@ -10,24 +10,24 @@
 #ifndef attribute_h
 #define attribute_h
 
+#include <glm/glm.hpp>
+
 #include "cereal/types/polymorphic.hpp"
 #include "file.h"
 #include "gl.h"
 #include "idraw.h"
 
-#include <glm/glm.hpp>
-
 // GL_ATTRIBUTE_TYPE,  AtributeVar type, glUniform value type, glUniformFunction
-#define TYPE_EXPANSION(func)\
-	func(GL_FLOAT				,float				,float			,glUniform1fv)\
-	func(GL_DOUBLE			,double				,double			,glUniform1dv)\
-	func(GL_FLOAT_VEC2	,glm::vec2		,float			,glUniform2fv)\
-	func(GL_FLOAT_VEC3	,glm::vec3		,float			,glUniform3fv)\
-	func(GL_FLOAT_VEC4	,glm::vec4		,float			,glUniform4fv)\
-	func(GL_FLOAT_MAT2	,glm::mat2		,float			,glUniformMatrix2fv)\
-	func(GL_FLOAT_MAT3	,glm::mat3		,float			,glUniformMatrix2fv)\
-	func(GL_FLOAT_MAT4	,glm::mat4		,float			,glUniformMatrix2fv)\
-	func(GL_SAMPLER_2D	,unsigned int	,			,)
+#define TYPE_EXPANSION(func)                                                              \
+	func(GL_FLOAT, float, float, glUniform1fv)                                            \
+		func(GL_DOUBLE, double, double, glUniform1dv)                                     \
+			func(GL_FLOAT_VEC2, glm::vec2, float, glUniform2fv)                           \
+				func(GL_FLOAT_VEC3, glm::vec3, float, glUniform3fv)                       \
+					func(GL_FLOAT_VEC4, glm::vec4, float, glUniform4fv)                   \
+						func(GL_FLOAT_MAT2, glm::mat2, float, glUniformMatrix2fv)         \
+							func(GL_FLOAT_MAT3, glm::mat3, float, glUniformMatrix3fv)     \
+								func(GL_FLOAT_MAT4, glm::mat4, float, glUniformMatrix4fv) \
+									func(GL_SAMPLER_2D, unsigned int, , )
 
 struct Attribute {
 	// static std::unique_ptr<Attribute> create_attrib_val(GLenum _type, void*_last_val=nullptr);

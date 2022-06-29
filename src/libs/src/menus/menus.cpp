@@ -42,6 +42,11 @@ void menus::imgui_engine_init() {
 	if (f.is_open()) {
 		cereal::JSONInputArchive ar(f);
 		menus_serialize(ar);
+		// loading text_editor_state
+		std::vector<std::string> paths;
+		ar(NVP(paths));
+		text_files.clear();
+		for (auto& f : paths) open_text_editor(f);
 	}
 }
 
@@ -50,6 +55,12 @@ void menus::imgui_engine_exit() {
 	if (f.is_open()) {
 		cereal::JSONOutputArchive ar(f);
 		menus_serialize(ar);
+		// saving text_editor_state
+		std::vector<std::string> paths;
+		for (auto& f : text_files)
+			if (f.open)
+				paths.push_back(f.path);
+		ar(NVP(paths));
 	}
 }
 using namespace std;
@@ -81,65 +92,61 @@ void select_recurse(
 	if (!obj)
 		return;
 
-	// auto filter_size = strlen(filter.InputBuf);
+	// Only draw ans setup drag and drop if valid
+	if (!valid_recurse(obj, f))
+		return;
+
 	auto draw = dynamic_pointer_cast<IDraw>(obj);
 	auto parent = dynamic_pointer_cast<Parent>(obj);
-	auto file = dynamic_pointer_cast<File>(obj);
-	auto name = ((draw ? draw->imgui_name() : string("Object_no_idraw?"))
-				 // + helper::string_format("###%i", i)
-				 )
-					.c_str();
+	auto name = draw ? draw->imgui_name() : string("Object_no_idraw?");
 
-	// Only draw ans setup drag and drop if valid
-	if (valid_recurse(obj, f)) {
-		if (parent && parent->children.size()) {
-			if (ImGui::TreeNodeEx(name,
-								  (flat ? ImGuiTreeNodeFlags_DefaultOpen : 0) |
-									  (selected == obj ? ImGuiTreeNodeFlags_Selected : 0) |
-									  ImGuiTreeNodeFlags_OpenOnArrow |
-									  0)) {
-				for (int e = 0; e < parent->children.size(); ++e)
-					select_recurse(parent->children[e], f, selected, e, flat);
-				ImGui::TreePop();
-			}
-		} else {
-			ImGui::Text(name);
+	if (parent && parent->children.size()) {
+		if (ImGui::TreeNodeEx(name.c_str(),
+							  (flat ? ImGuiTreeNodeFlags_DefaultOpen : 0) |
+								  (selected == obj ? ImGuiTreeNodeFlags_Selected : 0) |
+								  ImGuiTreeNodeFlags_OpenOnArrow |
+								  0)) {
+			for (size_t e = 0; e < parent->children.size(); ++e)
+				select_recurse(parent->children[e], f, selected, e, flat);
+			ImGui::TreePop();
 		}
-
-		if (f(obj) && ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-			selected = obj;
-		}
-		// Enable drag and drop for every item
-		auto ref = obj->my_ref();
-		imgui_dnd_ref(ref, true, ImGuiDragDropFlags_SourceAllowNullID);
+	} else {
+		ImGui::Text(name.c_str(), -1);
 	}
 
-	return;
+	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+		selected = obj;
+	}
+	// Enable drag and drop for every item
+	auto ref = obj->my_ref();
+	imgui_dnd_ref(ref, true, ImGuiDragDropFlags_SourceAllowNullID);
 }
 
-Ref_shared menus::select_asset(const char* name, select_filter select_filter, FactoryType_ create_types, MenuSelectFlags flags) {
+Ref_shared menus::select_asset(const char* name, select_filter select_filter, FACTORY_KEY_TYPE create_types, MenuSelectFlags flags) {
 	const bool modal = flags & MenuSelectFlags_Modal, new_only = flags & MenuSelectFlags_NewOnly;
 
 	static Ref_shared selected;
 	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_Appearing);
 
-	bool done = false;
+	static bool done = false;
 	static Ref_shared new_obj;
 	static bool is_new_obj = false;
 	static std::string new_rpath;
 
 	static auto checkbox_disabled = [](const char* name, bool& checked, bool disabled) {
 		if (disabled)
-			ImGui::PushDisabled();
+			ImGui::BeginDisabled();
 		ImGui::Checkbox(name, &checked);
 		if (disabled)
-			ImGui::PopDisabled();
+			ImGui::EndDisabled();
 	};
 
+	// Everythig outside of this should be as fast as possible, only if popup opens will this if be true,
 	if (modal ? ImGui::BeginPopupModal(name) : ImGui::BeginPopup(name)) {
 		if (new_only) {
 			is_new_obj = true;
 		}
+
 		// Making sure path doesn't exist
 		bool new_rpath_exists = false;
 		if (auto f = std::dynamic_pointer_cast<File>(new_obj)) {
@@ -155,28 +162,26 @@ Ref_shared menus::select_asset(const char* name, select_filter select_filter, Fa
 		checkbox_disabled("Is new object", is_new_obj, new_only);
 
 		if (is_new_obj) {
+			// Present buttons to define new object if factory choices are > 1
 			if (create_types_length > 1) {
-				// Selecting Type of item
 				const int division = 3;
-				// ImGui::PushItemWidth();
 				const auto width = ImGui::GetContentRegionAvail().x / division - 5.f;
 				int i = 0;
-				for (auto& tname : factory::factory.get_names()) {
-					bool tvalid = create_types & factory::factory.get_name_key(tname);
+				for (auto& tname : factory.get_types()) {
+					bool tvalid = create_types & factory.get_key(tname);
 					if (tvalid) {
 						if (i && i % division != 0)
 							ImGui::SameLine();
 
 						if (ImGui::Button(tname.c_str(), ImVec2(width, 0))) {
-							new_obj = factory::factory.create(tname);
+							new_obj = factory.create(tname);
 						}
 						++i;
 					}
 				}
-				// ImGui::PopItemWidth();
 			} else if (create_types_length == 1) {
-				if (!new_obj) {
-					new_obj = factory::factory.create(create_types);
+				if (!new_obj || factory.get_type(create_types) != new_obj->type()) {
+					new_obj = factory.create(create_types);
 					if (!new_obj)
 						throw "Tried setting new object but couldn't? is create_types_length wrong?";
 				}
@@ -185,7 +190,7 @@ Ref_shared menus::select_asset(const char* name, select_filter select_filter, Fa
 			if (new_obj) {
 				auto draw = dynamic_pointer_cast<IDraw>(new_obj);
 				if (draw)
-					ImGui::TextDisabled(helper::string_format("Creating new %s", draw->imgui_type_name()).c_str());
+					ImGui::TextDisabled(helper::string_format("Creating new %s", draw->type()).c_str());
 				auto file = dynamic_pointer_cast<File>(new_obj);
 				if (file) {
 					ImGui::InputText(file ? file->supposed_ext().c_str() : "rel_path", &new_rpath);
@@ -195,27 +200,27 @@ Ref_shared menus::select_asset(const char* name, select_filter select_filter, Fa
 			}
 
 		} else {
-			static ImGuiTextFilter filter_text;
-			filter_text.Draw("Filter", -1);
+			static ImGuiTextFilter filter_t;
+			filter_t.Draw("Filter", -1);
 			auto filter = [&](const Ref_shared& ref) {
 				auto draw = dynamic_pointer_cast<IDraw>(ref);
 				auto file = dynamic_pointer_cast<File>(ref);
 				return select_filter(ref) &&
-					   ((draw && filter_text.PassFilter(draw->imgui_name().c_str())) ||
-						(file && filter_text.PassFilter(file->data_path().c_str())));
+					   ((draw && filter_t.PassFilter(draw->imgui_name().c_str())) ||
+						(file && filter_t.PassFilter(file->data_path().c_str())));
 			};
 			for (auto& ref : assets::files) {
-				select_recurse(ref, filter, selected, 0, strlen(filter_text.InputBuf));
+				select_recurse(ref, filter, selected, 0, strlen(filter_t.InputBuf));
 			}
 		}
 
 		// BUTTONS
 		if (!allow_ok)
-			ImGui::PushDisabled();
+			ImGui::BeginDisabled();
 
 		auto ok = ImGui::Button("Ok", ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 0));
 		if (!allow_ok)
-			ImGui::PopDisabled();
+			ImGui::EndDisabled();
 
 		if (allow_ok && (ok || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))) {
 			done = true;
@@ -343,7 +348,7 @@ void menus::imgui_engine_update() {
 
 	// ? Open scene popup
 	{
-		auto scene = select_asset<Scene>("open_scene_popup_modal", FactoryType_Scene, MenuSelectFlags_Modal);
+		auto scene = select_asset<Scene>("open_scene_popup_modal", Factory_Scene, MenuSelectFlags_Modal);
 		if (scene)
 			engine::scene = scene;
 	}

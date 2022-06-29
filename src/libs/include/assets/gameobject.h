@@ -8,7 +8,6 @@
  * 
  * - Controls serialization of GameObject as a prefab/instance
  * - 
- * 
  */
 #ifndef GameObject_h
 #define GameObject_h
@@ -47,7 +46,7 @@ class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw, public P
 	std::shared_ptr<Referentiable> foster(const std::shared_ptr<Referentiable>& child) override;
 
 	IDRAW_IMGUI_NAME override { return filename().c_str(); }
-	IDRAW_IMGUI_TYPE_NAME override{return "GameObject";};
+	ITYPE override { return STRINGIFY(CLASSNAME_NORMAL); };
 	IDRAW_IMGUI_DRAW override;
 
 	std::unique_ptr<Transform> trans = std::make_unique<Transform>();
@@ -96,28 +95,14 @@ class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw, public P
 			for (auto& c : components)
 				if (c)
 					type_component_ht.insert(std::make_pair(helper::demangle(typeid(*c).name()), c));
-
-		// Setting refs for loading
-		// if(ref){
-		// 	auto other_go = std::dynamic_pointer_cast<GameObject>(ref);
-		// 	if(other_go)
-		// 	for(auto&tc:type_component_ht){
-		// 		auto other_comp = other_go->get_comp(tc.first);
-		// 		if(other_comp)tc.second->set_ref(other_comp);
-		// 	}
-		// 	else printf(ANSI_COLOR_RED "OtherGO not set error" ANSI_COLOR_RESET "\n");
-		// }
 	}
 };
 
 // ? PREFAB ####################################################################
 _CRT(CLASSNAME_NORMAL)
-// CEREAL_REGISTER_POLYMORPHIC_RELATION(Prefab<GameObject>, GameObject)
-// CEREAL_CLASS_VERSION(GameObject, 0)
 
 #undef CLASSNAME
 #undef CLASSNAME_NORMAL
-// #undef GAMEOBJECT_EXPANSION
 // ? ###########################################################################
 
 #endif

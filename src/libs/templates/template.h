@@ -5,23 +5,23 @@
  * @version 0.1
  * 
  */
-#ifndef  class_name_h
-#define  class_name_h
+#ifndef class_name_h
+#define class_name_h
 
-class  class_name{
+class class_name {
 	// VARIABLES
-	
+
 	// CONSTRUCTORS
 	class_name();
 	virtual ~class_name();
-	
+
 	// FUNCTIONS
-	
+
 	// COMPONENT
-	
+
 	// DRAW
-	
+
 	// SERIALIZATION
 };
 
-#endif //  class_name_h
+#endif	//  class_name_h

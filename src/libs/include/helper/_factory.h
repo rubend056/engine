@@ -5,71 +5,77 @@
  * @version 0.1
  * 
  */
-#ifndef  _factory_h
-#define  _factory_h
+#ifndef _factory_h
+#define _factory_h
 
 // #define FACTORY_BASE_CLASS Test
 
 #ifndef FACTORY_KEY_TYPE
-  #define FACTORY_KEY_TYPE uint32_t
+#define FACTORY_KEY_TYPE uint32_t
 #endif
 
 #ifndef FACTORY_BASE_CLASS
-
-	#error "No FACTORY_BASE_CLASS, make sure to define it as the base class for the factory"
+#error "No FACTORY_BASE_CLASS, make sure to define it as the base class for the factory"
 #endif
 
-#include <map>
 #include <memory>
 
 class FACTORY_BASE_CLASS;
 
+/**
+ * Variantiator is kind of like a template for on-demand creation of a class
+ * 
+ * _VariantinatorBase allows _VariantFactory to work will all of them as a common class, and
+ * _Variantinator is an actual template that is created for every type (bit of code that actually knows what it is exactly that has to be made)
+ */
 class _VariantinatorBase {
-  public:
-    _VariantinatorBase() {}
-    virtual ~_VariantinatorBase() {}
-    virtual std::unique_ptr<FACTORY_BASE_CLASS> Create() = 0;
+   public:
+	_VariantinatorBase() {}
+	virtual ~_VariantinatorBase() {}
+	virtual std::unique_ptr<FACTORY_BASE_CLASS> Create() = 0;
 };
 
-template< class T >
+template <class T>
 class _Variantinator : public _VariantinatorBase {
-  public:
-    _Variantinator() {}
-    virtual ~_Variantinator() {}
-    virtual std::unique_ptr<FACTORY_BASE_CLASS> Create() { return std::make_unique<T>(); }
+   public:
+	_Variantinator() {}
+	virtual ~_Variantinator() {}
+	virtual std::unique_ptr<FACTORY_BASE_CLASS> Create() { return std::make_unique<T>(); }
 };
 
-class _VariantFactory
-{
-  public:
-    _VariantFactory()
-    {
-         // If you want, you can do all your Register() calls in here, and even
-         // make the Register() function private.
-    }
+/**
+ * _VariantFactory handles all  _VariantinatorBase and creates based on 
+ */
+class _VariantFactory {
+   public:
+	_VariantFactory() {}
 
-    std::shared_ptr<FACTORY_BASE_CLASS> create( FACTORY_KEY_TYPE type )
-    {
-        auto it = int_switchToVariant.find( type );
-        if( it == int_switchToVariant.end() ) return nullptr;
-        return std::move(it->second->Create());
-    }
-    
-  protected:
-    template< FACTORY_KEY_TYPE type, typename T >
-    void Register()
-    {
-        Register( type, std::make_unique<_Variantinator<T>>() );
-    }
+	/**
+	 * Creates a pre-registered class based on its key
+	 */
+	std::shared_ptr<FACTORY_BASE_CLASS> create(FACTORY_KEY_TYPE type) {
+		for (auto& v : kv) {
+			if (v.first == type)
+				return std::move(v.second->Create());
+		}
+		return nullptr;
+	}
 
-  
-    void Register( FACTORY_KEY_TYPE type, std::unique_ptr<_VariantinatorBase>&& creator )
-    {
-        int_switchToVariant[type] = std::move(creator);
-    }
-  
-    std::map<FACTORY_KEY_TYPE, std::unique_ptr<_VariantinatorBase> > int_switchToVariant;
+   private:
+	// Key to Variant
+	std::map<FACTORY_KEY_TYPE, std::unique_ptr<_VariantinatorBase>> kv;
+
+	// Actual function
+	void Register(FACTORY_KEY_TYPE k, std::unique_ptr<_VariantinatorBase>&& creator) {
+		kv[k] = std::move(creator);
+	}
+
+   protected:
+	// Template function for registration
+	template <typename T>
+	void Register(FACTORY_KEY_TYPE k) {
+		Register(k, std::make_unique<_Variantinator<T>>());
+	}
 };
 
-
-#endif //  Factory_h
+#endif	//  Factory_h

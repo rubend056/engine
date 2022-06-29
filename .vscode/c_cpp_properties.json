@@ -10,7 +10,6 @@
                 "${workspaceFolder}/extern/imgui",
                 "${workspaceFolder}/extern/imgui/examples",
                 "${workspaceFolder}/extern/sdl2-src/include",
-                
                 "${workspaceFolder}/src/libs/include",
                 "${workspaceFolder}/src/libs/include/assets",
                 "${workspaceFolder}/src/libs/include/cereal",
@@ -18,8 +17,10 @@
                 "${workspaceFolder}/src/libs/include/rendering",
                 "${workspaceFolder}/src/libs/include/groups",
                 "${workspaceFolder}/src/libs/include/helper",
-                "${workspaceFolder}/src/libs/include/menus"
-                
+                "${workspaceFolder}/src/libs/include/menus",
+                "${workspaceFolder}/src/libs/src/engine",
+                "${workspaceFolder}/extern/imgui/backends",
+                "${workspaceFolder}/extern"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

@@ -13,8 +13,7 @@
  * 
  * - A Vertex Buffer Object (VBO) is a memory buffer in the high speed memory of your video card designed to hold information about vertices.
  * - A Vertex Array Object (VAO) is an object which contains one or more Vertex Buffer Objects and is designed to store the information for a complete rendered object.
- * 
- * 
+ * - VAO's basically tell the GPU, hey look, out of this VBO that's active, this is exactly how I want u to pass the data to the Rendering Pipeline (shaders and what not)
  */
 
 #ifndef mesh_h
@@ -49,12 +48,12 @@ class Mesh : public File, public Parent, public IDraw {
 
 	// FUNCTIONS
 	void vbo_bind() { glBindBuffer(GL_ARRAY_BUFFER, vbo_id); }
-	static bool supported(const std::string& ext);
+	static bool supported(std::string ext);
 	void load() override;
 
 	// DRAW
-	IDRAW_IMGUI_NAME override { return filename().c_str(); }
-	IDRAW_IMGUI_TYPE_NAME override { return "Mesh"; };
+	IDRAW_IMGUI_NAME override { return filename(); }
+	ITYPE override { return "Mesh"; };
 	IDRAW_IMGUI_DRAW override;
 
 	// SERIALIZATION
