@@ -11,6 +11,7 @@ There's two ways compilation is set up and both are crucial to creating a shippa
 ## Editor
 
 - Linux - pacman/apt
+  - Initailize submodules `git submodule update --init` if you didn't already clone with `--recuse-submodules` flag.
   - Run `make` from the project root to compile and launch the engine on project `./games/game0`. This loads all the assets and launches the last open scene.
 - Mac (unavailable)
 - Windows (unavaliable)

@@ -42,7 +42,7 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall")
 add_subdirectory(extern/box2d)
 add_subdirectory(extern/glad)
 add_subdirectory(extern/sdl)
-add_subdirectory(extern/sdl-mixer)
+# add_subdirectory(extern/sdl-mixer)
 add_subdirectory(extern/imgui)
 
 
@@ -99,7 +99,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		fmt
 		
 		SDL2
-		SDL2_mixer
+		# SDL2_mixer
 		
 		glad
 
