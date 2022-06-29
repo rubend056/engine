@@ -34,40 +34,40 @@ One of the things I aim to overcome is my utter lack to plan ahead and set goals
 
 <p align="center"><b>Day 1</b></p>
 <p align="center">
-<img class="image" width="90%" style="width: 90%;" alt="A simple screen" src=".images/day1.png">
+<img class="image" width="90%" style="width: 90%;" alt="A simple screen" src="misc/images/day1.png">
 
 <p align="center"><b>Day 3</b></p>
 <p align="center">
-<img class="image" width="90%" alt="File Editor, and file events with inotify" src=".images/day3.png">
+<img class="image" width="90%" alt="File Editor, and file events with inotify" src="misc/images/day3.png">
 
 <p align="center"><b>Day 10</b></p>
 <p align="center">
 Trying to get the textures working:<br>
 <p align="center">
-<img class="image" width="90%" alt="Still trying to get the textures working" src=".images/day10.png">
+<img class="image" width="90%" alt="Still trying to get the textures working" src="misc/images/day10.png">
 
 <p align="center"><b>Day 25</b></p>
 <p align="center">
 Now compiles for Ubuntu 18.04 as well as Archlinux and is configurable to use OpenGL Core 3.0 or 4.5:
 
-|           Main           |        New Scene         |
-| :----------------------: | :----------------------: |
-| ![](.images/day25_1.png) | ![](.images/day25_0.png) |
+|             Main             |          New Scene           |
+| :--------------------------: | :--------------------------: |
+| ![](misc/images/day25_1.png) | ![](misc/images/day25_0.png) |
 
 <!-- <p align="center"><b>Day 30</b></p>
 <p align="center">
-<img class="image" width="90%" src=".images/day30.gif"> -->
+<img class="image" width="90%" src="misc/images/day30.gif"> -->
 
 <p align="center"><b>Day 33</b></p>
 <p align="center">
-<img class="image" width="90%" src=".images/day33.png">
+<img class="image" width="90%" src="misc/images/day33.png">
 
 <p align="center"><b>Day 49</b></p>
 <p align="center">
 A huge range of improvement from serailizing to getting the textures finally working. As well as dynamic project reloading:
 
-|         Textures         |        Color Edit        |
-| :----------------------: | :----------------------: |
-| ![](.images/day49_0.png) | ![](.images/day49_1.png) |
+|           Textures           |          Color Edit          |
+| :--------------------------: | :--------------------------: |
+| ![](misc/images/day49_0.png) | ![](misc/images/day49_1.png) |
 
 <br>

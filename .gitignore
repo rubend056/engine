@@ -2,7 +2,7 @@
 /lib
 /game1
 /*.ini
-/engine
+/engine*
 *.ini
 *.zip
 *.tar*

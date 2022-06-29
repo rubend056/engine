@@ -4,3 +4,9 @@
 [submodule "extern/sdl"]
 	path = extern/sdl
 	url = https://github.com/rubend056/sdl.git
+[submodule "extern/sdl-mixer"]
+	path = extern/sdl-mixer
+	url = https://github.com/rubend056/sdl-mixer.git
+[submodule "extern/box2d"]
+	path = extern/box2d
+	url = https://github.com/rubend056/box2d.git
