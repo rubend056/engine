@@ -8,8 +8,10 @@
                 "${workspaceFolder}/extern/soil/include",
                 "${workspaceFolder}/extern/glad/33",
                 "${workspaceFolder}/extern/imgui",
+                "${workspaceFolder}/extern/proquint",
                 "${workspaceFolder}/extern/imgui/examples",
-                "${workspaceFolder}/extern/sdl2-src/include",
+                "${workspaceFolder}/extern/sdl/include",
+                "${workspaceFolder}/extern/sdl-mixer/include",
                 "${workspaceFolder}/src/libs/include",
                 "${workspaceFolder}/src/libs/include/assets",
                 "${workspaceFolder}/src/libs/include/cereal",
@@ -23,7 +25,6 @@
                 "${workspaceFolder}/extern"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-x64"

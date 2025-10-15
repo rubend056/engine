@@ -44,7 +44,7 @@ add_subdirectory(extern/glad)
 add_subdirectory(extern/sdl)
 # add_subdirectory(extern/sdl-mixer)
 add_subdirectory(extern/imgui)
-
+add_subdirectory(extern/proquint)
 
 
 
@@ -94,7 +94,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 		imgui
 
 		#Core libraries for engine
-		
+		proquint
+
 		soil
 		
 		SDL2

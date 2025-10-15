@@ -7,24 +7,26 @@
 #include <vector>
 
 #include "cereal/cereal.hpp"
+#include "proquint.h"
 #include "itype.h"
 #define REFERENTIABLE_SERIALIZE cereal::make_nvp("referentiable", cereal::virtual_base_class<Referentiable>(this))
 
 class Referentiable;
 typedef Referentiable* parent_type;
 typedef Referentiable Ref;
+typedef uint16_t ref_id_type;
 
 // ? REFERENTIABLE ###################
 class Referentiable : virtual IType {
    private:
-	static std::unordered_set<unsigned int> used_ids;
-	unsigned int _id = 0;
+	static std::unordered_set<ref_id_type> used_ids;
+	ref_id_type _id = 0;
 
 	// Generate a unique id if current
-	void gen(unsigned int wanted_id = 0);
+	void gen(ref_id_type wanted_id = 0);
 
    public:
-	unsigned int get_id();
+	ref_id_type get_id();
 	// Referentiable(Referentiable* _parent=nullptr):parent(_parent){}
 	virtual ~Referentiable() = default;
 	ITYPE override { return "Referentiable"; };
@@ -33,17 +35,17 @@ class Referentiable : virtual IType {
 	parent_type parent = nullptr;  // Backward link
    private:
 	// Recursive internal function to fill the vector of id's
-	void _my_ref(std::vector<unsigned int>& v);
+	void _my_ref(std::vector<ref_id_type>& v);
 
    public:
 	// Get vector of id's up until this object
-	std::vector<unsigned int> my_ref();
+	std::vector<ref_id_type> my_ref();
 	// Orpahns itself from parent, effectively destroying if no other reference
 	static void orphan(const std::shared_ptr<Referentiable>& obj);
 
 	template <class Archive>
 	void serialize(Archive& ar) {
-		unsigned int sid = _id;
+		ref_id_type sid = proqui _id;
 		ar(cereal::make_nvp("id", sid));
 		if (sid && sid != _id)
 			gen(sid);

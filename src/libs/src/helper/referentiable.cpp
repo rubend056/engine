@@ -4,15 +4,15 @@
 
 #include "debug.h"
 
-std::unordered_set<unsigned int> Referentiable::used_ids;
+std::unordered_set<ref_id_type> Referentiable::used_ids;
 
-unsigned int Referentiable::get_id() {
+ref_id_type Referentiable::get_id() {
 	if (!_id)
 		gen();
 	return _id;
 };
 
-void Referentiable::gen(unsigned int wanted_id) {
+void Referentiable::gen(ref_id_type wanted_id) {
 	// If id > 0 erase it from set
 	if (_id)
 		used_ids.erase(_id);
@@ -43,13 +43,13 @@ void Referentiable::gen(unsigned int wanted_id) {
 	// Insert the found id
 	used_ids.insert(_id);
 }
-void Referentiable::_my_ref(std::vector<unsigned int>& v) {
+void Referentiable::_my_ref(std::vector<ref_id_type>& v) {
 	if (parent)
 		parent->_my_ref(v);	 // If I have a parent, push back parent id
 	v.push_back(get_id());	 // Then push back my ID
 }
-std::vector<unsigned int> Referentiable::my_ref() {
-	std::vector<unsigned int> v;
+std::vector<ref_id_type> Referentiable::my_ref() {
+	std::vector<ref_id_type> v;
 	_my_ref(v);
 	return v;
 }

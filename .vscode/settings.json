@@ -103,7 +103,8 @@
     "*.def": "cpp",
     "charconv": "cpp",
     "ranges": "cpp",
-    "span": "cpp"
+    "span": "cpp",
+    "proquint.h": "c"
   },
   "C_Cpp.errorSquiggles": "Enabled",
   "files.exclude": {
@@ -113,6 +114,7 @@
   "cmake.configureOnOpen": true,
   "editor.tabSize": 4,
   "editor.foldingImportsByDefault": false,
-  "editor.formatOnSave": true,
-  "C_Cpp.dimInactiveRegions": false
+  "editor.formatOnSave": false,
+  "C_Cpp.dimInactiveRegions": false,
+  "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

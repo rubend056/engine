@@ -33,22 +33,22 @@ void inspector(bool* p_open) {
 		int i = 0;
 		for (auto& item : inspector_o) {
 			if (ImGui::BeginTabItem(helper::string_format("%s###%d", item->imgui_name().c_str(), i++).c_str())) {
-				if (auto r = std::dynamic_pointer_cast<Referentiable>(item))
-					if (r->parent) {
-						if (ImGui::Button("Delete")) {
-							Referentiable::orphan(r);
-							ImGui::EndTabItem();
-							break;
-						}
-						ImGui::SameLine();
-					}
-				// ImGui::SetNextItemWidth(-1);
 				if (ImGui::Button("Close", ImVec2(0, 0))) {
 					inspector_o.erase(std::find(inspector_o.begin(), inspector_o.end(), item));
 					ImGui::EndTabItem();
 					break;
 				}
-
+				// ImGui::SetNextItemWidth(-1);
+				if (auto r = std::dynamic_pointer_cast<Referentiable>(item)){
+					if (r->parent) {
+						ImGui::SameLine();
+						if (ImGui::Button("Delete")) {
+							Referentiable::orphan(r);
+							ImGui::EndTabItem();
+							break;
+						}
+					}
+}
 				item->imgui_draw();
 				ImGui::EndTabItem();
 			}

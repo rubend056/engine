@@ -69,12 +69,12 @@ class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw, public P
 		ar(PARENT_SERIALIZE, FILE_SERIALIZE, PREFAB_SERIALIZE);
 
 		/*Serailizing the size of components*/
-		int csize, oldsize;
-		csize = oldsize = components.size();
-		ar(csize);
+		size_t comp_size;
+		comp_size = components.size();
+		ar(CEREAL_NVP(comp_size));
 		/*Equaling the size of components to the size of serialized*/
-		for (int i = 0; i < csize - oldsize; ++i) components.push_back(std::shared_ptr<Component>());
-		for (int i = 0; i < csize; ++i) {
+		while(components.size() < comp_size) components.push_back(std::shared_ptr<Component>());
+		for (size_t i = 0; i < comp_size; ++i) {
 			/*Set is_ref to -> if component's parent doesn't equal 'this'*/
 			auto is_ref = components[i] ? components[i]->parent != (Referentiable*)this : true;
 			ar(is_ref);
@@ -91,10 +91,10 @@ class CLASSNAME_NORMAL : public PREFAB_NAME, public File, public IDraw, public P
 		}
 
 		// Populate type_component_ht
-		if (!type_component_ht.size())
-			for (auto& c : components)
-				if (c)
-					type_component_ht.insert(std::make_pair(helper::demangle(typeid(*c).name()), c));
+		type_component_ht.clear();
+		for (auto& c : components)
+			if (c)
+				type_component_ht.insert(std::make_pair(helper::demangle(typeid(*c).name()), c));
 	}
 };
 
